@@ -1,0 +1,23 @@
+#
+# logger config.
+# package: github.com/fuyibing/log.
+#
+# [app-name] Application name.
+# [adapter] TERM, FILE, REDIS.
+# [level] DEBUG, INFO, WARN, ERROR.
+# [time-format] 2006-01-02 15:04:05.999999
+#
+app-name: "Log"
+adapter: term
+level: debug
+time-format: "2006-01-02 15:04:05.999999"
+redis:
+  network: "tcp"
+  addr: "127.0.0.1:6379"
+  password: ""
+  db: 10
+  wait: true
+  max-active: 16
+  max-idle: 4
+  idle-timeout: 0
+  max-conn-lifetime: 0

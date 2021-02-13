@@ -1,0 +1,3 @@
+# for application config.
+addr: ":8088"
+name: "FybLog"
