@@ -45,6 +45,10 @@ func (o *adapterTerm) format(line LineInterface) string {
 		s += fmt.Sprintf("[v=%s] ", t.Version(line.TracingOffset()))
 	}
 	// Content.
+	d := line.Duration()
+	if d > 0.0 {
+		s += fmt.Sprintf("[d=%f]", d)
+	}
 	s += line.String() + "\n"
 	return s
 }
