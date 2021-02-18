@@ -15,7 +15,7 @@ redis:
   network: "tcp"
   addr: "127.0.0.1:6379"
   password: ""
-  db: 10
+  db: 0
   wait: true
   max-active: 16
   max-idle: 4
