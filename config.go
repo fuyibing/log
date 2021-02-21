@@ -25,7 +25,7 @@ type configuration struct {
 	AdapterName     string              `yaml:"adapter"`
 	Level           Level               `yaml:"-"`
 	LevelName       string              `yaml:"level"`
-	TimeFormat      string              `yaml:"time-format"`
+	TimeFormat      string              `yaml:"time"`
 	NameSpanId      string              `yaml:"span-id"`
 	NameSpanVersion string              `yaml:"span-version"`
 	NameTraceId     string              `yaml:"trace-id"`
@@ -126,7 +126,7 @@ func (o *configuration) initialize() {
 	// 3. Server name & port.
 	o.initializeInfo()
 	// 4. Log fields.
-	for _, path := range []string{"./config/log.yaml", "../config/log.yaml"} {
+	for _, path := range []string{"./tmp/log.yaml", "./config/log.yaml", "../config/log.yaml"} {
 		if err := o.LoadYaml(path); err == nil {
 			break
 		}
@@ -165,7 +165,7 @@ func (o *configuration) initializeInfo() {
 		Name string `yaml:"name"`
 	}{}
 	// Load from file.
-	for _, file := range []string{"./config/app.yaml", "../config/app.yaml"} {
+	for _, file := range []string{"./tmp/app.yaml", "./config/app.yaml", "../config/app.yaml"} {
 		bs, e1 := ioutil.ReadFile(file)
 		if e1 != nil {
 			continue

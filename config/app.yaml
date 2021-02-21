@@ -1,3 +1,10 @@
-# for application config.
+#
+# template: application config.
+#
+# [addr] 项目地址 (默认: 0.0.0.0:8080)
+# [name] 项目名称 (默认: sketch)
+# [version] 项目版本 (默认: 0.0.0)
+#
 addr: ":8088"
-name: "FybLog"
+name: "Log"
+versin: "1.0.0"
