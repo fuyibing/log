@@ -4,7 +4,10 @@
 package log
 
 import (
+	"fmt"
 	"io/ioutil"
+	"net"
+	"regexp"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -24,6 +27,8 @@ type configuration struct {
 	SpanId      string             `yaml:"span-id"`
 	SpanVersion string             `yaml:"span-version"`
 	TraceId     string             `yaml:"trace-id"`
+	appAddr     string
+	appName     string
 	debugOn     bool
 	infoOn      bool
 	warnOn      bool
@@ -40,6 +45,7 @@ func newConfiguration() interfaces.ConfigInterface {
 		SpanId:      interfaces.DefaultSpanId,
 		SpanVersion: interfaces.DefaultSpanVersion,
 		TraceId:     interfaces.DefaultTraceId,
+		appName:     "unknown",
 	}
 	// 2. extensions.
 	for _, file := range []string{"./tmp/log.yaml", "../tmp/log.yaml", "./config/log.yaml", "../config/log.yaml"} {
@@ -47,23 +53,40 @@ func newConfiguration() interfaces.ConfigInterface {
 			break
 		}
 	}
-	// 3. ended.
+	// 3. extensions.
+	x := &struct {
+		Addr string `yaml:"addr"`
+		Name string `yaml:"name"`
+	}{}
+	for _, file := range []string{"./tmp/app.yaml", "../tmp/app.yaml", "./config/app.yaml", "../config/app.yaml"} {
+		body, err := ioutil.ReadFile(file)
+		if err != nil {
+			continue
+		}
+		if nil != yaml.Unmarshal(body, x) {
+			continue
+		}
+		if x.Addr != "" {
+			o.appAddr = x.Addr
+		}
+		if x.Name != "" {
+			o.appName = x.Name
+		}
+		break
+	}
+	// 4. ended.
+	o.useService()
 	return o
 }
 
-func (o *configuration) DebugOn() bool { return o.debugOn }
-func (o *configuration) InfoOn() bool  { return o.infoOn }
-func (o *configuration) WarnOn() bool  { return o.warnOn }
-func (o *configuration) ErrorOn() bool { return o.errorOn }
-
-func (o *configuration) GetHandler() interfaces.Handler {
-	return o.Handler
-}
-
-// 读取时间格式.
-func (o *configuration) GetTimeFormat() string { return o.TimeFormat }
-
-// 读取请求链名称.
+func (o *configuration) AppAddr() string                    { return o.appAddr }
+func (o *configuration) AppName() string                    { return o.appName }
+func (o *configuration) DebugOn() bool                      { return o.debugOn }
+func (o *configuration) InfoOn() bool                       { return o.infoOn }
+func (o *configuration) WarnOn() bool                       { return o.warnOn }
+func (o *configuration) ErrorOn() bool                      { return o.errorOn }
+func (o *configuration) GetHandler() interfaces.Handler     { return o.Handler }
+func (o *configuration) GetTimeFormat() string              { return o.TimeFormat }
 func (o *configuration) GetTrace() (string, string, string) { return o.TraceId, o.SpanId, o.SpanVersion }
 
 // 从YAML加载配置.
@@ -153,4 +176,35 @@ func (o *configuration) useLevel() {
 	o.infoOn = o.Level >= interfaces.LevelInfo
 	o.warnOn = o.Level >= interfaces.LevelWarn
 	o.errorOn = o.Level >= interfaces.LevelError
+}
+
+// Use service.
+func (o *configuration) useService() {
+	ip, port := "unknown", "0"
+	// ip.
+	if nis, e1 := net.Interfaces(); e1 == nil {
+		for _, ni := range nis {
+			// Filtered by name.
+			if ni.Name != "en0" && ni.Name != "eth0" {
+				continue
+			}
+			// Point
+			if addrs, e2 := ni.Addrs(); e2 == nil {
+				for _, addr := range addrs {
+					if m := regexp.MustCompile(`^(\d+\.\d+\.\d+\.\d+)`).FindStringSubmatch(addr.String()); len(m) > 0 {
+						ip = m[1]
+						break
+					}
+				}
+			}
+		}
+	}
+	// port
+	if o.appAddr != "" {
+		if m := regexp.MustCompile(`:(\d+)$`).FindStringSubmatch(o.appAddr); len(m) == 2 {
+			port = m[1]
+		}
+	}
+	// service
+	o.appAddr = fmt.Sprintf("%s:%s", ip, port)
 }

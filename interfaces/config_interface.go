@@ -5,16 +5,18 @@ package interfaces
 
 // Config interface.
 type ConfigInterface interface {
+	AppAddr() string
+	AppName() string
 	DebugOn() bool
-	InfoOn() bool
-	WarnOn() bool
 	ErrorOn() bool
 	GetHandler() Handler
 	GetTimeFormat() string
 	GetTrace() (traceId string, spanId string, spanVersion string)
+	InfoOn() bool
 	LoadYaml(string) error
 	SetAdapter(string) ConfigInterface
 	SetHandler(Handler) ConfigInterface
-	SetTimeFormat(string) ConfigInterface
 	SetLevel(string) ConfigInterface
+	SetTimeFormat(string) ConfigInterface
+	WarnOn() bool
 }

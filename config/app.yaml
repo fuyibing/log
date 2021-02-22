@@ -1,0 +1,3 @@
+# use for application
+addr: ":9080"
+name: "FLog"

@@ -12,8 +12,7 @@ import (
 )
 
 // 日志客户端.
-type client struct {
-}
+type client struct{}
 
 // 创建日志实例.
 func newClient() interfaces.ClientInterface {
