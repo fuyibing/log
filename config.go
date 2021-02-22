@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net"
+	"os"
 	"regexp"
 	"strings"
 
@@ -29,6 +30,7 @@ type configuration struct {
 	TraceId     string             `yaml:"trace-id"`
 	appAddr     string
 	appName     string
+	pid         int
 	debugOn     bool
 	infoOn      bool
 	warnOn      bool
@@ -46,6 +48,7 @@ func newConfiguration() interfaces.ConfigInterface {
 		SpanVersion: interfaces.DefaultSpanVersion,
 		TraceId:     interfaces.DefaultTraceId,
 		appName:     "unknown",
+		pid:         os.Getpid(),
 	}
 	// 2. extensions.
 	for _, file := range []string{"./tmp/log.yaml", "../tmp/log.yaml", "./config/log.yaml", "../config/log.yaml"} {
@@ -79,15 +82,17 @@ func newConfiguration() interfaces.ConfigInterface {
 	return o
 }
 
-func (o *configuration) AppAddr() string                    { return o.appAddr }
-func (o *configuration) AppName() string                    { return o.appName }
-func (o *configuration) DebugOn() bool                      { return o.debugOn }
-func (o *configuration) InfoOn() bool                       { return o.infoOn }
-func (o *configuration) WarnOn() bool                       { return o.warnOn }
-func (o *configuration) ErrorOn() bool                      { return o.errorOn }
-func (o *configuration) GetHandler() interfaces.Handler     { return o.Handler }
-func (o *configuration) GetTimeFormat() string              { return o.TimeFormat }
-func (o *configuration) GetTrace() (string, string, string) { return o.TraceId, o.SpanId, o.SpanVersion }
+func (o *configuration) AppAddr() string                        { return o.appAddr }
+func (o *configuration) AppName() string                        { return o.appName }
+func (o *configuration) DebugOn() bool                          { return o.debugOn }
+func (o *configuration) InfoOn() bool                           { return o.infoOn }
+func (o *configuration) WarnOn() bool                           { return o.warnOn }
+func (o *configuration) ErrorOn() bool                          { return o.errorOn }
+func (o *configuration) GetHandler() interfaces.Handler         { return o.Handler }
+func (o *configuration) GetLevel(level interfaces.Level) string { return interfaces.LevelTexts[level] }
+func (o *configuration) GetPid() int                            { return o.pid }
+func (o *configuration) GetTimeFormat() string                  { return o.TimeFormat }
+func (o *configuration) GetTrace() (string, string, string)     { return o.TraceId, o.SpanId, o.SpanVersion }
 
 // 从YAML加载配置.
 func (o *configuration) LoadYaml(file string) (err error) {

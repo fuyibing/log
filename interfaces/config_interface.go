@@ -10,6 +10,8 @@ type ConfigInterface interface {
 	DebugOn() bool
 	ErrorOn() bool
 	GetHandler() Handler
+	GetLevel(level Level) string
+	GetPid() int
 	GetTimeFormat() string
 	GetTrace() (traceId string, spanId string, spanVersion string)
 	InfoOn() bool
