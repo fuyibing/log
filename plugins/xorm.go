@@ -36,6 +36,6 @@ func (o *XOrm) AfterSQL(c xorm.LogContext) {
 	}
 	// add ERROR log.
 	if c.Err != nil && log.Config.ErrorOn() {
-		log.Client.Errorfc(c.Ctx, fmt.Sprintf("[SQL] %s.", c.Err.Error()))
+		log.Client.Errorfc(c.Ctx, fmt.Sprintf("[SQL][d=%f] %s.", c.ExecuteTime.Seconds(), c.Err.Error()))
 	}
 }
