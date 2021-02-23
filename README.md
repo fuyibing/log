@@ -1,6 +1,6 @@
 # logger
 
-1. [x] 包名: `github.com/fuyibing/log`.
+1. [x] 包名: `github.com/fuyibing/log/v2`.
 1. [x] 版本: `v2`
 
 > 本包在导入后, 扫描 `tmp/log.yaml` 或 `config/log.yaml` 并初始化,

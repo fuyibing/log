@@ -13,7 +13,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/fuyibing/log/interfaces"
+	"github.com/fuyibing/log/v2/interfaces"
 )
 
 // 请求链结构体.

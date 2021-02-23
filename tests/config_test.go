@@ -6,7 +6,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/fuyibing/log"
+	"github.com/fuyibing/log/v2"
 )
 
 func TestConfig(t *testing.T) {

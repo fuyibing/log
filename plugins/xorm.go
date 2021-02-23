@@ -8,7 +8,7 @@ import (
 
 	xorm "xorm.io/xorm/log"
 
-	"github.com/fuyibing/log"
+	"github.com/fuyibing/log/v2"
 )
 
 type XOrm struct{}

@@ -13,7 +13,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"gopkg.in/yaml.v3"
 
-	"github.com/fuyibing/log/interfaces"
+	"github.com/fuyibing/log/v2/interfaces"
 )
 
 type redisConfig struct {

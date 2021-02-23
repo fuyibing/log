@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/fuyibing/log/interfaces"
+	"github.com/fuyibing/log/v2/interfaces"
 )
 
 var (

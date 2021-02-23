@@ -6,7 +6,7 @@ package adapters
 import (
 	"sync"
 
-	"github.com/fuyibing/log/interfaces"
+	"github.com/fuyibing/log/v2/interfaces"
 )
 
 // 文件配置.

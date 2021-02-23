@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fuyibing/log/interfaces"
+	"github.com/fuyibing/log/v2/interfaces"
 )
 
 // 日志客户端.

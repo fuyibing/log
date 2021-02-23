@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fuyibing/log"
-	"github.com/fuyibing/log/interfaces"
+	"github.com/fuyibing/log/v2"
+	"github.com/fuyibing/log/v2/interfaces"
 )
 
 func TestFunc(t *testing.T) {

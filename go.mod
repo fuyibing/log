@@ -1,6 +1,6 @@
-module github.com/fuyibing/log
+module github.com/fuyibing/log/v2
 
-go 1.14
+go 1.13
 
 require (
 	github.com/gomodule/redigo v1.8.4

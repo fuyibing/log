@@ -7,7 +7,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/fuyibing/log/interfaces"
+	"github.com/fuyibing/log/v2/interfaces"
 )
 
 // 绑定Tracing.

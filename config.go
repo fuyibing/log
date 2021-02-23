@@ -13,8 +13,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/fuyibing/log/adapters"
-	"github.com/fuyibing/log/interfaces"
+	"github.com/fuyibing/log/v2/adapters"
+	"github.com/fuyibing/log/v2/interfaces"
 )
 
 // 日志配置.

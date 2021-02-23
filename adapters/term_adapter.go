@@ -6,7 +6,7 @@ package adapters
 import (
 	"fmt"
 
-	"github.com/fuyibing/log/interfaces"
+	"github.com/fuyibing/log/v2/interfaces"
 )
 
 type termAdapter struct {

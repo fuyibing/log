@@ -6,7 +6,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/fuyibing/log/plugins"
+	"github.com/fuyibing/log/v2/plugins"
 )
 
 func TestPluginXorm(t *testing.T) {

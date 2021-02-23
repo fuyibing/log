@@ -6,8 +6,8 @@ package tests
 import (
 	"testing"
 
-	"github.com/fuyibing/log"
-	"github.com/fuyibing/log/interfaces"
+	"github.com/fuyibing/log/v2"
+	"github.com/fuyibing/log/v2/interfaces"
 )
 
 func TestHandler(t *testing.T) {
