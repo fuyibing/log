@@ -4,7 +4,6 @@
 package log
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -35,7 +34,7 @@ func (o *client) Debugf(text string, args ...interface{}) {
 }
 
 // 添加Debug日志, 支持格式化和请求链.
-func (o *client) Debugfc(ctx context.Context, text string, args ...interface{}) {
+func (o *client) Debugfc(ctx interface{}, text string, args ...interface{}) {
 	if Config.DebugOn() {
 		o.log(ctx, interfaces.LevelDebug, text, args...)
 	}
@@ -56,7 +55,7 @@ func (o *client) Infof(text string, args ...interface{}) {
 }
 
 // 添加Info日志, 支持格式化和请求链.
-func (o *client) Infofc(ctx context.Context, text string, args ...interface{}) {
+func (o *client) Infofc(ctx interface{}, text string, args ...interface{}) {
 	if Config.InfoOn() {
 		o.log(ctx, interfaces.LevelInfo, text, args...)
 	}
@@ -77,7 +76,7 @@ func (o *client) Warnf(text string, args ...interface{}) {
 }
 
 // 添加Warn日志, 支持格式化和请求链.
-func (o *client) Warnfc(ctx context.Context, text string, args ...interface{}) {
+func (o *client) Warnfc(ctx interface{}, text string, args ...interface{}) {
 	if Config.WarnOn() {
 		o.log(ctx, interfaces.LevelWarn, text, args...)
 	}
@@ -98,14 +97,14 @@ func (o *client) Errorf(text string, args ...interface{}) {
 }
 
 // 添加Error日志, 支持格式化和请求链.
-func (o *client) Errorfc(ctx context.Context, text string, args ...interface{}) {
+func (o *client) Errorfc(ctx interface{}, text string, args ...interface{}) {
 	if Config.ErrorOn() {
 		o.log(ctx, interfaces.LevelError, text, args...)
 	}
 }
 
 // 日志处理逻辑.
-func (o *client) log(ctx context.Context, level interfaces.Level, text string, args ...interface{}) {
+func (o *client) log(ctx interface{}, level interfaces.Level, text string, args ...interface{}) {
 	if handler := Config.GetHandler(); handler != nil {
 		handler(NewLine(ctx, level, text, args))
 	} else {

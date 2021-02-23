@@ -9,6 +9,7 @@ import (
 
 type TraceInterface interface {
 	GenVersion(i int32) string
+	GetParentSpanId() string
 	GetSpanId() string
 	GetSpanVersion() string
 	GetTraceId() string

@@ -3,10 +3,6 @@
 
 package interfaces
 
-import (
-	"context"
-)
-
 // 客户端接口
 type ClientInterface interface {
 	// 添加Debug日志.
@@ -16,7 +12,7 @@ type ClientInterface interface {
 	Debugf(text string, args ...interface{})
 
 	// 添加Debug日志, 支持格式化和请求链.
-	Debugfc(ctx context.Context, text string, args ...interface{})
+	Debugfc(ctx interface{}, text string, args ...interface{})
 
 	// 添加Info日志.
 	Info(text string)
@@ -25,7 +21,7 @@ type ClientInterface interface {
 	Infof(text string, args ...interface{})
 
 	// 添加Info日志, 支持格式化和请求链.
-	Infofc(ctx context.Context, text string, args ...interface{})
+	Infofc(ctx interface{}, text string, args ...interface{})
 
 	// 添加Warn日志.
 	Warn(text string)
@@ -34,7 +30,7 @@ type ClientInterface interface {
 	Warnf(text string, args ...interface{})
 
 	// 添加Warn日志, 支持格式化和请求链.
-	Warnfc(ctx context.Context, text string, args ...interface{})
+	Warnfc(ctx interface{}, text string, args ...interface{})
 
 	// 添加Error日志.
 	Error(text string)
@@ -43,5 +39,5 @@ type ClientInterface interface {
 	Errorf(text string, args ...interface{})
 
 	// 添加Error日志, 支持格式化和请求链.
-	Errorfc(ctx context.Context, text string, args ...interface{})
+	Errorfc(ctx interface{}, text string, args ...interface{})
 }

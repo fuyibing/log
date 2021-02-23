@@ -3,10 +3,6 @@
 
 package log
 
-import (
-	"context"
-)
-
 // 添加Debug日志.
 func Debug(text string) {
 	if Config.DebugOn() {
@@ -22,7 +18,7 @@ func Debugf(text string, args ...interface{}) {
 }
 
 // 添加Debug日志, 支持格式化和请求链.
-func Debugfc(ctx context.Context, text string, args ...interface{}) {
+func Debugfc(ctx interface{}, text string, args ...interface{}) {
 	if Config.DebugOn() {
 		Client.Debugfc(ctx, text, args...)
 	}
@@ -43,7 +39,7 @@ func Infof(text string, args ...interface{}) {
 }
 
 // 添加Info日志, 支持格式化和请求链.
-func Infofc(ctx context.Context, text string, args ...interface{}) {
+func Infofc(ctx interface{}, text string, args ...interface{}) {
 	if Config.InfoOn() {
 		Client.Infofc(ctx, text, args...)
 	}
@@ -64,7 +60,7 @@ func Warnf(text string, args ...interface{}) {
 }
 
 // 添加Warn日志, 支持格式化和请求链.
-func Warnfc(ctx context.Context, text string, args ...interface{}) {
+func Warnfc(ctx interface{}, text string, args ...interface{}) {
 	if Config.WarnOn() {
 		Client.Warnfc(ctx, text, args...)
 	}
@@ -85,7 +81,7 @@ func Errorf(text string, args ...interface{}) {
 }
 
 // 添加Error日志, 支持格式化和请求链.
-func Errorfc(ctx context.Context, text string, args ...interface{}) {
+func Errorfc(ctx interface{}, text string, args ...interface{}) {
 	if Config.ErrorOn() {
 		Client.Errorfc(ctx, text, args...)
 	}

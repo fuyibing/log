@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/kataras/iris/v12"
+
 	"github.com/fuyibing/log/v2/interfaces"
 )
 
@@ -33,10 +35,10 @@ type Line struct {
 	serviceName string
 	serviceAddr string
 	time        time.Time
-	tracing     *tracing
+	tracing     interfaces.TraceInterface
 }
 
-func NewLine(ctx context.Context, level interfaces.Level, text string, args []interface{}) interfaces.LineInterface {
+func NewLine(ctx interface{}, level interfaces.Level, text string, args []interface{}) interfaces.LineInterface {
 	o := &Line{
 		time: time.Now(),
 		text: text, args: args, level: level,
@@ -75,7 +77,7 @@ func (o *Line) Level() string { return Config.GetLevel(o.level) }
 
 func (o *Line) ParentSpanId() string {
 	if o.tracing != nil {
-		return o.tracing.parentSpanId
+		return o.tracing.GetParentSpanId()
 	}
 	return ""
 }
@@ -138,14 +140,33 @@ func (o *Line) parseDuration() {
 }
 
 // Parse tracing from Context.
-func (o *Line) parseTracing(ctx context.Context) {
+// ctx accept mixed struct instance, allow:
+// iris.Context, context.Context, Tracing
+func (o *Line) parseTracing(ctx interface{}) {
+	// nil.
 	if ctx == nil {
 		return
 	}
-	if get := ctx.Value(interfaces.OpenTracingKey); get != nil {
-		if tracing, ok := get.(*tracing); ok {
-			o.tracing = tracing
+	// Use iris.Context.
+	if ir, ok := ctx.(iris.Context); ok {
+		if x := ir.Values().Get(interfaces.OpenTracingKey); x != nil {
+			o.tracing = x.(interfaces.TraceInterface)
 			o.offset, _ = o.tracing.IncrOffset()
 		}
+		return
+	}
+	// Use context.Context.
+	if cc, ok := ctx.(context.Context); ok {
+		if x := cc.Value(interfaces.OpenTracingKey); x != nil {
+			o.tracing = x.(interfaces.TraceInterface)
+			o.offset, _ = o.tracing.IncrOffset()
+		}
+		return
+	}
+	// Use TraceInterface
+	if ti, ok := ctx.(interfaces.TraceInterface); ok {
+		o.tracing = ti.(interfaces.TraceInterface)
+		o.offset, _ = o.tracing.IncrOffset()
+		return
 	}
 }
