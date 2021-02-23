@@ -19,11 +19,11 @@
 #         [idle-timeout]: 连结空闲N秒后自动关闭
 #         [max-conn-lifetime]:
 #
-adapter: term
+adapter: redis
 level: debug
 time: "2006-01-02 15:04:05.999999"
 redis:
-  addr: "127.0.0.1:6379"
+  addr: "192.168.3.133:6379"
   database: 0
   idle-timeout: 30
   keep-alive: 60
@@ -31,7 +31,7 @@ redis:
   max-idle: 2
   max-lifetime: 60
   network: "tcp"
-  password: ""
+  password: "uniondrug@123"
   timeout: 0
   read-timeout: 0
   wait: true

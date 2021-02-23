@@ -17,8 +17,8 @@ import (
 func BindRequest(req *http.Request) {
 	// Bound and reuse.
 	if ctx := req.Context().Value(interfaces.OpenTracingKey); ctx != nil {
-		if tracing, ok := ctx.(*tracing); ok {
-			tracing.UseRequest(req)
+		if t, ok := ctx.(*tracing); ok {
+			t.UseRequest(req)
 			return
 		}
 	}
@@ -26,6 +26,7 @@ func BindRequest(req *http.Request) {
 	req.WithContext(context.WithValue(context.TODO(), interfaces.OpenTracingKey, NewTracing().UseRequest(req)))
 }
 
+// 创建上下文.
 func NewContext() context.Context {
 	return context.WithValue(context.TODO(), interfaces.OpenTracingKey, NewTracing().UseDefault())
 }
