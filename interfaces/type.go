@@ -29,6 +29,7 @@ const (
 )
 
 var LevelTexts = map[Level]string{
+	LevelOff:   "OFF",
 	LevelError: "ERROR",
 	LevelWarn:  "WARN",
 	LevelInfo:  "INFO",
