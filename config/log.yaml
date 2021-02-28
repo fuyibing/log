@@ -1,6 +1,5 @@
 #
 # package: github.com/fuyibing/log.
-# template: log config.
 #
 # [adapter] 日志模式 (可选: term, file, redis, 默认: term)
 # [level] 日志级别 (可选: DEBUG, INFO, WARN, ERROR, 默认: DEBUG)
