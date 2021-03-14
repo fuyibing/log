@@ -1,23 +1,40 @@
 #
-# logger config.
 # package: github.com/fuyibing/log.
 #
-# [app-name] Application name.
-# [adapter] TERM, FILE, REDIS.
-# [level] DEBUG, INFO, WARN, ERROR.
-# [time-format] 2006-01-02 15:04:05.999999
+# [adapter] 日志模式 (可选: term, file, redis, 默认: term)
+# [level] 日志级别 (可选: DEBUG, INFO, WARN, ERROR, 默认: DEBUG)
+# [time] 时间格式 (默认: 2006-01-02 15:04:05.999999)
+# [trace-id] 请求链主链名称 (默认: X-B3-Traceid)
+# [span-id] 请求链当前链名称 (默认: X-B3-Spanid)
+# [span-version] 请求链当前链版本号 (默认: X-B3-Version)
+# [redis] Redis模式, 日志上报到Redis中
+#         [network]: 连结方式 (默认: tcp)
+#         [addr]: Redis地址
+#         [password]: Redis密码
+#         [db]: Redis分片编号
+#         [wait]: Redis连结池中的连结不足时, 是否等待可用连结 (默认: true)
+#         [max-active]: Redis连结池最大连结数
+#         [max-idle]: Redis连结池最大空闲连结数
+#         [idle-timeout]: 连结空闲N秒后自动关闭
+#         [max-conn-lifetime]:
 #
-app-name: "Log"
 adapter: term
 level: debug
-time-format: "2006-01-02 15:04:05.999999"
+time: "2006-01-02 15:04:05.999999"
 redis:
+  addr: "192.168.3.133:6379"
+  database: 0
+  idle-timeout: 30
+  keep-alive: 60
+  max-active: 4
+  max-idle: 2
+  max-lifetime: 60
   network: "tcp"
-  addr: "127.0.0.1:6379"
-  password: ""
-  db: 10
+  password: "uniondrug@123"
+  timeout: 0
+  read-timeout: 0
   wait: true
-  max-active: 16
-  max-idle: 4
-  idle-timeout: 0
-  max-conn-lifetime: 0
+  write-timeout: 0
+  key-lifetime: 7200
+  key-prefix: logger
+  key-list: list

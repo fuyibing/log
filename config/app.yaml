@@ -1,3 +1,4 @@
 # for application config.
 addr: ":8088"
 name: "FybLog"
+versino: "3.0.0"
