@@ -4,6 +4,7 @@
 package log
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/kataras/iris/v12"
 
 	"github.com/fuyibing/log/v2/interfaces"
 )
@@ -93,4 +95,42 @@ func (o *tracing) parseHeader(header http.Header) interfaces.TraceInterface {
 	}
 	// with header.
 	return o
+}
+
+// 解析Tracing.
+func ParseTracing(ctx interface{}) interfaces.TraceInterface {
+	// nil.
+	if ctx == nil {
+		return nil
+	}
+	// Use iris.Context.
+	if ir, ok := ctx.(iris.Context); ok {
+		if x := ir.Values().Get(interfaces.OpenTracingKey); x != nil {
+			return x.(interfaces.TraceInterface)
+		}
+	}
+	// Use context.Context.
+	if cc, ok := ctx.(context.Context); ok {
+		if x := cc.Value(interfaces.OpenTracingKey); x != nil {
+			return x.(interfaces.TraceInterface)
+		}
+	}
+	// Use TraceInterface
+	if ti, ok := ctx.(interfaces.TraceInterface); ok {
+		return ti.(interfaces.TraceInterface)
+	}
+	// Undefined.
+	return nil
+}
+
+func ParseTracingToRequest(ctx interface{}, req *http.Request) {
+	trace := ParseTracing(ctx)
+	if trace == nil {
+		return
+	}
+	tracer := trace.(*tracing)
+	traceId, spanId, spanVersion := Config.GetTrace()
+	req.Header.Set(traceId, tracer.traceId)
+	req.Header.Set(spanId, tracer.spanId)
+	req.Header.Set(spanVersion, tracer.GenVersion(tracer.offset-1))
 }
