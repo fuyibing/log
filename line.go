@@ -4,13 +4,10 @@
 package log
 
 import (
-	"context"
 	"fmt"
 	"regexp"
 	"strconv"
 	"time"
-
-	"github.com/kataras/iris/v12"
 
 	"github.com/fuyibing/log/v2/interfaces"
 )
@@ -25,6 +22,7 @@ var (
 	regexpLineDuration = regexp.MustCompile(`\[d=(\d+\.?\d*)\]`)
 )
 
+// 日志行结构体.
 type Line struct {
 	args        []interface{}
 	duration    float64
@@ -38,18 +36,26 @@ type Line struct {
 	tracing     interfaces.TraceInterface
 }
 
+// 创建日志行实例.
 func NewLine(ctx interface{}, level interfaces.Level, text string, args []interface{}) interfaces.LineInterface {
+	// 行实例.
 	o := &Line{
 		time: time.Now(),
 		text: text, args: args, level: level,
 		pid:         Config.GetPid(),
 		serviceName: Config.AppName(), serviceAddr: Config.AppAddr(),
 	}
+	// 执行时长.
 	o.parseDuration()
-	o.parseTracing(ctx)
+	// 请求链.
+	if tracer := ParseTracing(ctx); tracer != nil {
+		o.tracing = tracer
+		o.offset, _ = o.tracing.IncrOffset()
+	}
 	return o
 }
 
+// 返回带颜色Level文本.
 func (o *Line) ColorLevel() string {
 	if c, ok := colors[o.level]; ok {
 		return fmt.Sprintf("%c[%d;%d;%dm%5s%c[0m",
@@ -62,6 +68,7 @@ func (o *Line) ColorLevel() string {
 	return o.Level()
 }
 
+// 日志正文.
 func (o *Line) Content() string {
 	if o.args != nil && len(o.args) > 0 {
 		return fmt.Sprintf(o.text, o.args...)
@@ -69,12 +76,15 @@ func (o *Line) Content() string {
 	return o.text
 }
 
+// 执行时长.
 func (o *Line) Duration() float64 {
 	return o.duration
 }
 
+// 日志级别.
 func (o *Line) Level() string { return Config.GetLevel(o.level) }
 
+// 上级Span.
 func (o *Line) ParentSpanId() string {
 	if o.tracing != nil {
 		return o.tracing.GetParentSpanId()
@@ -82,10 +92,12 @@ func (o *Line) ParentSpanId() string {
 	return ""
 }
 
+// 进程ID.
 func (o *Line) Pid() int {
 	return o.pid
 }
 
+// 请求信息.
 func (o *Line) RequestInfo() (method string, url string) {
 	if o.tracing != nil {
 		method, url = o.tracing.RequestInfo()
@@ -136,37 +148,5 @@ func (o *Line) parseDuration() {
 		if d, e := strconv.ParseFloat(m[1], 64); e == nil {
 			o.duration = d
 		}
-	}
-}
-
-// Parse tracing from Context.
-// ctx accept mixed struct instance, allow:
-// iris.Context, context.Context, Tracing
-func (o *Line) parseTracing(ctx interface{}) {
-	// nil.
-	if ctx == nil {
-		return
-	}
-	// Use iris.Context.
-	if ir, ok := ctx.(iris.Context); ok {
-		if x := ir.Values().Get(interfaces.OpenTracingKey); x != nil {
-			o.tracing = x.(interfaces.TraceInterface)
-			o.offset, _ = o.tracing.IncrOffset()
-		}
-		return
-	}
-	// Use context.Context.
-	if cc, ok := ctx.(context.Context); ok {
-		if x := cc.Value(interfaces.OpenTracingKey); x != nil {
-			o.tracing = x.(interfaces.TraceInterface)
-			o.offset, _ = o.tracing.IncrOffset()
-		}
-		return
-	}
-	// Use TraceInterface
-	if ti, ok := ctx.(interfaces.TraceInterface); ok {
-		o.tracing = ti.(interfaces.TraceInterface)
-		o.offset, _ = o.tracing.IncrOffset()
-		return
 	}
 }
