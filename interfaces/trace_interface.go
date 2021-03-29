@@ -15,6 +15,7 @@ type TraceInterface interface {
 	GetTraceId() string
 	IncrOffset() (before int32, after int32)
 	RequestInfo() (method string, url string)
+	Use(traceId, spanVersion string) TraceInterface
 	UseDefault() TraceInterface
 	UseRequest(req *http.Request) TraceInterface
 }

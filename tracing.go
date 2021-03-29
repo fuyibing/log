@@ -48,6 +48,15 @@ func (o *tracing) IncrOffset() (before int32, after int32) {
 // Http请求参数.
 func (o *tracing) RequestInfo() (method string, url string) { return o.method, o.url }
 
+// Use specified.
+func (o *tracing) Use(traceId, spanVersion string) interfaces.TraceInterface {
+	o.offset = 0
+	o.traceId = traceId
+	o.spanId = o.generateUniqId()
+	o.spanVersion = spanVersion
+	return o
+}
+
 // 使用默认模式.
 func (o *tracing) UseDefault() interfaces.TraceInterface {
 	o.offset = 0
