@@ -105,20 +105,24 @@ func (o *client) Errorfc(ctx interface{}, text string, args ...interface{}) {
 	}
 }
 
-func (o *client) Panic(rec interface{}) {
-	o.Panicc(nil, rec)
+func (o *client) Panic(text string) {
+	o.Panicfc(nil, text)
 }
 
-func (o *client) Panicc(ctx, rec interface{}) {
-	text := fmt.Sprintf("fatal: %v.", rec)
+func (o *client) Panicf(text string, args ...interface{}) {
+	o.Panicfc(nil, text, args...)
+}
+
+func (o *client) Panicfc(ctx interface{}, text string, args ...interface{}) {
+	str := fmt.Sprintf(text, args...)
 	for i := 1; ; i++ {
 		_, f, l, got := runtime.Caller(i)
 		if !got {
 			break
 		}
-		text += fmt.Sprintf("\n%s:%d", strings.TrimSpace(f), l)
+		str += fmt.Sprintf("\n%s:%d", strings.TrimSpace(f), l)
 	}
-	o.Errorfc(ctx, text)
+	o.Errorfc(ctx, str)
 }
 
 // 日志处理逻辑.
