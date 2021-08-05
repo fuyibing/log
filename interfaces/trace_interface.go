@@ -8,6 +8,8 @@ import (
 )
 
 type TraceInterface interface {
+	GenCurrentVersion() string
+	GenPreviewVersion() string
 	GenVersion(i int32) string
 	GetParentSpanId() string
 	GetSpanId() string
@@ -15,6 +17,7 @@ type TraceInterface interface {
 	GetTraceId() string
 	IncrOffset() (before int32, after int32)
 	RequestInfo() (method string, url string)
+	Use(traceId, spanVersion string) TraceInterface
 	UseDefault() TraceInterface
 	UseRequest(req *http.Request) TraceInterface
 }

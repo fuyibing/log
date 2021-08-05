@@ -86,3 +86,21 @@ func Errorfc(ctx interface{}, text string, args ...interface{}) {
 		Client.Errorfc(ctx, text, args...)
 	}
 }
+
+func Panic(text string) {
+	if Config.ErrorOn() {
+		Client.Panic(text)
+	}
+}
+
+func Panicf(text string, args ...interface{}) {
+	if Config.ErrorOn() {
+		Client.Panicf(text, args...)
+	}
+}
+
+func Panicfc(ctx interface{}, text string, args ...interface{}) {
+	if Config.ErrorOn() {
+		Client.Panicfc(ctx, text, args...)
+	}
+}

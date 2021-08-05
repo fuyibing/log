@@ -40,4 +40,8 @@ type ClientInterface interface {
 
 	// 添加Error日志, 支持格式化和请求链.
 	Errorfc(ctx interface{}, text string, args ...interface{})
+
+	Panic(text string)
+	Panicf(text string, args ...interface{})
+	Panicfc(ctx interface{}, text string, args ...interface{})
 }

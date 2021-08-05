@@ -32,6 +32,8 @@ type tracing struct {
 
 // 创建OpenTracing.
 func NewTracing() interfaces.TraceInterface  { return &tracing{spanVersion: "0"} }
+func (o *tracing) GenCurrentVersion() string { return o.GenVersion(o.offset) }
+func (o *tracing) GenPreviewVersion() string { return o.GenVersion(o.offset-1) }
 func (o *tracing) GenVersion(i int32) string { return fmt.Sprintf("%s.%d", o.spanVersion, i) }
 func (o *tracing) GetParentSpanId() string   { return o.parentSpanId }
 func (o *tracing) GetSpanId() string         { return o.spanId }
@@ -47,6 +49,15 @@ func (o *tracing) IncrOffset() (before int32, after int32) {
 
 // Http请求参数.
 func (o *tracing) RequestInfo() (method string, url string) { return o.method, o.url }
+
+// Use specified.
+func (o *tracing) Use(traceId, spanVersion string) interfaces.TraceInterface {
+	o.offset = 0
+	o.traceId = traceId
+	o.spanId = o.generateUniqId()
+	o.spanVersion = spanVersion
+	return o
+}
 
 // 使用默认模式.
 func (o *tracing) UseDefault() interfaces.TraceInterface {
