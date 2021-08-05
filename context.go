@@ -26,3 +26,18 @@ func IrisBind(ctx iris.Context) {
 func NewContext() context.Context {
 	return context.WithValue(context.TODO(), interfaces.OpenTracingKey, NewTracing().UseDefault())
 }
+
+// 子级上下文.
+func ChildContext(ctx interface{}) context.Context {
+	// 1. return NewContext() if param ctx nil.
+	if ctx == nil {
+		return NewContext()
+	}
+	// 2. parse bound tracing.
+	t := ParseTracing(ctx)
+	if t == nil {
+		return NewContext()
+	}
+	// 3. generate new tracing.
+	return context.WithValue(context.TODO(), interfaces.OpenTracingKey, NewTracing().Use(t.GetTraceId(), t.GenPreviewVersion()))
+}

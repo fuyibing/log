@@ -33,6 +33,7 @@ type tracing struct {
 // 创建OpenTracing.
 func NewTracing() interfaces.TraceInterface  { return &tracing{spanVersion: "0"} }
 func (o *tracing) GenCurrentVersion() string { return o.GenVersion(o.offset) }
+func (o *tracing) GenPreviewVersion() string { return o.GenVersion(o.offset-1) }
 func (o *tracing) GenVersion(i int32) string { return fmt.Sprintf("%s.%d", o.spanVersion, i) }
 func (o *tracing) GetParentSpanId() string   { return o.parentSpanId }
 func (o *tracing) GetSpanId() string         { return o.spanId }
