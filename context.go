@@ -5,6 +5,7 @@ package log
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kataras/iris/v12"
 
@@ -28,7 +29,7 @@ func NewContext() context.Context {
 }
 
 // 子级上下文.
-func ChildContext(ctx interface{}) context.Context {
+func ChildContext(ctx interface{}, text string, args ...interface{}) context.Context {
 	// 1. return NewContext() if param ctx nil.
 	if ctx == nil {
 		return NewContext()
@@ -38,6 +39,13 @@ func ChildContext(ctx interface{}) context.Context {
 	if t == nil {
 		return NewContext()
 	}
-	// 3. generate new tracing.
-	return context.WithValue(context.TODO(), interfaces.OpenTracingKey, NewTracing().Use(t.GetTraceId(), t.GenPreviewVersion()))
+	// 3. generate child tracing.
+	prefix := ""
+	if text != "" {
+		prefix = fmt.Sprintf(text, args...) + " "
+	}
+	Infofc(ctx, prefix+"build child span.")
+	ctn := context.WithValue(context.TODO(), interfaces.OpenTracingKey, NewTracing().Use(t.GetTraceId(), t.GenPreviewVersion()))
+	Infofc(ctn, prefix+"child span builded.")
+	return ctn
 }
