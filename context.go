@@ -40,12 +40,13 @@ func ChildContext(ctx interface{}, text string, args ...interface{}) context.Con
 		return NewContext()
 	}
 	// 3. generate child tracing.
-	prefix := ""
-	if text != "" {
-		prefix = fmt.Sprintf(text, args...) + " "
+	if text == "" {
+		text = "new span"
+	} else {
+		text = fmt.Sprintf(text, args...)
 	}
-	Infofc(ctx, prefix+"build child span.")
+
+	Infofc(ctx, text)
 	ctn := context.WithValue(context.TODO(), interfaces.OpenTracingKey, NewTracing().Use(t.GetTraceId(), t.GenPreviewVersion()))
-	Infofc(ctn, prefix+"child span builded.")
 	return ctn
 }
