@@ -1,10 +1,13 @@
 # logger
 
+[![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+
 1. [x] 包名: `github.com/fuyibing/log/v2`.
 1. [x] 版本: `v2`
 
 > 本包在导入后, 扫描 `tmp/log.yaml` 或 `config/log.yaml` 并初始化,
 > 详细配置参见本包的 `config/log.yaml` 注释.
+
 
 ### 通用用法.
 
