@@ -1,6 +1,5 @@
 # logger
 
-[![Build Status](https://travis-ci.org/mybatis/spring.svg?branch=master)]
 [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 1. [x] 包名: `github.com/fuyibing/log/v2`.
