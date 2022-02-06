@@ -1,6 +1,6 @@
 module github.com/fuyibing/log/v2
 
-go 1.13
+go 1.17
 
 require (
 	github.com/ajg/form v1.5.1 // indirect
@@ -23,5 +23,5 @@ require (
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
-	xorm.io/xorm v1.0.7
+	xorm.io/xorm v1.2.5
 )
