@@ -37,13 +37,13 @@ func (o *XOrm) AfterSQL(c xormLog.LogContext) {
 	if log.Config.InfoOn() {
 		if c.Args != nil && len(c.Args) > 0 {
 			boundSql, _ := builder.ConvertToBoundSQL(c.SQL, c.Args)
-			log.Client.Infofc(c.Ctx, fmt.Sprintf("[SQL=%s][d=%fs] %s - %v.", sId, c.ExecuteTime.Seconds(), boundSql, c.Args))
+			log.Client.Infofc(c.Ctx, fmt.Sprintf("[SQL=%s][d=%f] %s - %v.", sId, c.ExecuteTime.Seconds(), boundSql, c.Args))
 		} else {
-			log.Client.Infofc(c.Ctx, fmt.Sprintf("[SQL=%s][d=%fs] %s.", sId, c.ExecuteTime.Seconds(), c.SQL))
+			log.Client.Infofc(c.Ctx, fmt.Sprintf("[SQL=%s][d=%f] %s.", sId, c.ExecuteTime.Seconds(), c.SQL))
 		}
 	}
 	// add ERROR log.
 	if c.Err != nil && log.Config.ErrorOn() {
-		log.Client.Errorfc(c.Ctx, fmt.Sprintf("[SQL][sId=%s][dur=%fs] %s.", sId, c.ExecuteTime.Seconds(), c.Err.Error()))
+		log.Client.Errorfc(c.Ctx, fmt.Sprintf("[SQL=%s][d=%f] %s.", sId, c.ExecuteTime.Seconds(), c.Err.Error()))
 	}
 }
