@@ -6,7 +6,6 @@ package plugins
 import (
 	"fmt"
 
-	"xorm.io/builder"
 	xormLog "xorm.io/xorm/log"
 
 	"github.com/fuyibing/log/v2"
@@ -35,20 +34,7 @@ func (o *XOrm) AfterSQL(c xormLog.LogContext) {
 	}
 	// add INFO log.
 	if log.Config.InfoOn() {
-		if c.Args != nil && len(c.Args) > 0 {
-			// try to get bound SQL
-			var err error
-			var boundSql = ""
-			boundSql, err = builder.ConvertToBoundSQL(c.SQL, c.Args)
-			// logging
-			if err != nil || boundSql == "" {
-				log.Client.Infofc(c.Ctx, fmt.Sprintf("[SQL=%s][d=%f] %s - %v.", sId, c.ExecuteTime.Seconds(), c.SQL, c.Args))
-			} else {
-				log.Client.Infofc(c.Ctx, fmt.Sprintf("[SQL=%s][d=%f] %s - %v.", sId, c.ExecuteTime.Seconds(), boundSql, c.Args))
-			}
-		} else {
-			log.Client.Infofc(c.Ctx, fmt.Sprintf("[SQL=%s][d=%f] %s.", sId, c.ExecuteTime.Seconds(), c.SQL))
-		}
+		log.Client.Infofc(c.Ctx, fmt.Sprintf("[SQL=%s][d=%f] %s - %v.", sId, c.ExecuteTime.Seconds(), c.SQL, c.Args))
 	}
 	// add ERROR log.
 	if c.Err != nil && log.Config.ErrorOn() {
