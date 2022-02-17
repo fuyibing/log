@@ -33,7 +33,7 @@ func (o *XOrm) AfterSQL(c xormLog.LogContext) {
 		sId = key
 	}
 	// add INFO log.
-	if log.Config.InfoOn() {
+	if c.ExecuteTime > 0 && log.Config.InfoOn() {
 		log.Client.Infofc(c.Ctx, fmt.Sprintf("[SQL=%s][d=%f] %s - %v.", sId, c.ExecuteTime.Seconds(), c.SQL, c.Args))
 	}
 	// add ERROR log.
