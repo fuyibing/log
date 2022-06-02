@@ -1,6 +1,6 @@
 # Logger
 
-> package `github.com/fuyibing/log`.
+> package `github.com/fuyibing/log/v3`.
 
 ### Example.
 
