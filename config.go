@@ -92,7 +92,9 @@ func (o *configuration) GetHandler() interfaces.Handler         { return o.Handl
 func (o *configuration) GetLevel(level interfaces.Level) string { return interfaces.LevelTexts[level] }
 func (o *configuration) GetPid() int                            { return o.pid }
 func (o *configuration) GetTimeFormat() string                  { return o.TimeFormat }
-func (o *configuration) GetTrace() (string, string, string)     { return o.TraceId, o.SpanId, o.SpanVersion }
+func (o *configuration) GetTrace() (string, string, string) {
+	return o.TraceId, o.SpanId, o.SpanVersion
+}
 
 // 从YAML加载配置.
 func (o *configuration) LoadYaml(file string) (err error) {
@@ -172,6 +174,8 @@ func (o *configuration) useAdapter() {
 		o.SetHandler(adapters.NewFile().Run)
 	case interfaces.AdapterRedis:
 		o.SetHandler(adapters.NewRedis().Run)
+	case interfaces.AdapterKafka:
+		o.SetHandler(adapters.NewKafka().Run)
 	}
 }
 

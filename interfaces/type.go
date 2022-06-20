@@ -10,12 +10,14 @@ const (
 	AdapterTerm
 	AdapterFile
 	AdapterRedis
+	AdapterKafka
 )
 
 var AdapterTexts = map[Adapter]string{
 	AdapterTerm:  "TERM",
 	AdapterFile:  "FILE",
 	AdapterRedis: "REDIS",
+	AdapterKafka: "KAFKA",
 }
 
 type Level int

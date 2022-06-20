@@ -38,3 +38,6 @@ redis:
   key-lifetime: 7200
   key-prefix: logger
   key-list: list
+kafka:
+  brokers: "127.0.0.1:9092"
+  topic: "go-logs"
