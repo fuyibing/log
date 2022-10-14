@@ -2,9 +2,9 @@
 
 > package `github.com/fuyibing/log/v3`.
 
-## 适配器
+## 一、适配器
 
-### 终端打印
+### 1. 终端打印
 
 `同步`
 
@@ -25,7 +25,7 @@ term:
 [09:10:11][ERROR] error message
 ```
 
-### 文件存储
+### 2. 文件存储
 
 `同步` `降级`
 
@@ -47,13 +47,13 @@ file:
 [2022-10-14 15:36:41.141539][10.3.6.14:8527][FLOG][ERROR][pid=45334] error message
 ```
 
-### Redis 订阅
+### 3. Redis 订阅
 
 `异步` `降级`
 
 > Abount
 
-### Kafka 订阅
+### 4. Kafka 订阅
 
 `异步` `降级`
 
