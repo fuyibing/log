@@ -41,23 +41,50 @@ file:
 ```
 
 ```log
-[2022-10-14 15:36:41.140847][10.3.6.14:8527][FLOG][DEBUG][pid=45334] debug message
-[2022-10-14 15:36:41.141365][10.3.6.14:8527][FLOG][INFO][pid=45334] info message
-[2022-10-14 15:36:41.141401][10.3.6.14:8527][FLOG][INFO][pid=45334] warn message
-[2022-10-14 15:36:41.141539][10.3.6.14:8527][FLOG][ERROR][pid=45334] error message
+[2022-10-14 15:36:41.140847][10.3.6.14:8527][FLOG][DEBUG][PID=45334] debug message
+[2022-10-14 15:36:41.141365][10.3.6.14:8527][FLOG][INFO][PID=45334] info message
+[2022-10-14 15:36:41.141401][10.3.6.14:8527][FLOG][INFO][PID=45334] warn message
+[2022-10-14 15:36:41.141539][10.3.6.14:8527][FLOG][ERROR][PID=45334] error message
 ```
 
 ### 3. Redis 订阅
 
 `异步` `降级`
 
-> Abount
+> 日志内容写到Redis服务上, 其它服务可以消费Redis并转发到 `Kafka` `Aliyun log service` 等中间件上.
+
+```yaml
+# config/log.yaml
+adapter: "redis"                            # 适配器名称
+redis:
+  concurrency: 5                            # 写入Redis最大并发 (默认: 5)
+  limit: 100                                # 批量写入时, 每批最多数量 (默认: 100)
+  ticker: 500                               # 每隔 350 毫秒, 固定上报一次日志 (默认: 500)
+  key-prefix: "logger"                      # 写入到Redis的Key加上前缀.
+  key-lifetime: 3600                        # 写入到Redis后, 3600秒后没有被消费时丢弃.
+  key-list: "list"                          # 将Key加入到logger:list列表中, 消费时从此Key上使用LPOP
+  address:
+  password:
+  database:
+  max-active:
+  max-idle:
+  timeout:                                  # 连接Redis超时时长 (默认: 5)
+  read-timeout:                             # 读数据超时时长 (默认: 3)
+  write-timeout:                            # 写数据超时时长 (默认: 10)
+  wait: true                                # 连接池不足时, 是否等待 (默认: true)
+```
 
 ### 4. Kafka 订阅
 
 `异步` `降级`
 
 > About
+
+```yaml
+# config/log.yaml
+adapter: "kafka"                            # 适配器名称
+kafka:
+```
 
 ## Example
 
