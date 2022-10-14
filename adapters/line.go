@@ -83,7 +83,7 @@ func (o *Line) Release() {
 // 格式化文本.
 func (o *Line) String() (str string) {
 	// 1. 基础信息.
-	str = fmt.Sprintf("[%s][%s:%d][%s][%s][pid=%d]",
+	str = fmt.Sprintf("[%s][%s:%d][%s][%s][PID=%d]",
 		o.Time.Format(o.TimeFormat),
 		o.Host, o.Port,
 		o.Name, o.Level.String(),
@@ -92,18 +92,18 @@ func (o *Line) String() (str string) {
 
 	// 2. 链路信息.
 	if o.Trace {
-		str += fmt.Sprintf("[trace-id=%s][parent-span-id=%s][span-id=%s][span-version=%s.%d]",
+		str += fmt.Sprintf("[TRACE-ID=%s][PARENT-SPAN-ID=%s][SPAN-ID=%s][SPAN-VERSION=%s.%d]",
 			o.TraceId, o.ParentSpanId,
 			o.SpanId, o.SpanPrefix, o.SpanOffset,
 		)
 		if o.Duration > 0 {
-			str += fmt.Sprintf("[duration=%.06f]", o.Duration)
+			str += fmt.Sprintf("[DURATION=%.06f]", o.Duration)
 		}
 		if o.RequestMethod != "" {
-			str += fmt.Sprintf("[request-method=%s]", o.RequestMethod)
+			str += fmt.Sprintf("[REQUEST-METHOD=%s]", o.RequestMethod)
 		}
 		if o.RequestUrl != "" {
-			str += fmt.Sprintf("[request-url=%s]", o.RequestUrl)
+			str += fmt.Sprintf("[REQUEST-URL=%s]", o.RequestUrl)
 		}
 	}
 
