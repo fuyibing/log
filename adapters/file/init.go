@@ -1,13 +1,12 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2022-06-02
+// date: 2022-10-14
 
-package log
+package file
 
 import "sync"
 
 func init() {
 	new(sync.Once).Do(func() {
-		Client = (&client{}).init()
-		Config = (&config{}).init()
+		Config = (&Configuration{}).init()
 	})
 }

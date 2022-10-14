@@ -1,4 +1,4 @@
 # for application config.
-addr: ":8088"
-name: "FybLog"
-versino: "3.0.0"
+name: "FLOG"
+version: "3.0"
+port: 8527
