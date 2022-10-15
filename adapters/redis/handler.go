@@ -1,146 +1,124 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2022-10-13
+// date: 2022-10-15
 
 package redis
 
 import (
 	"context"
 	"fmt"
+	"math/rand"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
-	"github.com/fuyibing/log/v3/adapters"
+	"github.com/fuyibing/log/v3/base"
+	"github.com/fuyibing/log/v3/formatters"
 	"github.com/gomodule/redigo/redis"
 )
 
 type (
-	// Handler
-	// Redis适配器.
-	Handler interface {
-		// Interrupt
-		// 注册拦截.
-		//
-		// 当提交日志出现错误时, 接过拦截器转发降级, 本适配降级时转发给文件存储将
-		// 日志写入到本地文件中.
-		Interrupt(fatal func(line *adapters.Line, err error)) Handler
-
-		// Run
-		// 提交日志.
-		Run(line *adapters.Line, err error)
-
-		// Start
-		// 启动服务.
-		Start()
-
-		// Stop
-		// 退出服务.
-		Stop()
-	}
-
 	handler struct {
-		cancel context.CancelFunc
-		ctx    context.Context
+		ch          chan *base.Line
+		ct          *time.Ticker
+		concurrency int32
 
-		bufferIndex  uint64
-		bufferMapper map[uint64]*adapters.Line            // 缓存列表
-		ch           chan *adapters.Line                  // 消息通道
-		concurrency  int32                                // 并发数
-		connections  *redis.Pool                          // Redis连接池.
-		interrupt    func(line *adapters.Line, err error) // 拦截回调
-		listKey      string                               //
-		mu           sync.RWMutex                         // 读写锁
+		connections *redis.Pool
+		index       uint64
+		listKey     string
+		mapper      map[uint64]*base.Line
+		mu          *sync.RWMutex
+
+		engine base.AdapterEngine
 	}
 )
 
-func New() Handler {
+// New
+// 创建执行器.
+func New() base.AdapterEngine {
 	return (&handler{}).init()
 }
 
-// Interrupt
-// 注册拦截.
-func (o *handler) Interrupt(interrupt func(line *adapters.Line, err error)) Handler {
-	o.interrupt = interrupt
-	return o
-}
-
-// Run
-// 提交日志.
-func (o *handler) Run(line *adapters.Line, _ error) {
-	// 1. 拦截异常.
-	defer func() {
-		if v := recover(); v != nil {
-			if o.interrupt != nil {
-				o.interrupt(line, fmt.Errorf("panic on redis adapter: %v", v))
-			}
-		}
-	}()
-
-	// 2. 服务退出.
+// Log
+// 发送日志.
+func (o *handler) Log(line *base.Line, _ error) {
+	// 1. 服务退出.
 	if o.ch == nil {
-		panic("service stopped")
+		if o.engine != nil {
+			o.engine.Log(line, fmt.Errorf("error on redis adapter: stopped"))
+		}
 		return
 	}
 
-	// 3. 提交数据.
+	// 2. 捕获异常.
+	defer func() {
+		if r := recover(); r != nil && o.engine != nil {
+			o.engine.Log(line, fmt.Errorf("panic on redis adapter: %v", r))
+		}
+	}()
+
+	// 3. 发布日志.
 	o.ch <- line
+}
+
+// Parent
+// 绑定上级/降级.
+func (o *handler) Parent(engine base.AdapterEngine) base.AdapterEngine {
+	o.engine = engine
+	return o
 }
 
 // Start
 // 启动服务.
-func (o *handler) Start() {
+func (o *handler) Start(ctx context.Context) {
+	// 1. 启动上级.
+	if o.engine != nil {
+		o.engine.Start(ctx)
+	}
+
+	// 2. 监听信号.
 	go func() {
-		// 1. 创建通道.
-		o.mu.Lock()
-		o.ctx, o.cancel = context.WithCancel(context.Background())
-		o.ch = make(chan *adapters.Line)
-		o.mu.Unlock()
+		o.ch = make(chan *base.Line)
+		o.ct = time.NewTicker(time.Duration(Config.BatchFrequency) * time.Millisecond)
 
-		tick := time.NewTicker(time.Duration(Config.Ticker) * time.Millisecond)
-
-		// 2. 监听结束.
+		// 结束监听.
 		defer func() {
-			recover()
+			// 关闭信息.
 			close(o.ch)
-			tick.Stop()
-
-			o.mu.Lock()
 			o.ch = nil
-			o.ctx = nil
-			o.cancel = nil
-			o.mu.Unlock()
+
+			// 关闭定时.
+			o.ct.Stop()
+			o.ct = nil
+
+			// 捕获异常.
+			if r := recover(); r != nil && o.engine != nil {
+				o.engine.Log(nil, fmt.Errorf("panic on redis channel: %v", r))
+			}
 		}()
 
-		// 3. 监听信号.
+		// 监听过程.
 		for {
 			select {
 			case line := <-o.ch:
-				go o.push(line)
-			case <-tick.C:
-				go o.pop()
-			case <-o.ctx.Done():
+				go o.onPush(line)
+			case <-o.ct.C:
+				go o.onPop()
+			case <-ctx.Done():
 				return
 			}
 		}
 	}()
 }
 
-// Stop
-// 退出服务.
-func (o *handler) Stop() {
-	o.mu.RLock()
-	defer o.mu.RUnlock()
-	if o.ctx != nil && o.ctx.Err() == nil {
-		o.cancel()
-	}
-}
-
 // 构造实例.
 func (o *handler) init() *handler {
-	o.bufferMapper = make(map[uint64]*adapters.Line, 0)
 	o.listKey = fmt.Sprintf("%s:%s", Config.KeyPrefix, Config.KeyList)
-	o.mu = sync.RWMutex{}
+	o.mapper = make(map[uint64]*base.Line)
+	o.mu = new(sync.RWMutex)
 	o.initConnection()
+
+	defaultPoolNode = strings.ReplaceAll(fmt.Sprintf("%s_%d_%d", base.LogHost, rand.Intn(9999), rand.Intn(9999)), ".", "_")
 	return o
 }
 
@@ -173,37 +151,49 @@ func (o *handler) initConnection() {
 }
 
 // 取出消息.
-func (o *handler) pop() {
+func (o *handler) onPop() {
+	var (
+		conn        redis.Conn
+		concurrency = atomic.AddInt32(&o.concurrency, 1)
+		count       = 0
+		err         error
+		key         string
+		keys        []interface{}
+		list        []*base.Line
+	)
+
 	// 1. 并发限流.
-	if concurrency := atomic.AddInt32(&o.concurrency, 1); concurrency > Config.Concurrency {
+	if concurrency > Config.Concurrency {
 		atomic.AddInt32(&o.concurrency, -1)
 		return
 	}
 
-	// 2. 取出消息.
-	//    若缓冲区无待提交的日志时退出.
-	var (
-		list  []*adapters.Line
-		count int
-	)
+	// 2. 监听结束.
 	defer func() {
+		// 关闭连接.
+		if conn != nil {
+			_ = conn.Close()
+		}
+
+		// 恢复统计.
+		recover()
 		atomic.AddInt32(&o.concurrency, -1)
 
-		// 继续提交.
-		// 直到缓冲区处理完成.
+		// 继续处理.
 		if count > 0 {
-			o.pop()
+			o.onPop()
 		}
 	}()
-	if list, count = func() (l []*adapters.Line, n int) {
+
+	// 3. 取出消息.
+	if list, count = func() (l []*base.Line, n int) {
 		o.mu.Lock()
 		defer o.mu.Unlock()
-		l = make([]*adapters.Line, 0)
-		for k, v := range o.bufferMapper {
-			delete(o.bufferMapper, k)
+		l = make([]*base.Line, 0)
+		for k, v := range o.mapper {
+			delete(o.mapper, k)
 			l = append(l, v)
-			n++
-			if n >= Config.Limit {
+			if n++; n >= Config.BatchLimit {
 				break
 			}
 		}
@@ -212,81 +202,59 @@ func (o *handler) pop() {
 		return
 	}
 
-	// 3. 准备提交.
-	var (
-		conn = o.connections.Get()
-		err  error
-		key  string
-		keys = []interface{}{o.listKey}
-	)
+	// 4. 发布消息.
+	conn = o.connections.Get()
+	keys = []interface{}{o.listKey}
 
-	// 3.1 结束提交.
-	defer func() {
-		// 关闭连接.
-		_ = conn.Close()
-
-		// 运行异常.
-		if v := recover(); v != nil && o.interrupt != nil {
-			o.interrupt(nil, fmt.Errorf("panic on redis adapter: %v", v))
-		}
-	}()
-
-	// 3.2 遍历日志.
+	// 4.1 遍历消费.
 	for _, line := range list {
-		if key, err = o.sendLine(conn, line); err != nil {
-			if o.interrupt != nil {
-				o.interrupt(line, fmt.Errorf("error on redis adapter: %s", err.Error()))
-			}
+		key, err = o.sendLine(conn, line)
+
+		// 发布成功.
+		if err == nil {
+			keys = append(keys, key)
+			line.Release()
 			continue
 		}
-		keys = append(keys, key)
+
+		// 发布出错.
+		if o.engine != nil {
+			o.engine.Log(line, err)
+		}
 	}
 
-	// 3.2 写入列表.
-	//     将 KEY 列表加入到 logger:list 中.
+	// 4.2 加入列表.
 	if len(keys) > 1 {
-		if err = o.sendList(conn, keys); err != nil && o.interrupt != nil {
-			o.interrupt(nil, fmt.Errorf("error on redis adapter: %s", err.Error()))
-		}
+		o.sendList(conn, keys)
 	}
 }
 
-// 塞入消息.
-func (o *handler) push(line *adapters.Line) {
+// 加入缓冲.
+func (o *handler) onPush(line *base.Line) {
 	var (
-		i = atomic.AddUint64(&o.bufferIndex, 1)
+		i = atomic.AddUint64(&o.index, 1)
 		n = 0
 	)
 
-	// 1. 塞入缓冲.
+	// 加入缓冲.
 	o.mu.Lock()
-	o.bufferMapper[i] = line
-	n = len(o.bufferMapper)
+	o.mapper[i] = line
+	n = len(o.mapper)
 	o.mu.Unlock()
 
-	// 2. 立即取出.
-	if n >= Config.Limit {
-		o.pop()
+	// 立即取出.
+	if n >= Config.BatchLimit {
+		o.onPop()
 	}
 }
 
-// 写入数据.
-//
-// Redis: SET logger:172_16_0_1_3721_9981_1001 {"key":"value"} EX 3600
-func (o *handler) sendLine(conn redis.Conn, line *adapters.Line) (key string, err error) {
-	data := NewData(line)
-
-	key = data.Key()
-	if err = conn.Send("SET", key, data.String(), "EX", Config.KeyLifetime); err == nil {
-		// println("line: ", line.GetId(), " -> ", line.GetAcquires())
-		line.Release()
-	}
+func (o *handler) sendLine(conn redis.Conn, line *base.Line) (key string, err error) {
+	key = fmt.Sprintf("%s:%s:%d", Config.KeyPrefix, defaultPoolNode, line.GetIndex())
+	text := formatters.Formatter.AsJson(line, nil)
+	err = conn.Send("SET", key, text, "EX", Config.KeyLifetime)
 	return
 }
 
-// 写入列表.
-//
-// Redis: RPUSH logger:list KEY1 KEY2 KEY3
-func (o *handler) sendList(conn redis.Conn, keys []interface{}) error {
-	return conn.Send("RPUSH", keys...)
+func (o *handler) sendList(conn redis.Conn, keys []interface{}) {
+	_ = conn.Send("RPUSH", keys...)
 }

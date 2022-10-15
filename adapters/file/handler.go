@@ -1,105 +1,83 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2022-10-13
+// date: 2022-10-15
 
 package file
 
 import (
+	"context"
+	"fmt"
 	"sync"
-	"time"
 
-	"github.com/fuyibing/log/v3/adapters"
+	"github.com/fuyibing/log/v3/base"
+	"github.com/fuyibing/log/v3/formatters"
 )
 
 type (
-	// Handler
-	// 文件适配器.
-	Handler interface {
-		// Interrupt
-		// 注册拦截.
-		//
-		// 当提交日志出现错误时, 接过拦截器转发降级, 本适配降级时转发给终端输出将
-		// 日志打印到标准输出流.
-		Interrupt(fatal func(line *adapters.Line, err error)) Handler
-
-		// Run
-		// 提交日志.
-		Run(line *adapters.Line, err error)
-
-		// Start
-		// 启动服务.
-		Start()
-
-		// Stop
-		// 退出服务.
-		Stop()
-	}
-
 	handler struct {
-		engines   map[string]Engine
-		interrupt func(line *adapters.Line, err error)
-		mu        sync.RWMutex
+		engine base.AdapterEngine
+		mapper map[string]Writer
+		mu     *sync.RWMutex
 	}
 )
 
-func New() Handler {
+// New
+// 创建执行器.
+func New() base.AdapterEngine {
 	return (&handler{}).init()
 }
 
-// Interrupt
-// 注册拦截.
-func (o *handler) Interrupt(interrupt func(line *adapters.Line, err error)) Handler {
-	o.interrupt = interrupt
-	return o
-}
+// Log
+// 写入日志.
+func (o *handler) Log(line *base.Line, err error) {
+	text := formatters.Formatter.AsFile(line, err)
+	send := o.get(line).Write(text)
 
-// Run
-// 提交日志.
-func (o *handler) Run(line *adapters.Line, _ error) {
-	en := o.getEngine(line.Time)
-	err := en.Write(line.String())
-
-	if err == nil {
-		// println("line: ", line.GetId(), " -> ", line.GetAcquires())
+	// 写入成功.
+	if send == nil {
 		line.Release()
 		return
 	}
 
-	if o.interrupt != nil {
-		o.interrupt(line, err)
+	// 降级处理.
+	if o.engine != nil {
+		o.engine.Log(line, err)
 	}
+}
+
+// Parent
+// 绑定上级/降级.
+func (o *handler) Parent(engine base.AdapterEngine) base.AdapterEngine {
+	o.engine = engine
+	return o
 }
 
 // Start
 // 启动服务.
-func (o *handler) Start() {}
+func (o *handler) Start(ctx context.Context) {
+	if o.engine != nil {
+		o.engine.Start(ctx)
+	}
+}
 
-// Stop
-// 退出服务.
-func (o *handler) Stop() {}
-
-// 读取引擎.
-func (o *handler) getEngine(t time.Time) (en Engine) {
+// 检查文件.
+func (o *handler) get(line *base.Line) Writer {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 
-	var (
-		ok  bool
-		key = t.Format(Config.Name)
-	)
+	key := fmt.Sprintf("%s/%s", line.Time.Format(Config.Folder), line.Time.Format(Config.Name))
 
-	if en, ok = o.engines[key]; ok {
-		return
+	if v, ok := o.mapper[key]; ok {
+		return v
 	}
 
-	en = (&engine{}).init(t)
-	o.engines[key] = en
-	return
-
+	v := (&writer{}).init(line.Time)
+	o.mapper[key] = v
+	return v
 }
 
 // 构造实例.
 func (o *handler) init() *handler {
-	o.engines = make(map[string]Engine)
-	o.mu = sync.RWMutex{}
+	o.mapper = make(map[string]Writer, 0)
+	o.mu = new(sync.RWMutex)
 	return o
 }

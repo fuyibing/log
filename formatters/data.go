@@ -1,22 +1,19 @@
 // author: wsfuyibing <websearch@163.com>
 // date: 2022-10-14
 
-package redis
+package formatters
 
 import (
 	"encoding/json"
 	"fmt"
 	"sync"
 
-	"github.com/fuyibing/log/v3/adapters"
+	"github.com/fuyibing/log/v3/base"
 )
 
-var (
-	dataId   uint64 = 0
-	dataPool *sync.Pool
-)
+var dataPool *sync.Pool
 
-type Data struct {
+type data struct {
 	// 服务信息.
 
 	Module     string `json:"module"`
@@ -42,19 +39,13 @@ type Data struct {
 	RequestId     string `json:"requestId"`
 	RequestMethod string `json:"requestMethod"`
 	RequestUrl    string `json:"requestUrl"`
-
-	index uint64
 }
 
-func NewData(x *adapters.Line) *Data {
-	return dataPool.Get().(*Data).before(x)
+func NewData(line *base.Line, err error) *data {
+	return dataPool.Get().(*data).before(line, err)
 }
 
-func (o *Data) Key() string {
-	return fmt.Sprintf("%s:%s:%d", Config.KeyPrefix, adapters.NodeId, o.index)
-}
-
-func (o *Data) String() (str string) {
+func (o *data) String() (str string) {
 	// 1. 监听结束.
 	//    数据处理完成后, 释放实例回池.
 	defer func() {
@@ -69,7 +60,7 @@ func (o *Data) String() (str string) {
 	return
 }
 
-func (o *Data) after() *Data {
+func (o *data) after() *data {
 	// 服务信息.
 
 	o.Module = ""
@@ -96,35 +87,38 @@ func (o *Data) after() *Data {
 	return o
 }
 
-func (o *Data) before(x *adapters.Line) *Data {
-	o.index = x.GetIndex()
-
+func (o *data) before(line *base.Line, err error) *data {
 	// 服务信息.
 
-	o.Module = x.Name
-	o.Pid = x.Pid
-	o.ServerAddr = fmt.Sprintf("%s:%d", x.Host, x.Port)
+	o.Module = base.LogName
+	o.Pid = base.LogPid
+	o.ServerAddr = fmt.Sprintf("%s:%d", base.LogHost, base.LogPort)
 
 	// 日志信息.
 
-	o.Content = x.Content
-	o.Duration = x.Duration
-	o.Level = x.Level.String()
-	o.Time = x.Time.Format(x.TimeFormat)
+	o.Content = line.Content
+	o.Duration = line.Duration
+	o.Level = line.Level.Name()
+	o.Time = line.Time.Format(base.LogTimeFormat)
 
 	// 链路信息.
 
-	o.Action = x.Action
-	o.TraceId = x.TraceId
-	o.ParentSpanId = x.ParentSpanId
-	o.SpanId = x.SpanId
-	o.Version = fmt.Sprintf("%s.%d", x.SpanPrefix, x.SpanOffset)
-	o.RequestId = x.TraceId
-	o.RequestMethod = x.RequestMethod
-	o.RequestUrl = x.RequestUrl
+	o.TraceId = line.TraceId
+	o.ParentSpanId = line.ParentSpanId
+	o.SpanId = line.SpanId
+	o.Version = fmt.Sprintf("%s.%d", line.SpanPrefix, line.SpanOffset)
+	o.RequestId = line.TraceId
+	o.RequestMethod = line.RequestMethod
+	o.RequestUrl = line.RequestUrl
+
+	// 追加错误.
+	if err != nil {
+		o.Content += fmt.Sprintf(" << interrupt: %s", err.Error())
+	}
+
 	return o
 }
 
-func (o *Data) init() *Data {
+func (o *data) init() *data {
 	return o
 }

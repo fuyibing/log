@@ -1,18 +1,18 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2022-10-13
+// date: 2022-10-15
 
-package adapters
+package base
 
-import (
-	"sync"
-)
+import "sync"
 
 func init() {
 	new(sync.Once).Do(func() {
+
 		linePool = &sync.Pool{
 			New: func() interface{} {
 				return (&Line{}).init()
 			},
 		}
+
 	})
 }

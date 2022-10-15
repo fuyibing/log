@@ -1,12 +1,12 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2022-10-13
+// date: 2022-10-15
 
 package log
 
 import (
 	"context"
 
-	"github.com/fuyibing/log/v3/adapters"
+	"github.com/fuyibing/log/v3/base"
 )
 
 // NewContext
@@ -14,15 +14,15 @@ import (
 func NewContext() context.Context {
 	return context.WithValue(
 		context.Background(),
-		adapters.TracingKey, adapters.NewTracing().WithStart(),
+		base.TracingKey, base.NewTracing().WithStart(),
 	)
 }
 
 // ChildContext
 // 创建子链路上下文.
 func ChildContext(ctx context.Context, text string, args ...interface{}) context.Context {
-	if x, ok := ctx.Value(adapters.TracingKey).(*adapters.Tracing); ok {
-		ctn := context.WithValue(ctx, adapters.TracingKey, adapters.NewTracing().WithParent(x))
+	if x, ok := ctx.Value(base.TracingKey).(*base.Tracing); ok {
+		ctn := context.WithValue(ctx, base.TracingKey, base.NewTracing().WithParent(x))
 		if text == "" {
 			Client.Infofc(ctx, "begin child")
 		} else {

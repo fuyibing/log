@@ -1,12 +1,18 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2022-10-13
+// date: 2022-10-15
 
 package file
 
 var Config *Configuration
 
+const (
+	defaultPath   = "./logs"
+	defaultFolder = "2006-01"
+	defaultName   = "2006-01-02"
+)
+
 // Configuration
-// 文件配置.
+// 基础配置.
 type Configuration struct {
 	// 存储目录.
 	// 例如: /var/logs
@@ -23,24 +29,25 @@ type Configuration struct {
 	Name string `yaml:"name"`
 }
 
-// Defaults
-// 覆盖默认值.
-func (o *Configuration) Defaults(x *Configuration) {
-	if x.Path != "" {
-		o.Path = x.Path
+// Override
+// 覆盖配置.
+func (o *Configuration) Override(c *Configuration) *Configuration {
+	if c.Path != "" {
+		o.Path = c.Path
 	}
-	if x.Folder != "" {
-		o.Folder = x.Folder
+	if c.Folder != "" {
+		o.Folder = c.Folder
 	}
-	if x.Name != "" {
-		o.Name = x.Name
+	if c.Name != "" {
+		o.Name = c.Name
 	}
+	return o
 }
 
 // 构造实例.
 func (o *Configuration) init() *Configuration {
-	o.Path = "./logs"
-	o.Folder = "2006-01"
-	o.Name = "2006-01-02"
+	o.Path = defaultPath
+	o.Folder = defaultFolder
+	o.Name = defaultName
 	return o
 }

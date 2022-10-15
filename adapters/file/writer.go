@@ -11,13 +11,13 @@ import (
 )
 
 type (
-	// Engine
+	// Writer
 	// 文件操作.
-	Engine interface {
+	Writer interface {
 		Write(text string) (err error)
 	}
 
-	engine struct {
+	writer struct {
 		err        error
 		name, path string
 		filepath   string
@@ -27,7 +27,7 @@ type (
 
 // Write
 // 写入内容.
-func (o *engine) Write(text string) (err error) {
+func (o *writer) Write(text string) (err error) {
 	var fp *os.File
 
 	// 1. 准备写入.
@@ -63,7 +63,7 @@ func (o *engine) Write(text string) (err error) {
 }
 
 // 构造实例.
-func (o *engine) init(t time.Time) *engine {
+func (o *writer) init(t time.Time) *writer {
 	o.mu = sync.Mutex{}
 	o.name = fmt.Sprintf("%s.log", t.Format(Config.Name))
 	o.path = fmt.Sprintf("%s/%s", Config.Path, t.Format(Config.Folder))

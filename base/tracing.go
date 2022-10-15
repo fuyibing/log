@@ -1,7 +1,7 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2022-10-13
+// date: 2022-10-15
 
-package adapters
+package base
 
 import (
 	"fmt"
@@ -49,7 +49,7 @@ func (o *Tracing) WithRequest() {}
 
 func (o *Tracing) WithParent(x *Tracing) *Tracing {
 	o.traceId = x.GetTraceId()
-	o.parentSpanId = o.GetSpanId()
+	o.parentSpanId = x.GetSpanId()
 	o.spanId = o.uuid()
 	o.prefix = fmt.Sprintf("%s.%d", x.GetPrefix(), x.GetOffset())
 	return o
@@ -57,7 +57,6 @@ func (o *Tracing) WithParent(x *Tracing) *Tracing {
 
 func (o *Tracing) WithStart() *Tracing {
 	o.traceId = o.uuid()
-	o.parentSpanId = o.traceId
 	o.spanId = o.traceId
 	o.prefix = "0"
 	return o

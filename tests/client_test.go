@@ -1,10 +1,10 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2022-10-13
+// date: 2022-10-15
 
 package tests
 
 import (
-	"sync"
+	"fmt"
 	"testing"
 	"time"
 
@@ -13,41 +13,30 @@ import (
 
 func TestClient(t *testing.T) {
 
-	ct1 := log.NewContext()
-	log.Client.Debugfc(ct1, "debug 1")
-	log.Client.Infofc(ct1, "info 2")
+	// formatters.Formatter.SetTermFormatter(func(line *base.Line, err error) string {
+	//     return "my term:" + line.Content
+	// })
+
+	ctx := log.NewContext()
 
 	time.Sleep(time.Second)
-	ct2 := log.ChildContext(ct1, "child span")
-	log.Client.Infofc(ct2, "child info 1")
-	log.Client.Warnfc(ct2, "child warn 2")
 
-	log.Client.Warnfc(ct1, "warn 3")
-	log.Client.Errorfc(ct1, "error 4")
+	defer func() {
+		if r := recover(); r != nil {
+			log.Client.Panicfc(ctx, fmt.Sprintf("%v", r))
+		}
 
-	time.Sleep(time.Second)
-}
+		time.Sleep(time.Second)
+	}()
 
-func TestTryLock(t *testing.T) {
+	log.Client.Infofc(ctx, "Info message")
 
-	mu := sync.Mutex{}
-
-	wg := new(sync.WaitGroup)
-	for i := 0; i < 3; i++ {
-		wg.Add(1)
-		go func(index int) {
-			mu.Lock()
-			defer func() {
-				mu.Unlock()
-				wg.Done()
-			}()
-
-			println("begin:", index)
-			time.Sleep(time.Second)
-			println("end:", index)
-		}(i)
+	ctc := log.ChildContext(ctx, "child context")
+	for i := 0; i < 5; i++ {
+		log.Client.Warnfc(ctc, "Warn message: index=%d", i)
 	}
 
-	wg.Wait()
+	log.Client.Errorfc(ctx, "Error message")
+	log.Client.Panicfc(ctx, "not panic")
 
 }

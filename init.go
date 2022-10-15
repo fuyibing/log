@@ -3,11 +3,15 @@
 
 package log
 
-import "sync"
+import (
+	"sync"
+)
 
 func init() {
 	new(sync.Once).Do(func() {
 		Client = (&client{}).init()
-		Config = (&config{}).init()
+		Config = (&configuration{}).init()
+
+		Client.Start()
 	})
 }
