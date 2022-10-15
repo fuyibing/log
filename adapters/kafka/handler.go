@@ -148,7 +148,6 @@ func (o *handler) init() *handler {
 
 // 发布事件.
 func (o *handler) onEvent(e kafka.Event) {
-	println("kafka event:", e.String())
 }
 
 // 取出日志.

@@ -1,7 +1,7 @@
 #
 # package: github.com/fuyibing/log/v3.
 #
-adapter: file
+adapter: kafka
 level: debug
 time: "2006-01-02 15:04:05.999"
 term:

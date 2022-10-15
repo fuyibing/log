@@ -12,9 +12,9 @@ import (
 // NewContext
 // 创建链路上下文.
 func NewContext() context.Context {
-	return context.WithValue(
-		context.Background(),
-		base.TracingKey, base.NewTracing().WithStart(),
+	return context.WithValue(context.Background(),
+		base.TracingKey,
+		base.NewTracing().WithStart(),
 	)
 }
 
@@ -24,7 +24,7 @@ func ChildContext(ctx context.Context, text string, args ...interface{}) context
 	if x, ok := ctx.Value(base.TracingKey).(*base.Tracing); ok {
 		ctn := context.WithValue(ctx, base.TracingKey, base.NewTracing().WithParent(x))
 		if text == "" {
-			Client.Infofc(ctx, "begin child")
+			Client.Infofc(ctx, "child begin")
 		} else {
 			Client.Infofc(ctx, text, args...)
 		}

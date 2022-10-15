@@ -13,8 +13,9 @@ import (
 
 var dataPool *sync.Pool
 
+// 默认JSON数据结构.
 type data struct {
-	// 服务信息.
+	// 1. 服务信息.
 
 	Module     string `json:"module"`
 	Pid        int    `json:"pid"`
@@ -22,14 +23,14 @@ type data struct {
 	TaskId     int    `json:"taskId"`
 	TaskName   string `json:"taskName"`
 
-	// 日志信息.
+	// 2. 日志信息.
 
 	Content  string  `json:"content"`
 	Duration float64 `json:"duration"`
 	Level    string  `json:"level"`
 	Time     string  `json:"time"`
 
-	// 链路信息.
+	// 3. 链路信息.
 
 	Action        string `json:"action"`
 	TraceId       string `json:"traceId"`
@@ -41,10 +42,15 @@ type data struct {
 	RequestUrl    string `json:"requestUrl"`
 }
 
+// NewData
+// 数据实例.
 func NewData(line *base.Line, err error) *data {
-	return dataPool.Get().(*data).before(line, err)
+	return dataPool.Get().(*data).
+		before(line, err)
 }
 
+// String
+// 转为JSON字符串.
 func (o *data) String() (str string) {
 	// 1. 监听结束.
 	//    数据处理完成后, 释放实例回池.
@@ -56,7 +62,11 @@ func (o *data) String() (str string) {
 	// 2. 转换数据.
 	if buf, err := json.Marshal(o); err == nil {
 		str = string(buf)
+		return
 	}
+
+	// 3. 空数据.
+	str = "{}"
 	return
 }
 

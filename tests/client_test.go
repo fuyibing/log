@@ -32,11 +32,12 @@ func TestClient(t *testing.T) {
 	log.Client.Infofc(ctx, "Info message")
 
 	ctc := log.ChildContext(ctx, "child context")
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 1000; i++ {
 		log.Client.Warnfc(ctc, "Warn message: index=%d", i)
 	}
 
 	log.Client.Errorfc(ctx, "Error message")
 	log.Client.Panicfc(ctx, "not panic")
 
+	time.Sleep(time.Minute)
 }

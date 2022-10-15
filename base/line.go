@@ -51,15 +51,25 @@ func NewLine(level Level, text string, args []interface{}) *Line {
 	return o
 }
 
-func (o *Line) GetIdentify() (id, acquires uint64) { return o.id, o.acquires }
+// GetIdentify
+// 返回实例ID.
+func (o *Line) GetIdentify() (id, acquires uint64) {
+	return o.id, o.acquires
+}
 
-func (o *Line) GetIndex() uint64 { return o.index }
+// GetIndex
+// 返回日志索引量.
+func (o *Line) GetIndex() uint64 {
+	return o.index
+}
 
 // Release
 // 释放入池.
 func (o *Line) Release() {
 	o.after()
 	linePool.Put(o)
+
+	println("id = ", o.id, " & index = ", o.index)
 }
 
 // WithContext

@@ -17,10 +17,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var Config *configuration
+var Config *Configuration
 
 type (
-	configuration struct {
+	Configuration struct {
 		// 1. 服务定义
 		//    从 config/app.yaml 中解析.
 
@@ -31,11 +31,11 @@ type (
 		// 2. 基础配置
 		//    从 config/log.yaml 中解析.
 
-		Adapter     base.Adapter     `yaml:"-"`
-		AdapterName base.AdapterName `yaml:"adapter"`
-		Level       base.Level       `yaml:"-"`
-		LevelName   base.LevelName   `yaml:"level"`
-		TimeFormat  string           `yaml:"time"` // 时间格式.
+		Adapter     base.Adapter     `yaml:"-"`       // 适配器类型
+		AdapterName base.AdapterName `yaml:"adapter"` // 适配器名称
+		Level       base.Level       `yaml:"-"`       // 级别类型
+		LevelName   base.LevelName   `yaml:"level"`   // 级别名称
+		TimeFormat  string           `yaml:"time"`    // 时间格式.
 
 		// 3. 适配配置.
 		//    从 config/log.yaml 中解析.
@@ -45,21 +45,26 @@ type (
 		Redis *redis.Configuration `yaml:"redis"` // Redis 配置
 		Kafka *kafka.Configuration `yaml:"kafka"` // Kafka 配置
 
+		// n. 级别状态.
 		debugOn, infoOn, warnOn, errorOn bool
 	}
 )
 
-func (o *configuration) DebugOn() bool { return o.debugOn }
-func (o *configuration) InfoOn() bool  { return o.infoOn }
-func (o *configuration) WarnOn() bool  { return o.warnOn }
-func (o *configuration) ErrorOn() bool { return o.errorOn }
+// /////////////////////////////////////////////////////////////
+// 状态检测.
+// /////////////////////////////////////////////////////////////
+
+func (o *Configuration) DebugOn() bool { return o.debugOn }
+func (o *Configuration) InfoOn() bool  { return o.infoOn }
+func (o *Configuration) WarnOn() bool  { return o.warnOn }
+func (o *Configuration) ErrorOn() bool { return o.errorOn }
 
 // /////////////////////////////////////////////////////////////
 // 配置解析.
 // /////////////////////////////////////////////////////////////
 
 // 赋默认值.
-func (o *configuration) defaults() *configuration {
+func (o *Configuration) defaults() *Configuration {
 	if o.Name != "" {
 		base.LogName = o.Name
 	}
@@ -78,12 +83,12 @@ func (o *configuration) defaults() *configuration {
 }
 
 // 构造实例.
-func (o *configuration) init() *configuration {
+func (o *Configuration) init() *Configuration {
 	return o.runtime().scan().defaults().status()
 }
 
 // 运行参数.
-func (o *configuration) runtime() *configuration {
+func (o *Configuration) runtime() *Configuration {
 	if nis, e1 := net.Interfaces(); e1 == nil {
 		for _, ni := range nis {
 			if list, e2 := ni.Addrs(); e2 == nil {
@@ -100,7 +105,7 @@ func (o *configuration) runtime() *configuration {
 }
 
 // 解析文件.
-func (o *configuration) scan() *configuration {
+func (o *Configuration) scan() *Configuration {
 	for _, f := range []string{"./tmp/log.yaml", "../tmp/log.yaml", "./config/log.yaml", "../config/log.yaml"} {
 		if body, err := os.ReadFile(f); err == nil {
 			if yaml.Unmarshal(body, o) == nil {
@@ -121,7 +126,7 @@ func (o *configuration) scan() *configuration {
 }
 
 // 日志状态.
-func (o *configuration) status() *configuration {
+func (o *Configuration) status() *Configuration {
 	// 1. 日志级级.
 	o.Level = o.LevelName.Level()
 	switch o.Level {
