@@ -93,7 +93,7 @@ func (o *handler) Start(ctx context.Context) {
 
 			// 捕获异常.
 			if r := recover(); r != nil && o.engine != nil {
-				o.engine.Log(nil, fmt.Errorf("panic on redis channel: %v", r))
+				o.engine.Log(base.NewInternalLine(fmt.Sprintf("panic on redis channel: %v", r)), nil)
 			}
 		}()
 

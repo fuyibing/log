@@ -30,14 +30,14 @@ func New() base.AdapterEngine {
 // 写入日志.
 func (o *handler) Log(line *base.Line, err error) {
 	if line == nil {
+		if err == nil {
+			return
+		}
 		line = base.NewInternalLine(err.Error())
 	}
 
-	text := formatters.Formatter.AsFile(line, err)
-	send := o.get(line).Write(text)
-
 	// 写入成功.
-	if send == nil {
+	if err = o.get(line).Write(formatters.Formatter.AsFile(line, err)); err == nil {
 		line.Release()
 		return
 	}
