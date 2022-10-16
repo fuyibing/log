@@ -13,7 +13,6 @@ type (
 	// FormatterHandler
 	// 格式化执行器.
 	FormatterHandler func(line *base.Line) string
-	// FormatterHandler func(line *base.Line, err error) string
 
 	// FormatterManager
 	// 格式化管理器.
@@ -23,7 +22,6 @@ type (
 		//
 		// return "[2022-10-16 00:50:35.678][127.0.0.1:8080][FLOG][INFO] message"
 		AsFile(line *base.Line) string
-		// AsFile(line *base.Line, err error) string
 
 		// AsJson
 		// 用于写入Redis/Kafka.
@@ -37,14 +35,12 @@ type (
 		//     ...
 		// }
 		AsJson(line *base.Line) string
-		// AsJson(line *base.Line, err error) string
 
 		// AsTerm
 		// 用于终端打印.
 		//
 		// return "[2006-01-02 15:04:05.999][INFO] message"
 		AsTerm(line *base.Line) string
-		// AsTerm(line *base.Line, err error) string
 
 		// SetFileFormatter
 		// 自定义File格式.

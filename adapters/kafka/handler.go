@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
-	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -65,9 +64,14 @@ func (o *handler) Log(line *base.Line) {
 
 	// 2.2 捕获异常.
 	defer func() {
-		if r := recover(); r == nil {
+		r := recover()
+
+		if r == nil {
 			return
 		}
+
+		line.WithError(fmt.Errorf("panic on kafka adapter: %v", r))
+
 		o.onEngine(key)
 		o.delCache(key)
 	}()
@@ -113,16 +117,16 @@ func (o *handler) Start(ctx context.Context) {
 
 func (o *handler) addCache(key string, line *base.Line) {
 	o.mu.Lock()
-	defer o.mu.Unlock()
 	o.cached[key] = line.Time.Unix()
 	o.mapper[key] = line
+	o.mu.Unlock()
 }
 
 func (o *handler) delCache(key string) {
 	o.mu.Lock()
-	defer o.mu.Unlock()
 	delete(o.cached, key)
 	delete(o.mapper, key)
+	o.mu.Unlock()
 }
 
 func (o *handler) getCache(key string) *base.Line {
@@ -145,7 +149,7 @@ func (o *handler) onClean() {
 		ku = time.Now().Unix() - Config.Clean
 	)
 
-	// 遍历缓存.
+	// 1. 遍历缓存.
 	o.mu.RLock()
 	for k, u := range o.cached {
 		if u <= ku {
@@ -155,7 +159,7 @@ func (o *handler) onClean() {
 	}
 	o.mu.RUnlock()
 
-	// 遍历列表.
+	// 2. 遍历列表.
 	for _, k := range ks {
 		o.onEngine(k)
 		o.delCache(k)
@@ -202,8 +206,8 @@ func (o *handler) onEvent(e kafka.Event) (err error) {
 	default:
 		// 3. 丢弃消息.
 		{
-			x := reflect.TypeOf(e)
-			println("event type = ", x.Name(), " & text = ", t.String())
+			// x := reflect.TypeOf(e)
+			// println("event type = ", x.Name(), " & text = ", t.String())
 		}
 	}
 	return
