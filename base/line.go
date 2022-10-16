@@ -51,6 +51,10 @@ func NewLine(level Level, text string, args []interface{}) *Line {
 	return o
 }
 
+func NewInternalLine(text string, args ...interface{}) *Line {
+	return NewLine(Error, text, args)
+}
+
 // GetIdentify
 // 返回实例ID.
 func (o *Line) GetIdentify() (id, acquires uint64) {
@@ -68,8 +72,7 @@ func (o *Line) GetIndex() uint64 {
 func (o *Line) Release() {
 	o.after()
 	linePool.Put(o)
-
-	println("id = ", o.id, " & index = ", o.index)
+	// println("id = ", o.id, " & index = ", o.index, " & goroutines = ", runtime.NumGoroutine())
 }
 
 // WithContext

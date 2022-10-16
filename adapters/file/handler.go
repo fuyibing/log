@@ -29,6 +29,10 @@ func New() base.AdapterEngine {
 // Log
 // 写入日志.
 func (o *handler) Log(line *base.Line, err error) {
+	if line == nil {
+		line = base.NewInternalLine(err.Error())
+	}
+
 	text := formatters.Formatter.AsFile(line, err)
 	send := o.get(line).Write(text)
 

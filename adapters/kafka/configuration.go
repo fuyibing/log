@@ -6,54 +6,57 @@ package kafka
 var Config *Configuration
 
 const (
-	defaultConcurrency    int32 = 10
-	defaultBatchFrequency       = 200
-	defaultBatchLimit           = 100
-	defaultBroker               = "127.0.0.1:9092"
-	defaultTopic                = "flog"
+	defaultBatch   = 300
+	defaultClean   = 1
+	defaultBroker  = "127.0.0.1:9092"
+	defaultTopic   = "flog"
+	defaultTimeout = 3
 )
 
 // Configuration
 // 基础配置.
 type Configuration struct {
-	Concurrency    int32 `yaml:"concurrency"`
-	BatchFrequency int   `yaml:"batch-frequency"`
-	BatchLimit     int   `yaml:"batch-limit"`
-
+	Batch   int      `yaml:"batch"`
+	Clean   int64    `yaml:"clean"`
 	Brokers []string `yaml:"brokers"`
 	Topic   string   `yaml:"topic"`
+	Timeout int      `yaml:"timeout"` // 连接超时时长
 }
 
 // Override
 // 覆盖配置.
 func (o *Configuration) Override(c *Configuration) *Configuration {
-	if c.Concurrency > 0 {
-		o.Concurrency = c.Concurrency
+	// Basic 选项.
+
+	if c.Batch > 0 {
+		o.Batch = c.Batch
 	}
-	if c.BatchFrequency > 0 {
-		o.BatchFrequency = c.BatchFrequency
+	if c.Clean > 0 {
+		o.Clean = c.Clean
 	}
-	if c.BatchLimit > 0 {
-		o.BatchLimit = c.BatchLimit
-	}
+
+	// Kafka 选项.
 
 	if c.Brokers != nil && len(c.Brokers) > 0 {
 		o.Brokers = c.Brokers
 	}
-
 	if c.Topic != "" {
 		o.Topic = c.Topic
 	}
-
+	if c.Timeout > 0 {
+		o.Timeout = c.Timeout
+	}
 	return o
 }
 
 // 构造实例.
 func (o *Configuration) init() *Configuration {
-	o.Concurrency = defaultConcurrency
-	o.BatchFrequency = defaultBatchFrequency
-	o.BatchLimit = defaultBatchLimit
+	o.Batch = defaultBatch
+	o.Clean = defaultClean
+
 	o.Brokers = []string{defaultBroker}
 	o.Topic = defaultTopic
+	o.Timeout = defaultTimeout
+
 	return o
 }
