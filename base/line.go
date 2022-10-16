@@ -77,7 +77,7 @@ func (o *Line) Release() {
 
 // WithContext
 // 追加链路信息.
-func (o *Line) WithContext(ctx context.Context) {
+func (o *Line) WithContext(ctx context.Context) *Line {
 	if x, ok := ctx.Value(TracingKey).(*Tracing); ok {
 		o.Trace = true
 		o.TraceId = x.GetTraceId()
@@ -86,11 +86,19 @@ func (o *Line) WithContext(ctx context.Context) {
 		o.SpanOffset = x.GetOffsetIncr()
 		o.SpanPrefix = x.GetPrefix()
 	}
+	return o
+}
+
+// WithError
+// 追加错误.
+func (o *Line) WithError(err error) *Line {
+	o.Content += fmt.Sprintf(" << interrupt: %s", err.Error())
+	return o
 }
 
 // WithStack
 // 追加堆栈信息.
-func (o *Line) WithStack() {
+func (o *Line) WithStack() *Line {
 	for i := 3; ; i++ {
 		if _, f, l, g := runtime.Caller(i); g {
 			o.Content += fmt.Sprintf("\n%s:%d", strings.TrimSpace(f), l)
@@ -98,6 +106,7 @@ func (o *Line) WithStack() {
 		}
 		break
 	}
+	return o
 }
 
 // /////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 #
 # package: github.com/fuyibing/log/v3.
 #
-adapter: kafka
+adapter: redis
 level: debug
 time: "2006-01-02 15:04:05.999"
 term:
@@ -16,7 +16,7 @@ kafka:
   brokers:
     - "192.168.3.131:9092"
 redis:
-  addr: "127.0.0.1:6379"
+  addr: "127.0.0.1:3721"
   password: ""
   max-active: 4
   max-idle: 2

@@ -13,7 +13,9 @@ var (
 		base.Error: {31, 0}, // 白底红字
 	}
 	Config *Configuration
+)
 
+var (
 	defaultColor = false
 )
 

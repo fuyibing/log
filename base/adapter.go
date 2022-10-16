@@ -19,14 +19,14 @@ type (
 
 	// AdapterLog
 	// 适配器执行.
-	AdapterLog func(line *Line, err error)
+	AdapterLog func(line *Line)
 
 	// AdapterEngine
 	// 适配器引擎.
 	AdapterEngine interface {
 		// Log
 		// 发送日志.
-		Log(line *Line, err error)
+		Log(line *Line)
 
 		// Parent
 		// 绑定上级/降级.

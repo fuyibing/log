@@ -41,11 +41,15 @@ func New() base.AdapterEngine {
 
 // Log
 // 发送日志.
-func (o *handler) Log(line *base.Line, _ error) {
-	// 1. 服务退出.
+func (o *handler) Log(line *base.Line) {
+	if line == nil {
+		return
+	}
+
+	// 1. 服务降级.
 	if o.ch == nil {
 		if o.engine != nil {
-			o.engine.Log(line, fmt.Errorf("error on redis adapter: stopped"))
+			o.engine.Log(line.WithError(fmt.Errorf("error on redis adapter: stopped or not start")))
 		}
 		return
 	}
@@ -53,7 +57,7 @@ func (o *handler) Log(line *base.Line, _ error) {
 	// 2. 捕获异常.
 	defer func() {
 		if r := recover(); r != nil && o.engine != nil {
-			o.engine.Log(line, fmt.Errorf("panic on redis adapter: %v", r))
+			o.engine.Log(line.WithError(fmt.Errorf("panic on redis adapter: %v", r)))
 		}
 	}()
 
@@ -93,7 +97,7 @@ func (o *handler) Start(ctx context.Context) {
 
 			// 捕获异常.
 			if r := recover(); r != nil && o.engine != nil {
-				o.engine.Log(base.NewInternalLine(fmt.Sprintf("panic on redis channel: %v", r)), nil)
+				o.engine.Log(base.NewInternalLine(fmt.Sprintf("panic on redis channel: %v", r)))
 			}
 		}()
 
@@ -219,7 +223,7 @@ func (o *handler) onPop() {
 
 		// 发布出错.
 		if o.engine != nil {
-			o.engine.Log(line, err)
+			o.engine.Log(line.WithError(err))
 		}
 	}
 
@@ -248,13 +252,15 @@ func (o *handler) onPush(line *base.Line) {
 	}
 }
 
+// 发送日志.
 func (o *handler) sendLine(conn redis.Conn, line *base.Line) (key string, err error) {
 	key = fmt.Sprintf("%s:%s:%d", Config.KeyPrefix, defaultPoolNode, line.GetIndex())
-	text := formatters.Formatter.AsJson(line, nil)
+	text := formatters.Formatter.AsJson(line)
 	err = conn.Send("SET", key, text, "EX", Config.KeyLifetime)
 	return
 }
 
+// 追加列表.
 func (o *handler) sendList(conn redis.Conn, keys []interface{}) {
 	_ = conn.Send("RPUSH", keys...)
 }

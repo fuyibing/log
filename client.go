@@ -187,5 +187,5 @@ func (o *client) log(ctx context.Context, stack bool, level base.Level, text str
 	if stack {
 		line.WithStack()
 	}
-	o.engine.Log(line, nil)
+	o.engine.Log(line)
 }

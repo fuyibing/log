@@ -38,14 +38,14 @@ func New() base.AdapterEngine {
 
 // Log
 // 发送日志.
-func (o *handler) Log(line *base.Line, _ error) {
+func (o *handler) Log(line *base.Line) {
 	// 1. 降级处理.
 	//    未启动 Kafka 生产者或正在启动中, 此过程若定义了降级适配器, 则
 	//    转发到降级, 反之丢弃.
 	if o.producer == nil {
 		// 1.1 降级处理.
 		if o.engine != nil {
-			o.engine.Log(line, nil)
+			o.engine.Log(line.WithError(fmt.Errorf("error on kafka adapter: stopped or not start")))
 			return
 		}
 
@@ -57,7 +57,7 @@ func (o *handler) Log(line *base.Line, _ error) {
 	// 2. 准备发送.
 	var (
 		key   = fmt.Sprintf("%s_%d", o.node, line.GetIndex())
-		value = formatters.Formatter.AsJson(line, nil)
+		value = formatters.Formatter.AsJson(line)
 	)
 
 	// 2.1 加入缓存.
@@ -178,7 +178,7 @@ func (o *handler) onEngine(key string) {
 		}
 
 		// 降级处理.
-		o.engine.Log(v, nil)
+		o.engine.Log(v)
 	}
 }
 
@@ -252,7 +252,7 @@ func (o *handler) listen(ctx context.Context) {
 		// 1.3 降级转发.
 		if err != nil && o.engine != nil {
 			err = fmt.Errorf("error on kafka adapter: %v", err)
-			o.engine.Log(base.NewInternalLine(err.Error()), err)
+			o.engine.Log(base.NewInternalLine(err.Error()))
 		}
 	}()
 

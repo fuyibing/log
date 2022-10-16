@@ -44,9 +44,9 @@ type data struct {
 
 // NewData
 // 数据实例.
-func NewData(line *base.Line, err error) *data {
+func NewData(line *base.Line) *data {
 	return dataPool.Get().(*data).
-		before(line, err)
+		before(line)
 }
 
 // String
@@ -97,7 +97,7 @@ func (o *data) after() *data {
 	return o
 }
 
-func (o *data) before(line *base.Line, err error) *data {
+func (o *data) before(line *base.Line) *data {
 	// 服务信息.
 
 	o.Module = base.LogName
@@ -120,11 +120,6 @@ func (o *data) before(line *base.Line, err error) *data {
 	o.RequestId = line.TraceId
 	o.RequestMethod = line.RequestMethod
 	o.RequestUrl = line.RequestUrl
-
-	// 追加错误.
-	if err != nil {
-		o.Content += fmt.Sprintf(" << interrupt: %s", err.Error())
-	}
 
 	return o
 }

@@ -11,8 +11,8 @@ type jsonFormatter struct{}
 
 // Format
 // 格式化过程.
-func (o *jsonFormatter) Format(line *base.Line, err error) string {
-	return NewData(line, err).String()
+func (o *jsonFormatter) Format(line *base.Line) string {
+	return NewData(line).String()
 }
 
 // 构造实例.

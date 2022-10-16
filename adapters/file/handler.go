@@ -28,23 +28,25 @@ func New() base.AdapterEngine {
 
 // Log
 // 写入日志.
-func (o *handler) Log(line *base.Line, err error) {
+func (o *handler) Log(line *base.Line) {
+	// 1. 取消日志.
 	if line == nil {
-		if err == nil {
-			return
-		}
-		line = base.NewInternalLine(err.Error())
+		return
 	}
 
-	// 写入成功.
-	if err = o.get(line).Write(formatters.Formatter.AsFile(line, err)); err == nil {
+	// 2. 写入成功.
+	defer func() { recover() }()
+
+	err := o.get(line).Write(formatters.Formatter.AsFile(line))
+
+	if err == nil {
 		line.Release()
 		return
 	}
 
-	// 降级处理.
+	// 3. 降级处理.
 	if o.engine != nil {
-		o.engine.Log(line, err)
+		o.engine.Log(line.WithError(err))
 	}
 }
 

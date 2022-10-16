@@ -15,7 +15,7 @@ type termFormatter struct{}
 
 // Format
 // 格式化过程.
-func (o *termFormatter) Format(line *base.Line, err error) (text string) {
+func (o *termFormatter) Format(line *base.Line) (text string) {
 	// 1. 基础信息.
 	text = fmt.Sprintf("[%s][%s]", line.Time.Format(base.LogTimeFormat), line.Level.Name())
 
@@ -31,10 +31,6 @@ func (o *termFormatter) Format(line *base.Line, err error) (text string) {
 
 	// 4. 日志内容.
 	text += fmt.Sprintf(" %s", line.Content)
-
-	if err != nil {
-		text += fmt.Sprintf(" << interupt: %s", err)
-	}
 	return
 }
 
