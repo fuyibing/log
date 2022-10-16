@@ -38,31 +38,36 @@ func New() base.AdapterEngine {
 // Log
 // 发送日志.
 func (o *handler) Log(line *base.Line) {
-	// 1. 降级处理.
+	// 1. 无效日志.
+	if line == nil {
+		return
+	}
+
+	// 2. 降级处理.
 	//    未启动 Kafka 生产者或正在启动中, 此过程若定义了降级适配器, 则
 	//    转发到降级, 反之丢弃.
 	if o.producer == nil {
-		// 1.1 降级处理.
+		// 2.1 降级处理.
 		if o.engine != nil {
 			o.engine.Log(line.WithError(fmt.Errorf("error on kafka adapter: stopped or not start")))
 			return
 		}
 
-		// 1.2 丢弃日志.
+		// 2.2 丢弃日志.
 		line.Release()
 		return
 	}
 
-	// 2. 准备发送.
+	// 3. 准备发送.
 	var (
 		key   = fmt.Sprintf("%s_%d", o.node, line.GetIndex())
 		value = formatters.Formatter.AsJson(line)
 	)
 
-	// 2.1 加入缓存.
+	// 3.1 加入缓存.
 	o.addCache(key, line)
 
-	// 2.2 捕获异常.
+	// 3.2 捕获异常.
 	defer func() {
 		r := recover()
 
@@ -76,7 +81,7 @@ func (o *handler) Log(line *base.Line) {
 		o.delCache(key)
 	}()
 
-	// 2.3 发送消息.
+	// 3.3 发送消息.
 	o.producer.ProduceChannel() <- &kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &Config.Topic, Partition: kafka.PartitionAny},
 		Key:            []byte(key),
@@ -182,7 +187,7 @@ func (o *handler) onEngine(key string) {
 		}
 
 		// 降级处理.
-		o.engine.Log(v)
+		o.engine.Log(v.WithError(fmt.Errorf("error on kafka adapter: sent time out")))
 	}
 }
 
@@ -255,8 +260,7 @@ func (o *handler) listen(ctx context.Context) {
 
 		// 1.3 降级转发.
 		if err != nil && o.engine != nil {
-			err = fmt.Errorf("error on kafka adapter: %v", err)
-			o.engine.Log(base.NewInternalLine(err.Error()))
+			o.engine.Log(base.NewInternalLine(fmt.Sprintf("error on kafka adapter: %v", err)))
 		}
 	}()
 

@@ -29,25 +29,35 @@ func New() base.AdapterEngine {
 // Log
 // 写入日志.
 func (o *handler) Log(line *base.Line) {
-	// 1. 取消日志.
+	// 1. 无效日志.
 	if line == nil {
 		return
 	}
 
-	// 2. 写入成功.
-	defer func() { recover() }()
+	// 2. 写入文件.
+	var err error
 
-	err := o.get(line).Write(formatters.Formatter.AsFile(line))
+	// 2.1 捕获结果.
+	defer func() {
+		// 捕获异常.
+		if r := recover(); r != nil {
+			err = fmt.Errorf("panic on file adapter: %v", r)
+		}
 
-	if err == nil {
-		line.Release()
-		return
-	}
+		// 写入完成.
+		if err == nil || o.engine == nil {
+			line.Release()
+			return
+		}
 
-	// 3. 降级处理.
-	if o.engine != nil {
+		// 降级处理
 		o.engine.Log(line.WithError(err))
-	}
+	}()
+
+	// 2.2 写入过程.
+	//     若文件写入失败, 将失败原因追加在内容后面, 并转发给终端
+	//     适配器负责打印.
+	err = o.get(line).Write(formatters.Formatter.AsFile(line))
 }
 
 // Parent

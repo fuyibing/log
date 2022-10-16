@@ -25,32 +25,33 @@ func New() base.AdapterEngine {
 // Log
 // 打印日志.
 func (o *handler) Log(line *base.Line) {
+	// 1. 无效日志.
 	if line == nil {
 		return
 	}
 
-	// 1. 监听结束.
+	// 2. 监听结束.
 	defer func() {
-		// 1.1 实例回池.
+		// 2.1 实例回池.
 		line.Release()
 
-		// 1.2 捕获异常.
+		// 2.2 捕获异常.
 		if r := recover(); r != nil {
 			o.output(fmt.Sprintf("panic on terminal adapter: %v", r))
 		}
 	}()
 
-	// 2. 日志内容.
+	// 3. 日志内容.
 	text := formatters.Formatter.AsTerm(line)
 
-	// 2.1 日志着色.
+	// 3.1 日志着色.
 	if *Config.Color {
 		if c, ok := Colors[line.Level]; ok {
 			text = fmt.Sprintf("%c[%d;%d;%dm%s%c[0m", 0x1B, 0, c[1], c[0], text, 0x1B)
 		}
 	}
 
-	// 2.2 打印日志.
+	// 3.2 打印日志.
 	o.output(text)
 }
 
