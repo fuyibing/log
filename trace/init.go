@@ -4,11 +4,11 @@
 package trace
 
 const (
-	defaultSpanPrefix = "0"
+	DefaultSpanPrefix = "0"
+	OpenTracingKey    = "FlogOpenTracingKey"
 )
 
 var (
-	TracingKey          = "FlogOpenTracingKey"
 	TracingTraceId      = "X-B3-Traceid"
 	TracingParentSpanId = "X-B3-Parentspanid"
 	TracingSpanId       = "X-B3-Spanid"

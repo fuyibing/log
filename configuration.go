@@ -10,6 +10,7 @@ import (
 	"github.com/fuyibing/log/v3/adapters/redis"
 	"github.com/fuyibing/log/v3/adapters/term"
 	"github.com/fuyibing/log/v3/base"
+	"github.com/fuyibing/log/v3/trace"
 	"gopkg.in/yaml.v3"
 	"net"
 	"os"
@@ -38,6 +39,11 @@ type configuration struct {
 	Name    string `yaml:"name"`    // 服务名称(app.yaml)
 	Port    int    `yaml:"port"`    // 服务端口(app.yaml)
 	Version string `yaml:"version"` // 服务版本(app.yaml)
+
+	TraceId      string `yaml:"trace-id"`
+	ParentSpanId string `yaml:"parent-span-id"`
+	SpanId       string `yaml:"span-id"`
+	SpanVersion  string `yaml:"span-version"`
 
 	// 级别状态
 	debugOn, infoOn, warnOn, errorOn bool
@@ -92,6 +98,7 @@ func (o *configuration) status() *configuration {
 // 从 YAML 文件读取的参数覆盖 base 包下的参数.
 func (o *configuration) sync() *configuration {
 	// 适配器配置.
+
 	if o.Term != nil {
 		term.Config.Override(o.Term)
 	}
@@ -105,11 +112,29 @@ func (o *configuration) sync() *configuration {
 		kafka.Config.Override(o.Kafka)
 	}
 
+	// 链路参数
+
+	if o.TraceId != "" {
+		trace.TracingTraceId = o.TraceId
+	}
+	if o.ParentSpanId != "" {
+		trace.TracingParentSpanId = o.ParentSpanId
+	}
+	if o.SpanId != "" {
+		trace.TracingSpanId = o.SpanId
+	}
+	if o.SpanVersion != "" {
+		trace.TracingSpanVersion = o.SpanVersion
+	}
+
+	// 基础参数
+
 	if o.TimeFormat != "" {
 		base.LogTimeFormat = o.TimeFormat
 	}
 
 	// 服务参数.
+
 	if o.Name != "" {
 		base.LogName = o.Name
 	}

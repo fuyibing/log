@@ -99,7 +99,7 @@ func (o *Line) Release() {
 // 追加链路信息.
 func (o *Line) WithContext(ctx context.Context) *Line {
 	if ctx != nil {
-		if x, ok := ctx.Value(trace.TracingKey).(*trace.Tracing); ok {
+		if x, ok := ctx.Value(trace.OpenTracingKey).(*trace.Tracing); ok {
 			o.Trace = true
 			o.TraceId = x.TraceId
 			o.ParentSpanId = x.ParentSpanId

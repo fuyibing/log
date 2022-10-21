@@ -15,14 +15,13 @@ import (
 // Tracing
 // 链路参数.
 type Tracing struct {
-	TraceId      string // 主链路
-	ParentSpanId string // 上级链路
-	SpanId       string // 本级链路
-	SpanPrefix   string // 链路前缀
-	SpanOffset   int32  // 链路偏移
-
-	RequestMethod string
-	RequestUrl    string
+	TraceId       string // 主链路
+	ParentSpanId  string // 上级链路
+	SpanId        string // 本级链路
+	SpanPrefix    string // 链路前缀
+	SpanOffset    int32  // 链路偏移
+	RequestMethod string // HTTP 请求方式
+	RequestUrl    string // HTTP 请求地址
 }
 
 // NewTracing
@@ -54,9 +53,9 @@ func (o *Tracing) WithRequest(request *http.Request) *Tracing {
 // WithRoot
 // 基础根链路.
 func (o *Tracing) WithRoot() *Tracing {
-	o.SpanId = o.makeSpanId()
-	o.SpanPrefix = defaultSpanPrefix
 	o.TraceId = o.makeTraceId()
+	o.SpanId = o.makeSpanId()
+	o.SpanPrefix = DefaultSpanPrefix
 	return o
 }
 

@@ -4,20 +4,17 @@
 adapter:
   - "term"
   - "file"
+  - "kafka"
 level: debug
-time: "2006-01-02 15:04:05.999"
+time: "2006-01-02 15:04:05.999999"
 term:
-  debugger: false
   color: true
 file:
-  debugger: false
 kafka:
-  debugger: true
   kafka-topic: "uniondrug-log"
   kafka-brokers:
     - "192.168.3.131:9092"
 redis:
-  debugger: true
   addr: "192.168.3.133:6379"
   password: ""
   max-active: 4
