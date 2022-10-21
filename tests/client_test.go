@@ -11,10 +11,10 @@ import (
 )
 
 func TestClient(t *testing.T) {
-	t.Log("------------ logger begin ---------")
+	t.Logf("------------ logger begin: %s ---------", log.Config.TimeFormat)
 
 	defer func() {
-		time.Sleep(time.Minute * 1)
+		time.Sleep(time.Second * 1)
 		log.Client.Stop()
 		t.Log("------------ logger quited ---------")
 	}()
@@ -23,7 +23,7 @@ func TestClient(t *testing.T) {
 
 	ctx := trace.New()
 	num := time.Now().Nanosecond()
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 3; i++ {
 		log.Client.Infofc(ctx, "info %d.%d", num, i)
 	}
 }

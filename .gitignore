@@ -8,3 +8,4 @@ bak/1017/tests/logs
 
 # ignore files
 *.bak
+go.sum
