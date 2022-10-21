@@ -1,19 +1,15 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2022-06-02
+// date: 2022-10-17
 
 package log
 
-import (
-	"sync"
-)
+import "sync"
 
 func init() {
 	new(sync.Once).Do(func() {
-		// 1. 构建实例.
-		Client = (&client{}).init()
-		Config = (&Configuration{}).init()
+		Config = (&configuration{}).init()
 
-		// 2. 启动客户端.
+		Client = (&client{}).init()
 		Client.Start()
 	})
 }

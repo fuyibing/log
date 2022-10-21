@@ -4,7 +4,7 @@
 
 bak/
 logs/
-tests/logs
+bak/1017/tests/logs
 
 # ignore files
 *.bak

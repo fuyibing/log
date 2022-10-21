@@ -16,6 +16,7 @@ type fileFormatter struct{}
 // Format
 // 格式化过程.
 func (o *fileFormatter) Format(line *base.Line) (text string) {
+
 	// 1. 基础信息.
 	text = fmt.Sprintf("[%s][%s:%d][%s][%s][PID=%d]",
 		line.Time.Format(base.LogTimeFormat),

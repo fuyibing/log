@@ -14,6 +14,8 @@ const (
 // Configuration
 // 基础配置.
 type Configuration struct {
+	Debugger bool `yaml:"debugger"`
+
 	// 存储目录.
 	// 例如: /var/logs
 	Path string `yaml:"path"`
@@ -32,6 +34,8 @@ type Configuration struct {
 // Override
 // 覆盖配置.
 func (o *Configuration) Override(c *Configuration) *Configuration {
+	o.Debugger = c.Debugger
+
 	if c.Path != "" {
 		o.Path = c.Path
 	}

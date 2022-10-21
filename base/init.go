@@ -7,12 +7,10 @@ import "sync"
 
 func init() {
 	new(sync.Once).Do(func() {
-
 		linePool = &sync.Pool{
 			New: func() interface{} {
 				return (&Line{}).init()
 			},
 		}
-
 	})
 }

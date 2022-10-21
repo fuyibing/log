@@ -3,7 +3,9 @@
 
 package term
 
-import "github.com/fuyibing/log/v3/base"
+import (
+	"github.com/fuyibing/log/v3/base"
+)
 
 var (
 	Colors = map[base.Level][]int{
@@ -22,6 +24,8 @@ var (
 // Configuration
 // 基础配置.
 type Configuration struct {
+	Debugger bool `yaml:"debugger"`
+
 	// 终端着色.
 	// 是否依据不同级别的日志, 输出不同的颜色.
 	Color *bool `yaml:"color"`
@@ -30,6 +34,8 @@ type Configuration struct {
 // Override
 // 覆盖配置.
 func (o *Configuration) Override(x *Configuration) *Configuration {
+	o.Debugger = x.Debugger
+
 	if x.Color != nil {
 		o.Color = x.Color
 	}

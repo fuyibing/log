@@ -6,12 +6,11 @@ package base
 import "os"
 
 var (
-	LogHost = "0.0.0.0"
-	LogPid  = os.Getpid()
-	LogPort = 0
-
+	LogHost       = "0.0.0.0"
 	LogName       = "FLOG"
+	LogPid        = os.Getpid()
+	LogPort       = 0
+	LogTimeFormat = "2006-01-02 15:04:05.999"
 	LogUserAgent  = "FLOG/3.0"
 	LogVersion    = "3.0"
-	LogTimeFormat = "2006-01-02 15:04:05.999"
 )

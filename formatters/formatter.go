@@ -3,7 +3,9 @@
 
 package formatters
 
-import "github.com/fuyibing/log/v3/base"
+import (
+	"github.com/fuyibing/log/v3/base"
+)
 
 var (
 	Formatter FormatterManager

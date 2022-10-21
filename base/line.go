@@ -11,6 +11,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/fuyibing/log/v3/trace"
 )
 
 var (
@@ -22,18 +24,15 @@ var (
 // 日志行.
 type Line struct {
 	id, acquires, index uint64
+	retryTimes          int32
 
 	// 日志值.
-	Time    time.Time // 日期
-	Level   Level     // 级别
-	Content string    // 内容
-
-	// 扩展值.
-
-	Duration float64 // 执行时长
+	Content  string    // 内容
+	Duration float64   // 执行时长
+	Level    Level     // 级别
+	Time     time.Time // 日期
 
 	// 链路值.
-
 	Trace                                    bool
 	SpanId, ParentSpanId, TraceId            string
 	SpanOffset                               int32
@@ -51,8 +50,10 @@ func NewLine(level Level, text string, args []interface{}) *Line {
 	return o
 }
 
+// NewInternalLine
+// 内部调用.
 func NewInternalLine(text string, args ...interface{}) *Line {
-	return NewLine(Error, text, args)
+	return NewLine(Warn, text, args)
 }
 
 // GetIdentify
@@ -67,24 +68,48 @@ func (o *Line) GetIndex() uint64 {
 	return o.index
 }
 
+// RetryTimes
+// 读取重试次数.
+func (o *Line) RetryTimes() int32 {
+	return atomic.LoadInt32(&o.retryTimes)
+}
+
+// RetryTimesIncrement
+// 重试次数递加.
+func (o *Line) RetryTimesIncrement() *Line {
+	atomic.AddInt32(&o.retryTimes, 1)
+	return o
+}
+
+// RetryTimesReset
+// 重置重试次数.
+func (o *Line) RetryTimesReset() *Line {
+	atomic.StoreInt32(&o.retryTimes, 0)
+	return o
+}
+
 // Release
 // 释放入池.
 func (o *Line) Release() {
 	o.after()
 	linePool.Put(o)
-	// println("id = ", o.id, " & index = ", o.index, " & goroutines = ", runtime.NumGoroutine())
 }
 
 // WithContext
 // 追加链路信息.
 func (o *Line) WithContext(ctx context.Context) *Line {
-	if x, ok := ctx.Value(TracingKey).(*Tracing); ok {
-		o.Trace = true
-		o.TraceId = x.GetTraceId()
-		o.ParentSpanId = x.GetParentSpanId()
-		o.SpanId = x.GetSpanId()
-		o.SpanOffset = x.GetOffsetIncr()
-		o.SpanPrefix = x.GetPrefix()
+	if ctx != nil {
+		if x, ok := ctx.Value(trace.TracingKey).(*trace.Tracing); ok {
+			o.Trace = true
+			o.TraceId = x.TraceId
+			o.ParentSpanId = x.ParentSpanId
+			o.SpanId = x.SpanId
+			o.SpanPrefix = x.SpanPrefix
+			o.SpanOffset = x.Increment()
+
+			o.RequestMethod = x.RequestMethod
+			o.RequestUrl = x.RequestUrl
+		}
 	}
 	return o
 }
@@ -92,7 +117,9 @@ func (o *Line) WithContext(ctx context.Context) *Line {
 // WithError
 // 追加错误.
 func (o *Line) WithError(err error) *Line {
-	o.Content += fmt.Sprintf(" << interrupt: %s", err.Error())
+	if err != nil {
+		o.Content += fmt.Sprintf(" << interrupt: %s", err.Error())
+	}
 	return o
 }
 
@@ -115,6 +142,17 @@ func (o *Line) WithStack() *Line {
 
 // 后置执行.
 func (o *Line) after() *Line {
+	o.Content = ""
+	o.Duration = 0
+	o.Trace = false
+	o.SpanId = ""
+	o.ParentSpanId = ""
+	o.TraceId = ""
+	o.SpanOffset = 0
+	o.SpanPrefix = ""
+	o.RequestAction = ""
+	o.RequestMethod = ""
+	o.RequestUrl = ""
 	return o
 }
 
@@ -122,6 +160,7 @@ func (o *Line) after() *Line {
 func (o *Line) before() *Line {
 	atomic.AddUint64(&o.acquires, 1)
 	o.index = atomic.AddUint64(&lineIndex, 1)
+	atomic.StoreInt32(&o.retryTimes, 0)
 	return o
 }
 

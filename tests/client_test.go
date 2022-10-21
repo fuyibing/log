@@ -1,43 +1,29 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2022-10-15
+// date: 2022-10-17
 
 package tests
 
 import (
-	"fmt"
+	"github.com/fuyibing/log/v3"
+	"github.com/fuyibing/log/v3/trace"
 	"testing"
 	"time"
-
-	"github.com/fuyibing/log/v3"
 )
 
 func TestClient(t *testing.T) {
+	t.Log("------------ logger begin ---------")
 
-	// formatters.Formatter.SetTermFormatter(func(line *base.Line, err error) string {
-	//     return "my term:" + line.Content
-	// })
-
-	ctx := log.NewContext()
+	defer func() {
+		time.Sleep(time.Minute * 1)
+		log.Client.Stop()
+		t.Log("------------ logger quited ---------")
+	}()
 
 	time.Sleep(time.Second)
 
-	defer func() {
-		if r := recover(); r != nil {
-			log.Client.Panicfc(ctx, fmt.Sprintf("%v", r))
-		}
-
-		time.Sleep(time.Second)
-	}()
-
-	log.Client.Infofc(ctx, "Info message")
-
-	ctc := log.ChildContext(ctx, "child context")
-	for i := 0; i < 1000; i++ {
-		log.Client.Warnfc(ctc, "Warn message: index=%d", i)
+	ctx := trace.New()
+	num := time.Now().Nanosecond()
+	for i := 0; i < 10; i++ {
+		log.Client.Infofc(ctx, "info %d.%d", num, i)
 	}
-
-	log.Client.Errorfc(ctx, "Error message")
-	log.Client.Panicfc(ctx, "not panic")
-
-	time.Sleep(time.Minute)
 }

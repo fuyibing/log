@@ -3,7 +3,9 @@
 
 package formatters
 
-import "github.com/fuyibing/log/v3/base"
+import (
+	"github.com/fuyibing/log/v3/base"
+)
 
 // JSON格式化.
 // 格式化后的数据用于写入到Redis/Kafka中.

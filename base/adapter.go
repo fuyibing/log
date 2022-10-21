@@ -35,6 +35,10 @@ type (
 		// Start
 		// 启动服务.
 		Start(ctx context.Context)
+
+		// Wait
+		// 等待完成.
+		Wait()
 	}
 )
 

@@ -1,22 +1,24 @@
 #
 # package: github.com/fuyibing/log/v3.
 #
-adapter: kafka
+adapter:
+  - "term"
+  - "file"
 level: debug
 time: "2006-01-02 15:04:05.999"
 term:
+  debugger: false
   color: true
-  time: "15:04:05"
 file:
-  path: "./logs"
-  folder: "2006-01"
-  name: "2006-01-02"
+  debugger: false
 kafka:
-  topic: "uniondrug-log"
-  brokers:
+  debugger: true
+  kafka-topic: "uniondrug-log"
+  kafka-brokers:
     - "192.168.3.131:9092"
 redis:
-  addr: "127.0.0.1:3721"
+  debugger: true
+  addr: "192.168.3.133:6379"
   password: ""
   max-active: 4
   max-idle: 2
