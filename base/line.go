@@ -105,7 +105,7 @@ func (o *Line) WithContext(ctx context.Context) *Line {
 			o.ParentSpanId = x.ParentSpanId
 			o.SpanId = x.SpanId
 			o.SpanPrefix = x.SpanPrefix
-			o.SpanOffset = x.Increment()
+			o.SpanOffset = x.Increment() - 1
 
 			o.RequestMethod = x.RequestMethod
 			o.RequestUrl = x.RequestUrl
