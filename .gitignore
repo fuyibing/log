@@ -1,11 +1,11 @@
-# ignore directories
+# directories
+
 .bak
+.directory
 .idea
+.vscode
+.DS_STORE
 
-bak/
-logs/
-bak/1017/tests/logs
 
-# ignore files
-*.bak
+# files
 go.sum
