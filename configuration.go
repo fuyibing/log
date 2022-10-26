@@ -49,6 +49,11 @@ type configuration struct {
 	debugOn, infoOn, warnOn, errorOn bool
 }
 
+func (o *configuration) DebugOn() bool { return o.debugOn }
+func (o *configuration) InfoOn() bool  { return o.infoOn }
+func (o *configuration) WarnOn() bool  { return o.warnOn }
+func (o *configuration) ErrorOn() bool { return o.errorOn }
+
 // 构造实例.
 func (o *configuration) init() *configuration {
 	return o.scan().sync().status()
@@ -69,12 +74,13 @@ func (o *configuration) scan() *configuration {
 		}
 	}
 
-	o.Level = o.LevelName.Level()
 	return o
 }
 
 // 启动状态.
 func (o *configuration) status() *configuration {
+	o.Level = o.LevelName.Level()
+
 	switch o.Level {
 	case base.Error:
 		o.errorOn = true
@@ -98,7 +104,6 @@ func (o *configuration) status() *configuration {
 // 从 YAML 文件读取的参数覆盖 base 包下的参数.
 func (o *configuration) sync() *configuration {
 	// 适配器配置.
-
 	if o.Term != nil {
 		term.Config.Override(o.Term)
 	}
