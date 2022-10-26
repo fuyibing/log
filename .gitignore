@@ -6,6 +6,7 @@
 .vscode
 .DS_STORE
 
+logs/
 
 # files
 go.sum

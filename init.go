@@ -7,9 +7,10 @@ import "sync"
 
 func init() {
 	new(sync.Once).Do(func() {
-		Config = (&configuration{}).init()
+		Client = &ClientManager{}
+		Client.init()
 
-		Client = (&client{}).init()
-		Client.Start()
+		Config = &Configuration{}
+		Config.init()
 	})
 }

@@ -19,10 +19,11 @@ import (
 
 // Config
 // 基础配置.
-var Config *configuration
+var Config *Configuration
 
+// Configuration
 // 基础配置结构体.
-type configuration struct {
+type Configuration struct {
 	// 适配器定义.
 	Adapter []base.AdapterName   `yaml:"adapter"` // 适配器名称(log.yaml)
 	Term    *term.Configuration  `yaml:"term"`    // 适配器配置(log.yaml.term)
@@ -49,18 +50,67 @@ type configuration struct {
 	debugOn, infoOn, warnOn, errorOn bool
 }
 
-func (o *configuration) DebugOn() bool { return o.debugOn }
-func (o *configuration) InfoOn() bool  { return o.infoOn }
-func (o *configuration) WarnOn() bool  { return o.warnOn }
-func (o *configuration) ErrorOn() bool { return o.errorOn }
+// /////////////////////////////////////////////////////////////
+// 状态开关
+// /////////////////////////////////////////////////////////////
+
+func (o *Configuration) DebugOn() bool {
+	return o.debugOn
+}
+
+func (o *Configuration) ErrorOn() bool {
+	return o.errorOn
+}
+
+func (o *Configuration) InfoOn() bool {
+	return o.infoOn
+}
+
+func (o *Configuration) WarnOn() bool {
+	return o.warnOn
+}
+
+// /////////////////////////////////////////////////////////////
+// 调整配置
+// /////////////////////////////////////////////////////////////
+
+func (o *Configuration) SetAdapter(adapter ...base.Adapter) *Configuration {
+	o.useAdapter(adapter...)
+	return o
+}
+
+func (o *Configuration) SetLevel(level base.Level) *Configuration {
+	o.useLevel(level)
+	return o
+}
 
 // 构造实例.
-func (o *configuration) init() *configuration {
-	return o.scan().sync().status()
+func (o *Configuration) init() *Configuration {
+	// 1. 解析配置.
+	o.scan()
+
+	// 2. 同步配置.
+	o.syncAdapterConfig()
+	o.syncBase()
+	o.syncOpenTracing()
+
+	// 3. 启用级别.
+	if o.Level == base.Off {
+		o.Level = base.Info
+	}
+	o.useLevel(o.Level)
+
+	if o.Adapter == nil || len(o.Adapter) == 0 {
+		o.useAdapter(base.Term)
+	} else {
+		o.useAdapterName(o.Adapter...)
+	}
+
+	return o
 }
 
 // 解析文件.
-func (o *configuration) scan() *configuration {
+func (o *Configuration) scan() {
 	for _, fs := range [][]string{
 		{"./tmp/log.yaml", "../tmp/log.yaml", "./config/log.yaml", "../config/log.yaml"},
 		{"./tmp/app.yaml", "../tmp/app.yaml", "./config/app.yaml", "../config/app.yaml"},
@@ -74,36 +124,10 @@ func (o *configuration) scan() *configuration {
 		}
 	}
 
-	return o
-}
-
-// 启动状态.
-func (o *configuration) status() *configuration {
 	o.Level = o.LevelName.Level()
-
-	switch o.Level {
-	case base.Error:
-		o.errorOn = true
-	case base.Warn:
-		o.errorOn = true
-		o.warnOn = true
-	case base.Info:
-		o.errorOn = true
-		o.warnOn = true
-		o.infoOn = true
-	case base.Debug:
-		o.errorOn = true
-		o.warnOn = true
-		o.infoOn = true
-		o.debugOn = true
-	}
-	return o
 }
 
-// 同步配置.
-// 从 YAML 文件读取的参数覆盖 base 包下的参数.
-func (o *configuration) sync() *configuration {
-	// 适配器配置.
+func (o *Configuration) syncAdapterConfig() {
 	if o.Term != nil {
 		term.Config.Override(o.Term)
 	}
@@ -116,29 +140,10 @@ func (o *configuration) sync() *configuration {
 	if o.Kafka != nil {
 		kafka.Config.Override(o.Kafka)
 	}
+}
 
-	// 链路参数
-
-	if o.TraceId != "" {
-		trace.TracingTraceId = o.TraceId
-	}
-	if o.ParentSpanId != "" {
-		trace.TracingParentSpanId = o.ParentSpanId
-	}
-	if o.SpanId != "" {
-		trace.TracingSpanId = o.SpanId
-	}
-	if o.SpanVersion != "" {
-		trace.TracingSpanVersion = o.SpanVersion
-	}
-
-	// 基础参数
-
-	if o.TimeFormat != "" {
-		base.LogTimeFormat = o.TimeFormat
-	}
-
-	// 服务参数.
+func (o *Configuration) syncBase() *Configuration {
+	// 1. 解析配置.
 
 	if o.Name != "" {
 		base.LogName = o.Name
@@ -146,13 +151,19 @@ func (o *configuration) sync() *configuration {
 	if o.Port > 0 {
 		base.LogPort = o.Port
 	}
+	if o.TimeFormat != "" {
+		base.LogTimeFormat = o.TimeFormat
+	}
 	if o.Version != "" {
 		base.LogVersion = o.Version
 	}
+
+	// 2. 动态计算.
+
 	base.LogUserAgent = fmt.Sprintf("%s/%s", base.LogName, base.LogVersion)
 
-	// 部署节点.
-	// 解析部署机器的IP地址.
+	// 3. 动态计算.
+	//    解析部署机器的IP地址.
 	if nis, e1 := net.Interfaces(); e1 == nil {
 		for _, ni := range nis {
 			if list, e2 := ni.Addrs(); e2 == nil {
@@ -167,4 +178,58 @@ func (o *configuration) sync() *configuration {
 	}
 
 	return o
+}
+
+func (o *Configuration) syncOpenTracing() {
+	if o.TraceId != "" {
+		trace.TracingTraceId = o.TraceId
+	}
+	if o.ParentSpanId != "" {
+		trace.TracingParentSpanId = o.ParentSpanId
+	}
+	if o.SpanId != "" {
+		trace.TracingSpanId = o.SpanId
+	}
+	if o.SpanVersion != "" {
+		trace.TracingSpanVersion = o.SpanVersion
+	}
+}
+
+func (o *Configuration) useAdapter(adapters ...base.Adapter) {
+	var a base.AdapterEngine
+
+	// 1. 遍历适配器.
+	for _, adapter := range adapters {
+		switch adapter {
+		case base.Kafka:
+			a = kafka.New().Parent(a)
+		case base.Redis:
+			a = redis.New().Parent(a)
+		case base.File:
+			a = file.New().Parent(a)
+		case base.Term:
+			a = term.New().Parent(a)
+		}
+	}
+
+	// 2. 绑定适配器.
+	Client.adapter = a
+	Client.adapterOn = a != nil
+}
+
+func (o *Configuration) useAdapterName(names ...base.AdapterName) {
+	adapters := make([]base.Adapter, 0)
+	for _, name := range names {
+		adapters = append(adapters, name.Adapter())
+	}
+	o.useAdapter(adapters...)
+}
+
+func (o *Configuration) useLevel(level base.Level) {
+	o.Level = level
+
+	o.debugOn = level >= base.Debug
+	o.infoOn = level >= base.Info
+	o.warnOn = level >= base.Warn
+	o.errorOn = level >= base.Error
 }
