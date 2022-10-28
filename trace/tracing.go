@@ -65,7 +65,7 @@ func (o *Tracing) WithTracing(tracing *Tracing) *Tracing {
 	o.TraceId = tracing.TraceId
 	o.ParentSpanId = tracing.SpanId
 	o.SpanId = o.makeSpanId()
-	o.SpanPrefix = fmt.Sprintf("%s.%d", tracing.SpanPrefix, tracing.SpanOffset)
+	o.SpanPrefix = fmt.Sprintf("%s.%d", tracing.SpanPrefix, tracing.SpanOffset-1)
 	return o
 }
 
