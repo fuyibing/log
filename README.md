@@ -22,11 +22,11 @@ func main(){
 
 ### Configurations
 
-#### YAML
+##### YAML
 
 Load config file `config/log.yaml` when package initialized.
 
-```yaml
+```
 adapter:
   - kafka               # send log to kafka
   - file                # send log to file if send to kafka failed
@@ -37,7 +37,7 @@ term:
   color: false
 ```
 
-#### CODE
+##### CODE
 
 You must config them with coder.
 
@@ -67,12 +67,11 @@ func(){
 adapter := log.Client.GetAdapterInterface(conf.Kafka)
 
 if adapter == nil {
-return
+    return
 }
 
 adapter.SetFormatter(func (line *base.Line) (text string, error){
-
-return "format result", nil
+    return "format result", nil
 })
 
 ```
