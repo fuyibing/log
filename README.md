@@ -1,10 +1,20 @@
 # Log
 
-```shell
+```
 import "github.com/fuyibing/log/v8"
 ```
 
-## Adapters
+```
+func main(){
+    log.Debug("debug info")
+    log.Debugf("debug at MessageQueue[topic=%s, queue=%d]", "Topic", 1)
+
+    // With open tracing on context.
+    log.Debugfc(ctx, "debug at MessageQueue[topic=%s, queue=%d]", "Topic", 1)
+}
+```
+
+## Supports
 
 - [x] Term
 - [x] File
@@ -12,31 +22,48 @@ import "github.com/fuyibing/log/v8"
 
 ### Configurations
 
-#### Based on config file `config/log.yaml`
+#### YAML
+
+Load config file `config/log.yaml` when package initialized.
 
 ```yaml
 adapter:
-  - file
-  - term
+  - kafka               # send log to kafka
+  - file                # send log to file if send to kafka failed
+  - term                # send log to terminal if send to file failed
+kafka:
+file:
+term:
+  color: false
 ```
 
-Based on code
+#### CODE
 
-```go
+You must config them with coder.
+
+```
+func(){
+    log.Config.Kafka.Topic = "Topic"
+
+    log.Config.Set(
+        conf.WithLevel(conf.Info),    	
+        conf.WithAdapter(conf.Kafka, conf.File, conf.Term),    	
+    )
+}
 
 ```
 
 ## Formatter
 
-Built-in
+### Built-in
+
+- [X] Kafka
+- [X] File
+- [X] Term
+
+### Custom
 
 ```
-When adapter registered
-```
-
-Custom
-
-```go
 adapter := log.Client.GetAdapterInterface(conf.Kafka)
 
 if adapter == nil {
