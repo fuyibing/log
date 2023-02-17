@@ -17,8 +17,8 @@ func main(){
 ## Supports
 
 - [x] Term
-- [x] File
-- [x] Kafka
+- [x] File `async`
+- [x] Kafka `async`
 
 ### Configurations
 
@@ -54,6 +54,14 @@ func(){
 ```
 
 ## Formatter
+
+```log
+[2023-02-16 09:10:11.235][DEBUG][PID=3721][SERVICE=app][172.16.0.100:80880] debug message
+[2023-02-16 09:10:11.235][INFO][PID=3721][SERVICE=app][172.16.0.100:80880] info message
+[2023-02-16 09:10:11.241][WARN][PID=3721][SERVICE=app][172.16.0.100:80880] warning message
+[2023-02-16 09:10:11.244][ERROR][PID=3721][SERVICE=app][172.16.0.100:80880] error message
+[2023-02-16 09:10:11.246][FATAL][PID=3721][SERVICE=app][172.16.0.100:80880] fatal message
+```
 
 ### Built-in
 

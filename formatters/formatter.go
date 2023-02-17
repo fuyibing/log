@@ -1,12 +1,12 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-02-16
+// date: 2023-02-17
 
-package formats
+package formatters
 
 import (
 	"github.com/fuyibing/log/v8/base"
 )
 
 type (
-	Formatter func(line *base.Line) (text string, err error)
+	Formatter func(line *base.Line) string
 )

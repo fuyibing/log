@@ -5,7 +5,7 @@
 .DS_STORE
 
 logs/
-tests/
+.bak/v01/tests/
 
 # files
 go.sum
