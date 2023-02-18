@@ -6,10 +6,14 @@ package main
 import (
 	"encoding/json"
 	"github.com/fuyibing/log/v8"
+	"github.com/fuyibing/log/v8/conf"
 	"time"
 )
 
 func init() {
+	log.Config.Set(
+		conf.SetAsyncDisabled(true),
+	)
 	log.Client.Reset()
 }
 

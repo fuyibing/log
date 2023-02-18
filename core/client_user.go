@@ -75,6 +75,34 @@ func (o *client) Fatalfc(ctx context.Context, text string, args ...interface{}) 
 // Lines operators
 // /////////////////////////////////////////////////////////////
 
+func (o *client) CallAdapter(lines ...*base.Line) {
+	var (
+		err error
+	)
+
+	// Call error adapter.
+	defer func() {
+		// Catch panic.
+		if v := recover(); v != nil {
+			err = fmt.Errorf("v")
+		}
+
+		// Call error handler if send failed.
+		if err != nil && o.ae != nil {
+			_ = o.ae.Logs(lines...)
+		}
+
+		// Release all lines after operated.
+		o.ReleaseLines(lines)
+	}()
+
+	if o.ar == nil {
+		err = fmt.Errorf("unknown adapter registry")
+	} else {
+		err = o.ar.Logs(lines...)
+	}
+}
+
 func (o *client) PopFromBucket() {
 	// Ignore coroutine if concurrency is greater than
 	// configuration.
@@ -86,26 +114,12 @@ func (o *client) PopFromBucket() {
 	// Prepare pop.
 	var (
 		count  int
-		err    error
 		list   []*base.Line
 		recall = false
 	)
 
 	// End adapter called.
 	defer func() {
-		// Catch panic.
-		if v := recover(); v != nil {
-			err = fmt.Errorf("v")
-		}
-
-		// Call error handler if send failed.
-		if err != nil && o.ae != nil {
-			_ = o.ae.Logs(list...)
-		}
-
-		// Release all lines after operated.
-		o.ReleaseLines(list)
-
 		// Revert concurrency then continue call pop
 		// until bucket is empty.
 		atomic.AddInt32(&o.concurrency, -1)
@@ -118,12 +132,7 @@ func (o *client) PopFromBucket() {
 	// Pop progress.
 	if list, _, count, _ = o.bucket.Popn(conf.Config.GetBatchLimit()); count > 0 {
 		recall = true
-
-		if o.ar == nil {
-			err = fmt.Errorf("unknown adapter registry")
-		} else {
-			err = o.ar.Logs(list...)
-		}
+		o.CallAdapter(list...)
 	}
 }
 
@@ -133,6 +142,12 @@ func (o *client) PushIntoBucket(ctx context.Context, level conf.Level, text stri
 	line := base.Pool.AcquireLine().WithContext(ctx)
 	line.Level = level
 	line.Text = fmt.Sprintf(text, args...)
+
+	// SYNC Mode, if ASYNC Disabled.
+	if conf.Config.GetAsyncDisabled() {
+		o.CallAdapter(line)
+		return
+	}
 
 	// Send to adapter.
 	if total, count := o.bucket.Push(line); count > 0 && total >= conf.Config.GetBatchLimit() {

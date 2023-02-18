@@ -4,6 +4,7 @@
 package conf
 
 func (o *configuration) GetAdapter() string           { return o.Adapter }
+func (o *configuration) GetAsyncDisabled() bool       { return o.AsyncDisabled }
 func (o *configuration) GetFile() FileConfiguration   { return o.File }
 func (o *configuration) GetKafka() KafkaConfiguration { return o.Kafka }
 func (o *configuration) GetLevel() Level              { return o.Level }

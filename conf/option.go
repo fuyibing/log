@@ -21,6 +21,12 @@ func SetAdapter(s string) Option {
 	}
 }
 
+func SetAsyncDisabled(b bool) Option {
+	return func(c *configuration) {
+		c.AsyncDisabled = b
+	}
+}
+
 func SetLevel(level Level) Option {
 	return func(c *configuration) {
 		c.Level = level

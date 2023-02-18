@@ -12,6 +12,7 @@ import (
 type (
 	Configuration interface {
 		GetAdapter() string
+		GetAsyncDisabled() bool
 		GetBatchConcurrency() int32
 		GetBatchFrequency() int
 		GetBatchLimit() int
@@ -40,13 +41,14 @@ type (
 	}
 
 	configuration struct {
-		Adapter     string `yaml:"adapter"`
-		Level       Level  `yaml:"level"`
-		Prefix      string `yaml:"prefix"`
-		ServiceHost string `yaml:"service-host"`
-		ServiceName string `yaml:"service-name"`
-		ServicePort int    `yaml:"service-port"`
-		TimeFormat  string `yaml:"time-format"`
+		Adapter       string `yaml:"adapter"`
+		AsyncDisabled bool   `yaml:"async-disabled"`
+		Level         Level  `yaml:"level"`
+		Prefix        string `yaml:"prefix"`
+		ServiceHost   string `yaml:"service-host"`
+		ServiceName   string `yaml:"service-name"`
+		ServicePort   int    `yaml:"service-port"`
+		TimeFormat    string `yaml:"time-format"`
 
 		// Basic: batch mode.
 

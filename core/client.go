@@ -130,7 +130,6 @@ func (o *client) reset() {
 		if call := adapters.Adapter.Get(conf.Config.GetAdapter()); call != nil {
 			o.ar = call()
 			o.arc = arc
-			o.Infof("client ready, adapter=%s, level=%s", conf.Config.GetAdapter(), conf.Config.GetLevel())
 		}
 	}
 }
