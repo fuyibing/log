@@ -5,6 +5,7 @@ package main
 
 import (
 	"github.com/fuyibing/log/v8"
+	"github.com/fuyibing/log/v8/adapters"
 	"github.com/fuyibing/log/v8/base"
 	"github.com/fuyibing/log/v8/conf"
 )
@@ -20,7 +21,7 @@ func (*formatter) String(line *base.Line) string {
 
 func init() {
 	log.Config.Set(
-		conf.SetAdapter("term"),
+		conf.SetAdapter(adapters.AdapterTerm),
 		conf.SetLevel(conf.Debug),
 		conf.SetTermColor(true),
 	)
