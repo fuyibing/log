@@ -29,17 +29,24 @@ func (o *TextFormatter) String(line *base.Line) (str string) {
 	// Prefix.
 	str = conf.Config.GetPrefix()
 
-	// Time & Level & PID.
-	str += fmt.Sprintf("[%s][%s][PI=%d]",
+	// Time & Level.
+	str += fmt.Sprintf("[%s][%s]",
 		line.Time.Format(conf.Config.GetTimeFormat()),
 		line.Level,
-		conf.Config.GetPid(),
 	)
 
-	// Append service name.
-	if s := conf.Config.GetServiceName(); s != "" {
-		str += fmt.Sprintf("[SN=%s]", s)
+	// Service: host + port.
+	if s := conf.Config.GetServiceHost(); s != "" {
+		str += fmt.Sprintf("[%s:%d]", s, conf.Config.GetServicePort())
 	}
+
+	// Service: name.
+	if s := conf.Config.GetServiceName(); s != "" {
+		str += fmt.Sprintf("[S=%s]", s)
+	}
+
+	// PID.
+	str += fmt.Sprintf("[P=%d]", conf.Config.GetPid())
 
 	// Open Tracing.
 	if t := line.Tracing(); t != nil {
@@ -49,6 +56,14 @@ func (o *TextFormatter) String(line *base.Line) (str string) {
 			t.ParentSpanId,
 			t.GenVersion(line.TracingOffset()),
 		)
+
+		// Append http request location.
+		if t.RequestMethod != "" && t.RequestUrl != "" {
+			str += fmt.Sprintf("[R=%s][RM=%s]",
+				t.RequestUrl,
+				t.RequestMethod,
+			)
+		}
 	}
 
 	// User info.

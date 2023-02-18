@@ -13,6 +13,9 @@ import (
 func init() {
 	log.Config.Set(
 		conf.SetAsyncDisabled(true),
+		conf.SetTimeFormat("05.999"),
+		conf.SetServiceHost("127.0.0.1"),
+		conf.SetServicePort(8080),
 	)
 	log.Client.Reset()
 }
