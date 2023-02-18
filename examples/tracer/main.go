@@ -21,7 +21,7 @@ func init() {
 
 func main() {
 	// Stop log client. Ensure that all data in the
-	// memory queue is processed.
+	// memory queue are processed.
 	defer log.Client.Stop()
 
 	c1 := log.NewContext()

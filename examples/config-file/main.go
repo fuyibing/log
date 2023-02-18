@@ -14,7 +14,7 @@ func init() {
 
 func main() {
 	// Stop log client. Ensure that all data in the
-	// memory queue is processed.
+	// memory queue are processed.
 	defer log.Client.Stop()
 
 	buf, _ := json.Marshal(log.Config)
