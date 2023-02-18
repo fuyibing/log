@@ -110,6 +110,7 @@ func (o *client) popn() {
 			_ = o.are.Logs(list...)
 		}
 
+		// Release lines.
 		o.release(list)
 	}
 }
