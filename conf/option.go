@@ -44,9 +44,21 @@ func SetPrefix(s string) Option {
 	}
 }
 
+func SetServiceHost(s string) Option {
+	return func(c *configuration) {
+		c.ServiceHost = s
+	}
+}
+
 func SetServiceName(s string) Option {
 	return func(c *configuration) {
 		c.ServiceName = s
+	}
+}
+
+func SetServicePort(n int) Option {
+	return func(c *configuration) {
+		c.ServicePort = n
 	}
 }
 

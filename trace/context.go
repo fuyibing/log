@@ -58,6 +58,10 @@ func NewRequest(req *http.Request) context.Context {
 		t.Version = s
 	}
 
+	// Assign request info.
+	t.RequestUrl = req.RequestURI
+	t.RequestMethod = req.Method
+
 	// Return created with value.
 	return context.WithValue(context.Background(),
 		conf.OpenTracingKey,

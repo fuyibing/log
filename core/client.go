@@ -5,7 +5,6 @@ package core
 
 import (
 	"context"
-	"fmt"
 	"github.com/fuyibing/log/v8/adapters"
 	"github.com/fuyibing/log/v8/conf"
 	"sync/atomic"
@@ -18,11 +17,20 @@ type (
 		// return adapter registry.
 		GetAdapterRegistry() adapters.AdapterRegistry
 
+		// GetBucket
+		// return client lines bucket.
 		GetBucket() Bucket
 
-		Start()
+		// Reset
+		// adapter handler.
+		Reset()
+
+		// Stop
+		// client, block process until all lines completed.
 		Stop()
 
+		// ClientUser
+		// import exported user methods.
 		ClientUser
 	}
 
@@ -46,6 +54,7 @@ type (
 
 	client struct {
 		ar, ae      adapters.AdapterRegistry
+		arc         string
 		bucket      Bucket
 		concurrency int32
 	}
@@ -60,36 +69,37 @@ func NewClient() Client {
 // Exported methods
 // /////////////////////////////////////////////////////////////
 
-func (o *client) GetAdapterRegistry() adapters.AdapterRegistry {
-	return o.ar
-}
-
-func (o *client) GetBucket() Bucket { return o.bucket }
-
-func (o *client) Start() { o.start() }
-func (o *client) Stop()  { o.stop() }
+func (o *client) GetAdapterRegistry() adapters.AdapterRegistry { return o.ar }
+func (o *client) GetBucket() Bucket                            { return o.bucket }
+func (o *client) Reset()                                       { o.reset() }
+func (o *client) Stop()                                        { o.stop() }
 
 // /////////////////////////////////////////////////////////////
 // Access methods
 // /////////////////////////////////////////////////////////////
 
 func (o *client) init() *client {
-	o.ae = adapters.Adapter.Get(adapters.AdapterError)
+	// Register bucket.
 	o.bucket = (&bucket{}).init()
+
+	// Register error adapter.
+	if call := adapters.Adapter.Get(adapters.AdapterError); call != nil {
+		o.ae = call()
+	}
+
+	// Set configured adapter.
+	o.reset()
 	return o
 }
 
-func (o *client) start() {
-	// Get adapter from registry.
-	if o.ar = adapters.Adapter.Get(conf.Config.GetAdapter()); o.ar == nil {
-		panic(fmt.Sprintf("adapter not registered: %s", conf.Config.GetAdapter()))
-		return
+func (o *client) reset() {
+	if arc := conf.Config.GetAdapter(); arc != o.arc {
+		if call := adapters.Adapter.Get(conf.Config.GetAdapter()); call != nil {
+			o.ar = call()
+			o.arc = arc
+			o.Infof("client ready, adapter=%s, level=%s", conf.Config.GetAdapter(), conf.Config.GetLevel())
+		}
 	}
-
-	o.Infof("client started, adapter=%s, level=%s",
-		conf.Config.GetAdapter(),
-		conf.Config.GetLevel(),
-	)
 }
 
 func (o *client) stop() bool {

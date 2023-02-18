@@ -86,16 +86,30 @@ func (o *client) PopFromBucket() {
 	// Prepare pop.
 	var (
 		count  int
+		err    error
 		list   []*base.Line
 		recall = false
 	)
 
 	// End adapter called.
 	defer func() {
+		// Catch panic.
+		if v := recover(); v != nil {
+			err = fmt.Errorf("v")
+		}
+
+		// Call error handler if send failed.
+		if err != nil && o.ae != nil {
+			_ = o.ae.Logs(list...)
+		}
+
+		// Release all lines after operated.
+		o.ReleaseLines(list)
+
+		// Revert concurrency then continue call pop
+		// until bucket is empty.
 		atomic.AddInt32(&o.concurrency, -1)
 
-		// Continue call pop
-		// until bucket is empty.
 		if recall {
 			o.PopFromBucket()
 		}
@@ -105,13 +119,11 @@ func (o *client) PopFromBucket() {
 	if list, _, count, _ = o.bucket.Popn(conf.Config.GetBatchLimit()); count > 0 {
 		recall = true
 
-		// Send to adapter.
-		if err := o.ar.Logs(list...); err != nil {
-			_ = o.ae.Logs(list...)
+		if o.ar == nil {
+			err = fmt.Errorf("unknown adapter registry")
+		} else {
+			err = o.ar.Logs(list...)
 		}
-
-		// Release lines.
-		o.ReleaseLines(list)
 	}
 }
 

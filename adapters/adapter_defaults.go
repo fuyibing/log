@@ -4,7 +4,6 @@
 package adapters
 
 import (
-	"github.com/fuyibing/log/v8/adapters/errors"
 	"github.com/fuyibing/log/v8/adapters/file"
 	"github.com/fuyibing/log/v8/adapters/kafka"
 	"github.com/fuyibing/log/v8/adapters/term"
@@ -19,9 +18,9 @@ const (
 )
 
 var (
-	adapterDefaults = map[string]func() AdapterRegistry{
+	adapterContainers = map[string]func() AdapterRegistry{
 		AdapterError: func() (ar AdapterRegistry) {
-			ar = errors.New()
+			ar = term.New()
 			ar.SetFormatter(formatters.NewErrorFormatter())
 			return
 		},

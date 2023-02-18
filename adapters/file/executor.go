@@ -15,6 +15,8 @@ import (
 )
 
 type (
+	// Executor
+	// write log lines to files.
 	Executor struct {
 		formatter  formatters.Formatter
 		mu         *sync.RWMutex

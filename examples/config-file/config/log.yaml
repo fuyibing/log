@@ -1,7 +1,7 @@
 #
 # log client based on yaml configuration
 #
-adapter: "term"
+adapter: "file"
 level: "debug"
 time-format: "15:04:05.999999"
 

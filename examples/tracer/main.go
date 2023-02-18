@@ -16,7 +16,7 @@ func init() {
 	)
 
 	// Start log client and accept request.
-	log.Client.Start()
+	log.Client.Reset()
 }
 
 func main() {

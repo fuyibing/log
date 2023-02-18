@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	log.Client.Start()
+	log.Client.Reset()
 }
 
 func main() {

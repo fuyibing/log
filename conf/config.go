@@ -21,7 +21,9 @@ type (
 		GetParentSpanId() string
 		GetPid() int
 		GetPrefix() string
+		GetServiceHost() string
 		GetServiceName() string
+		GetServicePort() int
 		GetSpanId() string
 		GetTerm() TermConfiguration
 		GetTimeFormat() string
@@ -42,7 +44,9 @@ type (
 		AutoStart   bool   `yaml:"auto-start"`
 		Level       Level  `yaml:"level"`
 		Prefix      string `yaml:"prefix"`
+		ServiceHost string `yaml:"service-host"`
 		ServiceName string `yaml:"service-name"`
+		ServicePort int    `yaml:"service-port"`
 		TimeFormat  string `yaml:"time-format"`
 
 		// Basic: batch mode.

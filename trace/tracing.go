@@ -20,6 +20,8 @@ type (
 		TraceId      string
 		Version      string
 
+		RequestMethod, RequestUrl string
+
 		offset, previous int32
 		parent           *Tracing
 	}
@@ -29,22 +31,32 @@ type (
 // Exported methods
 // /////////////////////////////////////////////////////////////
 
-func (o *Tracing) GenVersion(n int32) string {
-	return fmt.Sprintf("%v.%d", o.Version, n)
-}
+// GenVersion
+// return version number of trace.
+//
+//   return "0.0"		// First log of the same tracer
+//   return "0.3.0"
+//   return "0.3.1"
+func (o *Tracing) GenVersion(n int32) string { return fmt.Sprintf("%v.%d", o.Version, n) }
 
+// GetIncrement
+// increment offset then return previous value.
 func (o *Tracing) GetIncrement() int32 {
 	o.previous = atomic.AddInt32(&o.offset, 1) - 1
 	return o.previous
 }
 
-func (o *Tracing) GetPrevious() int32 {
-	return o.previous
-}
+// GetOffset
+// return current offset.
+func (o *Tracing) GetOffset() int32 { return o.offset }
 
-func (o *Tracing) WithParent(p *Tracing) {
-	o.parent = p
-}
+// GetPrevious
+// return previous offset value.
+func (o *Tracing) GetPrevious() int32 { return o.previous }
+
+// WithParent
+// bind parent tracing to current.
+func (o *Tracing) WithParent(p *Tracing) { o.parent = p }
 
 // /////////////////////////////////////////////////////////////
 // Access methods

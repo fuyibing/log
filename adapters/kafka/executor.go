@@ -12,6 +12,11 @@ import (
 )
 
 type (
+	// Executor
+	// send log lines to kafka with specified topic.
+	//
+	// You can subscribe kafka message than redirect to aliyun
+	// log service or elasticsearch by logstash.
 	Executor struct {
 		formatter     formatters.Formatter
 		producer      sarama.SyncProducer

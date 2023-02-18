@@ -11,18 +11,33 @@ import (
 
 type (
 	AdapterManager interface {
-		Get(name string) AdapterRegistry
-		Set(name string, registry AdapterRegistry) AdapterManager
+		// Get
+		// registry from manager.
+		Get(name string) func() AdapterRegistry
+
+		// Set
+		// registry into manager.
+		//
+		// Override if exists. You must restart client if used
+		// registry changed.
+		Set(name string, callee func() AdapterRegistry) AdapterManager
 	}
 
+	// AdapterRegistry
+	// interface for customer adapter.
 	AdapterRegistry interface {
+		// Logs
+		// write lines to target storage / device.
 		Logs(lines ...*base.Line) error
+
+		// SetFormatter
+		// specify log content formatter handler.
 		SetFormatter(formatter formatters.Formatter)
 	}
 
 	adapter struct {
 		mu         *sync.RWMutex
-		registries map[string]AdapterRegistry
+		registries map[string]func() AdapterRegistry
 	}
 )
 
@@ -30,7 +45,7 @@ type (
 // Interface methods
 // /////////////////////////////////////////////////////////////
 
-func (o *adapter) Get(name string) AdapterRegistry {
+func (o *adapter) Get(name string) func() AdapterRegistry {
 	o.mu.RLock()
 	defer o.mu.RUnlock()
 	if v, ok := o.registries[name]; ok {
@@ -39,10 +54,10 @@ func (o *adapter) Get(name string) AdapterRegistry {
 	return nil
 }
 
-func (o *adapter) Set(name string, registry AdapterRegistry) AdapterManager {
+func (o *adapter) Set(name string, callee func() AdapterRegistry) AdapterManager {
 	o.mu.Lock()
 	defer o.mu.Unlock()
-	o.registries[name] = registry
+	o.registries[name] = callee
 	return o
 }
 
@@ -52,15 +67,13 @@ func (o *adapter) Set(name string, registry AdapterRegistry) AdapterManager {
 
 func (o *adapter) init() *adapter {
 	o.mu = &sync.RWMutex{}
-	o.registries = make(map[string]AdapterRegistry)
+	o.registries = make(map[string]func() AdapterRegistry)
 	o.initDefaults()
 	return o
 }
 
 func (o *adapter) initDefaults() {
-	for name, call := range adapterDefaults {
-		if call != nil {
-			o.Set(name, call())
-		}
+	for name, call := range adapterContainers {
+		o.Set(name, call)
 	}
 }

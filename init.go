@@ -18,5 +18,10 @@ func init() {
 	new(sync.Once).Do(func() {
 		Config = conf.Config
 		Client = core.NewClient()
+
+		// Auto start if enabled.
+		if Config.GetAutoStart() {
+			Client.Reset()
+		}
 	})
 }
