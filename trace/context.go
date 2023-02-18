@@ -26,9 +26,12 @@ func NewChild(ctx context.Context) context.Context {
 			if ct, ok := cv.(*Tracing); ok {
 				t := (&Tracing{}).init()
 				t.WithParent(ct)
-				t.TraceId = ct.TraceId
 				t.ParentSpanId = ct.SpanId
+				t.TraceId = ct.TraceId
 				t.Version = ct.GenVersion(ct.GetPrevious())
+
+				t.RequestMethod = ct.RequestMethod
+				t.RequestUrl = ct.RequestUrl
 
 				return context.WithValue(context.Background(), conf.OpenTracingKey, t)
 			}
