@@ -137,3 +137,19 @@ func SetTermColor(b bool) Option {
 		c.Term.Color = b
 	}
 }
+
+// /////////////////////////////////////////////////////////////
+// Adapter: Kafka
+// /////////////////////////////////////////////////////////////
+
+func SetKafkaAddress(addr ...string) Option {
+	return func(c *configuration) {
+		c.Kafka.Addresses = addr
+	}
+}
+
+func SetKafkaTopic(topic string) Option {
+	return func(c *configuration) {
+		c.Kafka.Topic = topic
+	}
+}

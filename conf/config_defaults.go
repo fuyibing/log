@@ -16,6 +16,7 @@ const (
 	DefaultTraceId      = "X-B3-Traceid"
 	DefaultTraceVersion = "X-B3-Version"
 
+	Agent          = "LogV8"
 	OpenTracingKey = "OpenTracingKey"
 )
 

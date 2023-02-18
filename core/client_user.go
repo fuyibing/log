@@ -75,12 +75,6 @@ func (o *client) Fatalfc(ctx context.Context, text string, args ...interface{}) 
 // Access methods
 // /////////////////////////////////////////////////////////////
 
-func (o *client) ignores(lines []*base.Line) {
-	// TODO for send failed lines
-	// call release without operated
-	o.release(lines)
-}
-
 func (o *client) popn() {
 	// Ignore coroutine if concurrency is greater than
 	// configuration.
@@ -113,10 +107,10 @@ func (o *client) popn() {
 
 		// Send to adapter.
 		if err := o.ar.Logs(list...); err == nil {
-			o.release(list)
-		} else {
-			o.ignores(list)
+			_ = o.are.Logs(list...)
 		}
+
+		o.release(list)
 	}
 }
 

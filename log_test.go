@@ -9,10 +9,9 @@ import (
 	"testing"
 )
 
-type testFormatter struct {
-}
+type testFormatter struct{}
 
-func (*testFormatter) Body(line *base.Line) []byte { return nil }
+func (*testFormatter) Body(_ *base.Line) []byte { return nil }
 
 func (*testFormatter) String(line *base.Line) string {
 	return "my formatter: " + line.Text

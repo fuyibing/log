@@ -1,7 +1,7 @@
 #
 # log client based on yaml configuration
 #
-adapter: "file"
+adapter: "kafka"
 level: "debug"
 time-format: "15:04:05.999999"
 
@@ -13,12 +13,13 @@ batch-limit: 150
 
 # usage: adapter=file
 #        use default if fields not configured
-file:
+#file:
 
 # usage: adapter=kafka
 #        use default if fields not configured
 kafka:
-  topic-name: "topic"
+  addresses:
+  topic: "topic"
 
 # usage: adapter=term
 term:

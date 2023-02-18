@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/fuyibing/log/v8/adapters"
+	"github.com/fuyibing/log/v8/adapters/errors"
 	"github.com/fuyibing/log/v8/conf"
 	"sync/atomic"
 	"time"
@@ -45,7 +46,7 @@ type (
 	}
 
 	client struct {
-		ar          adapters.AdapterRegistry
+		ar, are     adapters.AdapterRegistry
 		bucket      Bucket
 		concurrency int32
 	}
@@ -74,6 +75,7 @@ func (o *client) Stop()  { o.stop() }
 // /////////////////////////////////////////////////////////////
 
 func (o *client) init() *client {
+	o.are = errors.New()
 	o.bucket = (&bucket{}).init()
 	return o
 }
