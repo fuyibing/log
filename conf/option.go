@@ -78,6 +78,12 @@ func SetBatchConcurrency(n int32) Option {
 	}
 }
 
+func SetBatchFrequency(n int) Option {
+	return func(c *configuration) {
+		c.BatchFrequency = n
+	}
+}
+
 func SetBatchLimit(n int) Option {
 	return func(c *configuration) {
 		c.BatchLimit = n

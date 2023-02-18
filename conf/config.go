@@ -12,8 +12,8 @@ import (
 type (
 	Configuration interface {
 		GetAdapter() string
-		GetAutoStart() bool
 		GetBatchConcurrency() int32
+		GetBatchFrequency() int
 		GetBatchLimit() int
 		GetFile() FileConfiguration
 		GetKafka() KafkaConfiguration
@@ -41,7 +41,6 @@ type (
 
 	configuration struct {
 		Adapter     string `yaml:"adapter"`
-		AutoStart   bool   `yaml:"auto-start"`
 		Level       Level  `yaml:"level"`
 		Prefix      string `yaml:"prefix"`
 		ServiceHost string `yaml:"service-host"`
@@ -52,6 +51,7 @@ type (
 		// Basic: batch mode.
 
 		BatchConcurrency int32 `yaml:"batch-concurrency"`
+		BatchFrequency   int   `yaml:"batch-frequency"`
 		BatchLimit       int   `yaml:"batch-limit"`
 
 		// Base: open tracing.
@@ -150,6 +150,9 @@ func (o *configuration) initDefaults() {
 	// Basic: batch mode.
 	if o.BatchConcurrency == 0 {
 		o.Set(SetBatchConcurrency(DefaultBatchConcurrency))
+	}
+	if o.BatchFrequency == 0 {
+		o.Set(SetBatchFrequency(DefaultBatchFrequency))
 	}
 	if o.BatchLimit == 0 {
 		o.Set(SetBatchLimit(DefaultBatchLimit))

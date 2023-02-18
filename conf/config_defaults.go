@@ -9,6 +9,7 @@ const (
 	DefaultTimeFormat = "2006-01-02 15:04:05.999"
 
 	DefaultBatchConcurrency = 10
+	DefaultBatchFrequency   = 150
 	DefaultBatchLimit       = 100
 
 	DefaultParentSpanId = "X-B3-Parentspanid"

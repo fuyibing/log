@@ -6,6 +6,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/fuyibing/log/v8"
+	"time"
 )
 
 func init() {
@@ -13,9 +14,12 @@ func init() {
 }
 
 func main() {
-	// Stop log client. Ensure that all data in the
+	// Close log client. Ensure that all data in the
 	// memory queue are processed.
-	defer log.Client.Stop()
+	defer func() {
+		time.Sleep(time.Second * 3)
+		log.Client.Close()
+	}()
 
 	buf, _ := json.Marshal(log.Config)
 	log.Infof("configuration: %s", buf)

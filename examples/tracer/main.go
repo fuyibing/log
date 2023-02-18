@@ -20,9 +20,9 @@ func init() {
 }
 
 func main() {
-	// Stop log client. Ensure that all data in the
+	// Close log client. Ensure that all data in the
 	// memory queue are processed.
-	defer log.Client.Stop()
+	defer log.Client.Close()
 
 	c1 := log.NewContext()
 	log.Debugfc(c1, "example 1 debug")

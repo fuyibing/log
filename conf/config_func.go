@@ -4,7 +4,6 @@
 package conf
 
 func (o *configuration) GetAdapter() string           { return o.Adapter }
-func (o *configuration) GetAutoStart() bool           { return o.AutoStart }
 func (o *configuration) GetFile() FileConfiguration   { return o.File }
 func (o *configuration) GetKafka() KafkaConfiguration { return o.Kafka }
 func (o *configuration) GetLevel() Level              { return o.Level }
@@ -19,6 +18,7 @@ func (o *configuration) GetTimeFormat() string        { return o.TimeFormat }
 // Batch mode.
 
 func (o *configuration) GetBatchConcurrency() int32 { return o.BatchConcurrency }
+func (o *configuration) GetBatchFrequency() int     { return o.BatchFrequency }
 func (o *configuration) GetBatchLimit() int         { return o.BatchLimit }
 
 // Open tracing.
