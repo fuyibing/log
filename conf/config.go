@@ -130,6 +130,8 @@ func (o *configuration) initDefaults() {
 
 	if o.Adapter == "" {
 		o.Set(SetAdapter(DefaultAdapter))
+	} else {
+		o.Adapter = strings.ToLower(o.Adapter)
 	}
 	if s := o.Level.String(); s != "" {
 		o.Set(SetLevel(Level(strings.ToUpper(s))))

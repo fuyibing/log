@@ -85,6 +85,10 @@ func (o *client) start() {
 		return
 	}
 
+	o.Infof("client started, adapter=%s, level=%s",
+		conf.Config.GetAdapter(),
+		conf.Config.GetLevel(),
+	)
 }
 
 func (o *client) stop() bool {

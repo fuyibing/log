@@ -16,9 +16,10 @@ func main(){
 
 ## Supports
 
-- [x] Term
-- [x] File `async`
-- [x] Kafka `async`
+- `Term` : Print log content on console.
+- `File` : Write log to local file with **async** mode.
+- `Kafka` : Publish log to kafka with **async** mode. You can subscribe specified topic message by **logstash**, then
+  write to aliyun log service or elasticsearch.
 
 ### Configurations
 
@@ -27,10 +28,10 @@ func main(){
 Load config file `config/log.yaml` when package initialized.
 
 ```
-adapter:
-  - kafka               # send log to kafka
-  - file                # send log to file if send to kafka failed
-  - term                # send log to terminal if send to file failed
+adapter: term
+level: debug
+time-format: "2006-01-02 15:04:05.999999"
+
 kafka:
 file:
 term:

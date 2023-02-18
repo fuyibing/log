@@ -37,23 +37,17 @@ func New() *Executor {
 // /////////////////////////////////////////////////////////////
 
 func (o *Executor) Logs(lines ...*base.Line) (err error) {
-	var (
-		list = make([]string, 0)
-	)
+	list := make([]string, 0)
 
-	// Release when end.
-	defer func() {
-		for _, line := range lines {
-			line.Release()
-		}
-	}()
-
+	// Iterate lines.
 	for _, line := range lines {
 		list = append(list, o.format(line))
 	}
 
 	// Send to standard output.
-	_, err = fmt.Fprintf(os.Stdout, fmt.Sprintf("%s\n", strings.Join(list, "\n")))
+	_, err = fmt.Fprintf(os.Stdout,
+		fmt.Sprintf("%s\n", strings.Join(list, "\n")),
+	)
 	return
 }
 
