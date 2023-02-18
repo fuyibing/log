@@ -1,7 +1,7 @@
 #
 # log client based on yaml configuration
 #
-adapter: "kafka"
+adapter: "term"
 level: "debug"
 time-format: "15:04:05.999999"
 

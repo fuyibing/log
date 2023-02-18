@@ -4,6 +4,7 @@
 package adapters
 
 import (
+	"github.com/fuyibing/log/v8/adapters/errors"
 	"github.com/fuyibing/log/v8/adapters/file"
 	"github.com/fuyibing/log/v8/adapters/kafka"
 	"github.com/fuyibing/log/v8/adapters/term"
@@ -11,24 +12,30 @@ import (
 )
 
 const (
-	adapterFile  = "file"
-	adapterTerm  = "term"
-	adapterKafka = "kafka"
+	AdapterError = "error"
+	AdapterFile  = "file"
+	AdapterTerm  = "term"
+	AdapterKafka = "kafka"
 )
 
 var (
 	adapterDefaults = map[string]func() AdapterRegistry{
-		adapterFile: func() (ar AdapterRegistry) {
+		AdapterError: func() (ar AdapterRegistry) {
+			ar = errors.New()
+			ar.SetFormatter(formatters.NewErrorFormatter())
+			return
+		},
+		AdapterFile: func() (ar AdapterRegistry) {
 			ar = file.New()
 			ar.SetFormatter(formatters.NewTextFormatter())
 			return
 		},
-		adapterTerm: func() (ar AdapterRegistry) {
+		AdapterTerm: func() (ar AdapterRegistry) {
 			ar = term.New()
 			ar.SetFormatter(formatters.NewTextFormatter())
 			return
 		},
-		adapterKafka: func() (ar AdapterRegistry) {
+		AdapterKafka: func() (ar AdapterRegistry) {
 			ar = kafka.New()
 			ar.SetFormatter(formatters.NewJsonFormatter())
 			return

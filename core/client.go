@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/fuyibing/log/v8/adapters"
-	"github.com/fuyibing/log/v8/adapters/errors"
 	"github.com/fuyibing/log/v8/conf"
 	"sync/atomic"
 	"time"
@@ -46,7 +45,7 @@ type (
 	}
 
 	client struct {
-		ar, are     adapters.AdapterRegistry
+		ar, ae      adapters.AdapterRegistry
 		bucket      Bucket
 		concurrency int32
 	}
@@ -75,7 +74,7 @@ func (o *client) Stop()  { o.stop() }
 // /////////////////////////////////////////////////////////////
 
 func (o *client) init() *client {
-	o.are = errors.New()
+	o.ae = adapters.Adapter.Get(adapters.AdapterError)
 	o.bucket = (&bucket{}).init()
 	return o
 }
@@ -101,7 +100,7 @@ func (o *client) stop() bool {
 		// Open new coroutine
 		// to consume bucket.
 		if concurrency < conf.Config.GetBatchConcurrency() {
-			go o.popn()
+			go o.PopFromBucket()
 		}
 
 		// Wait for a while.

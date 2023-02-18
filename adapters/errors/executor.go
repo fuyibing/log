@@ -9,10 +9,14 @@ import (
 )
 
 type (
-	Executor struct{}
+	Executor struct {
+		formatter formatters.Formatter
+	}
 )
 
-func New() *Executor { return (&Executor{}).init() }
+func New() *Executor {
+	return (&Executor{}).init()
+}
 
 // /////////////////////////////////////////////////////////////
 // Exported methods
@@ -20,12 +24,14 @@ func New() *Executor { return (&Executor{}).init() }
 
 func (o *Executor) Logs(lines ...*base.Line) (err error) {
 	for _, line := range lines {
-		println("~", line.Text)
+		println(o.formatter.String(line))
 	}
 	return
 }
 
-func (o *Executor) SetFormatter(_ formatters.Formatter) {}
+func (o *Executor) SetFormatter(formatter formatters.Formatter) {
+	o.formatter = formatter
+}
 
 // /////////////////////////////////////////////////////////////
 // Access methods
