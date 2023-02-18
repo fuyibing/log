@@ -1,5 +1,5 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-02-17
+// date: 2023-02-18
 
 package conf
 
@@ -8,7 +8,6 @@ type (
 )
 
 const (
-	Off   Level = "OFF"
 	Fatal Level = "FATAL"
 	Error Level = "ERROR"
 	Warn  Level = "WARN"
@@ -29,7 +28,6 @@ func (l Level) Int() int {
 	case Debug:
 		return 5
 	}
-
 	return 0
 }
 

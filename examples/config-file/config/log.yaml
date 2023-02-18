@@ -1,0 +1,24 @@
+#
+# log client based on yaml configuration
+#
+adapter: "term"
+level: "debug"
+time-format: "15:04:05.999999"
+
+# Batch mode
+batch-concurrency: 3
+batch-limit: 150
+
+# Open tracing.
+
+# usage: adapter=file
+file:
+  base-path: "./"
+
+# usage: adapter=kafka
+kafka:
+  topic-name: "topic"
+
+# usage: adapter=term
+term:
+  color: true

@@ -1,5 +1,5 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-02-17
+// date: 2023-02-18
 
 package formatters
 
@@ -10,16 +10,56 @@ import (
 )
 
 type (
-	TextFormatter struct {
-	}
+	TextFormatter struct{}
 )
 
 func NewTextFormatter() *TextFormatter {
 	return &TextFormatter{}
 }
 
-func (o *TextFormatter) Format(line *base.Line) string {
-	return fmt.Sprintf("%s[%s][%s]",
-		conf.Config.Prefix, line.Time.Format(conf.Config.TimeFormat), line.Level.String(),
-	) + " " + line.Text
+// /////////////////////////////////////////////////////////////
+// Interface methods
+// /////////////////////////////////////////////////////////////
+
+func (o *TextFormatter) Body(line *base.Line) []byte {
+	return []byte(o.String(line))
+}
+
+func (o *TextFormatter) String(line *base.Line) (str string) {
+	// Prefix.
+	str = conf.Config.GetPrefix()
+
+	// Time & Level & PID.
+	str += fmt.Sprintf("[%s][%s][PI=%d]",
+		line.Time.Format(conf.Config.GetTimeFormat()),
+		line.Level,
+		conf.Config.GetPid(),
+	)
+
+	// Append service name.
+	if s := conf.Config.GetServiceName(); s != "" {
+		str += fmt.Sprintf("[SN=%s]", s)
+	}
+
+	// Open Tracing.
+	if t := line.Tracing(); t != nil {
+		str += fmt.Sprintf("[T=%s][TS=%s][TP=%s][TV=%v]",
+			t.TraceId,
+			t.SpanId,
+			t.ParentSpanId,
+			t.GenVersion(line.TracingOffset()),
+		)
+	}
+
+	// User info.
+	str += " " + line.Text
+	return
+}
+
+// /////////////////////////////////////////////////////////////
+// Access methods
+// /////////////////////////////////////////////////////////////
+
+func (o *TextFormatter) init() *TextFormatter {
+	return o
 }

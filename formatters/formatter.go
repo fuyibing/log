@@ -1,5 +1,5 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-02-17
+// date: 2023-02-18
 
 package formatters
 
@@ -8,5 +8,8 @@ import (
 )
 
 type (
-	Formatter func(line *base.Line) string
+	Formatter interface {
+		Body(line *base.Line) []byte
+		String(line *base.Line) string
+	}
 )

@@ -1,59 +1,139 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-02-16
+// date: 2023-02-18
 
 package conf
 
-// Option
-// interface for configuration fields configure.
-type Option func(config *Configuration)
+import (
+	"path/filepath"
+)
 
-// WithAdapter bind adapter priority from left to right. If left
-// executed error, select down.
-//
-// configured : Kafka, File.
-// execution  : Return if logs send to kafka succeed, otherwise
-//              write logs to disk file.
-func WithAdapter(adapters ...Adapter) Option {
-	return func(config *Configuration) {
-		config.Adapters = adapters
+type (
+	Option func(c *configuration)
+)
+
+// /////////////////////////////////////////////////////////////
+// Basic: normal
+// /////////////////////////////////////////////////////////////
+
+func SetAdapter(s string) Option {
+	return func(c *configuration) {
+		c.Adapter = s
 	}
 }
 
-// WithPrefix prepend specified string ahead of log text.
-//
-//   WithPrefix("MyLogger")
-func WithPrefix(prefix string) Option {
-	return func(config *Configuration) {
-		config.Prefix = prefix
+func SetLevel(level Level) Option {
+	return func(c *configuration) {
+		c.Level = level
+
+		// Compare level integer.
+		i := level.Int()
+		e := i > 0
+
+		// Update switch status.
+		c.fatalOn = e && i >= Fatal.Int()
+		c.errorOn = e && i >= Error.Int()
+		c.warnOn = e && i >= Warn.Int()
+		c.infoOn = e && i >= Info.Int()
+		c.debugOn = e && i >= Debug.Int()
 	}
 }
 
-// WithLevel specify log level.
-//
-//   WithLevel(conf.Debug)
-//   WithLevel(conf.Info)
-//   WithLevel(conf.Warn)
-func WithLevel(level Level) Option {
-	return func(config *Configuration) {
-		config.Level = level
-		config.updateStatus()
+func SetPrefix(s string) Option {
+	return func(c *configuration) {
+		c.Prefix = s
 	}
 }
 
-// WithService set running service info.
-//
-//   WithService("[service=myapp]")
-func WithService(service string) Option {
-	return func(config *Configuration) {
-		config.Service = service
+func SetServiceName(s string) Option {
+	return func(c *configuration) {
+		c.ServiceName = s
 	}
 }
 
-// WithTimeFormat specify format time string.
-//
-//   WithTimeFormat("2006-01-02 15:04:05.999")
-func WithTimeFormat(s string) Option {
-	return func(config *Configuration) {
-		config.TimeFormat = s
+func SetTimeFormat(s string) Option {
+	return func(c *configuration) {
+		c.TimeFormat = s
+	}
+}
+
+// /////////////////////////////////////////////////////////////
+// Basic: batch mode
+// /////////////////////////////////////////////////////////////
+
+func SetBatchConcurrency(n int32) Option {
+	return func(c *configuration) {
+		c.BatchConcurrency = n
+	}
+}
+
+func SetBatchLimit(n int) Option {
+	return func(c *configuration) {
+		c.BatchLimit = n
+	}
+}
+
+// /////////////////////////////////////////////////////////////
+// Basic: open tracing
+// /////////////////////////////////////////////////////////////
+
+func SetSpanId(s string) Option {
+	return func(c *configuration) {
+		c.SpanId = s
+	}
+}
+
+func SetParentSpanId(s string) Option {
+	return func(c *configuration) {
+		c.ParentSpanId = s
+	}
+}
+
+func SetTraceId(s string) Option {
+	return func(c *configuration) {
+		c.TraceId = s
+	}
+}
+
+func SetTraceVersion(s string) Option {
+	return func(c *configuration) {
+		c.TraceVersion = s
+	}
+}
+
+// /////////////////////////////////////////////////////////////
+// Adapter: File
+// /////////////////////////////////////////////////////////////
+
+func SetFileBasePath(s string) Option {
+	return func(c *configuration) {
+		c.File.BasePath, _ = filepath.Abs(s)
+	}
+}
+
+func SetFileExtName(s string) Option {
+	return func(c *configuration) {
+		c.File.ExtName = s
+	}
+}
+
+func SetFileFileName(s string) Option {
+	return func(c *configuration) {
+		c.File.FileName = s
+	}
+}
+
+func SetFileSeparatorPath(s string) Option {
+	return func(c *configuration) {
+		c.File.SeparatorPath = s
+	}
+}
+
+// /////////////////////////////////////////////////////////////
+// Adapter: Term
+// /////////////////////////////////////////////////////////////
+
+func SetTermColor(b bool) Option {
+	return func(c *configuration) {
+		c.Term.Color = b
 	}
 }

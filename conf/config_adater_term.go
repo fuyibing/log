@@ -1,0 +1,28 @@
+// author: wsfuyibing <websearch@163.com>
+// date: 2023-02-18
+
+package conf
+
+type (
+	TermConfiguration interface {
+		GetColor() bool
+	}
+
+	termConfiguration struct {
+		parent *configuration
+
+		Color bool `yaml:"color"`
+	}
+)
+
+// /////////////////////////////////////////////////////////////
+// Interface methods
+// /////////////////////////////////////////////////////////////
+
+func (o *termConfiguration) GetColor() bool { return o.Color }
+
+// /////////////////////////////////////////////////////////////
+// Access methods
+// /////////////////////////////////////////////////////////////
+
+func (o *termConfiguration) initDefaults() {}

@@ -1,5 +1,5 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-02-17
+// date: 2023-02-18
 
 package conf
 
@@ -7,12 +7,15 @@ import (
 	"sync"
 )
 
-var (
-	Config *Configuration
-)
+var Config Configuration
 
 func init() {
 	new(sync.Once).Do(func() {
-		Config = (&Configuration{}).init()
+		Config = func() Configuration {
+			c := (&configuration{}).init()
+			c.initYaml()
+			c.initDefaults()
+			return c
+		}()
 	})
 }
