@@ -29,6 +29,10 @@ func (o *Line) Release() {
 	Pool.ReleaseLine(o)
 }
 
+// TextParse
+// collect variables into fields from text.
+func (o *Line) TextParse() { Parser.Parse(o) }
+
 func (o *Line) Tracing() *trace.Tracing {
 	return o.tracing
 }

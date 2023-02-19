@@ -7,8 +7,14 @@ import (
 	"sync"
 )
 
+var (
+	Parser ParserManager
+	Pool   PoolManager
+)
+
 func init() {
 	new(sync.Once).Do(func() {
+		Parser = (&parser{}).init()
 		Pool = (&pool{}).init()
 	})
 }

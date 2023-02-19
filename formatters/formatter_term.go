@@ -33,11 +33,15 @@ func (o *TermFormatter) String(line *base.Line) (str string) {
 		line.Level,
 	)
 
+	if line.Duration > 0 {
+		str += fmt.Sprintf("{D=%v}", line.Duration)
+	}
+
 	// Open Tracing.
 	if t := line.Tracing(); t != nil {
-		str += fmt.Sprintf("[%s=%v]", t.SpanId, t.GenVersion(line.TracingOffset()))
+		str += fmt.Sprintf("{%s=%v}", t.SpanId, t.GenVersion(line.TracingOffset()))
 		if t.Http {
-			str += fmt.Sprintf("[%s %s]", t.HttpRequestMethod, t.HttpRequestUrl)
+			str += fmt.Sprintf("{%s=%s}", t.HttpRequestMethod, t.HttpRequestUrl)
 		}
 	}
 

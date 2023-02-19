@@ -7,10 +7,6 @@ import (
 	"sync"
 )
 
-var (
-	Pool PoolManager
-)
-
 type (
 	PoolManager interface {
 		AcquireLine() *Line

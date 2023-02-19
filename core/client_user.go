@@ -142,6 +142,7 @@ func (o *client) PushIntoBucket(ctx context.Context, level conf.Level, text stri
 	line := base.Pool.AcquireLine().WithContext(ctx)
 	line.Level = level
 	line.Text = fmt.Sprintf(text, args...)
+	line.TextParse()
 
 	// SYNC Mode, if ASYNC Disabled.
 	if conf.Config.GetAsyncDisabled() {
