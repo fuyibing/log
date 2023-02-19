@@ -16,10 +16,7 @@ func init(){
 }
 
 func main(){
-    defer func(){
-        // Wait all uncompleted logs done.
-        log.Client.Stop()
-    }()
+    defer log.Client.Close()
 
     log.Debug("debug info")
     log.Debugf("debug at MessageQueue[topic=%s, queue=%d]", "Topic", 1)
