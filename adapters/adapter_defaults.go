@@ -21,17 +21,17 @@ var (
 	adapterContainers = map[string]func() AdapterRegistry{
 		AdapterError: func() (ar AdapterRegistry) {
 			ar = term.New()
-			ar.SetFormatter(formatters.NewErrorFormatter())
+			ar.SetFormatter(formatters.NewTermFormatter())
 			return
 		},
 		AdapterFile: func() (ar AdapterRegistry) {
 			ar = file.New()
-			ar.SetFormatter(formatters.NewTextFormatter())
+			ar.SetFormatter(formatters.NewFileFormatter())
 			return
 		},
 		AdapterTerm: func() (ar AdapterRegistry) {
 			ar = term.New()
-			ar.SetFormatter(formatters.NewTextFormatter())
+			ar.SetFormatter(formatters.NewTermFormatter())
 			return
 		},
 		AdapterKafka: func() (ar AdapterRegistry) {

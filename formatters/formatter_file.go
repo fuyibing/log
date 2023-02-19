@@ -10,22 +10,22 @@ import (
 )
 
 type (
-	TextFormatter struct{}
+	FileFormatter struct{}
 )
 
-func NewTextFormatter() *TextFormatter {
-	return &TextFormatter{}
+func NewFileFormatter() *FileFormatter {
+	return &FileFormatter{}
 }
 
 // /////////////////////////////////////////////////////////////
 // Interface methods
 // /////////////////////////////////////////////////////////////
 
-func (o *TextFormatter) Body(line *base.Line) []byte {
+func (o *FileFormatter) Body(line *base.Line) []byte {
 	return []byte(o.String(line))
 }
 
-func (o *TextFormatter) String(line *base.Line) (str string) {
+func (o *FileFormatter) String(line *base.Line) (str string) {
 	// Prefix.
 	str = conf.Config.GetPrefix()
 
@@ -75,6 +75,6 @@ func (o *TextFormatter) String(line *base.Line) (str string) {
 // Access methods
 // /////////////////////////////////////////////////////////////
 
-func (o *TextFormatter) init() *TextFormatter {
+func (o *FileFormatter) init() *FileFormatter {
 	return o
 }

@@ -63,7 +63,12 @@ func init() {
     log.Config.Set(	
         conf.SetAdapter(adapters.AdapterTerm),
         conf.SetLevel(conf.Info),
-        conf.SetTermColor(true),
+
+        conf.SetServiceEnvironment("192.168.10.110"), // testing
+        conf.SetServiceAddr("172.16.0.110"),          // 172.16.0.110
+		conf.SetServicePort(app.Config.Port),         // 8080
+		conf.SetServiceName(app.Config.Name),         // MyAPP
+		conf.SetServiceVersion(app.Config.Version),   // 1.2.3
     )
 }
 
