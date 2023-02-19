@@ -9,6 +9,12 @@ import (
 	"net/http"
 )
 
+// New
+// return root trace context. Compatible with old version.
+func New() context.Context {
+	return NewContext()
+}
+
 // NewContext
 // return root trace context.
 func NewContext() context.Context {
