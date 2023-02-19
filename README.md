@@ -8,21 +8,41 @@ import "github.com/fuyibing/log/v8"
 
 ```
 func init(){
+    // Follow configurations are optional. All of follows can be
+    // configured in `config/log.yaml`. Filled with default if not
+    // configured.
     log.Config.Set(
-        conf.SetAdapter("term"),
-        conf.SetLevel(conf.Debug),
-        conf.SetTermColor(true),
+        conf.SetTimeFormat("2006-01-02 15:04:05.999999"),
+        conf.SetLevel(conf.Error),
+        conf.SetPrefix("Prefix"),
+
+        conf.SetServiceAddr("172.16.0.110"),
+        conf.SetServicePort(8080),
+        conf.SetServiceEnvironment("production"),
+        conf.SetServiceName("myapp"),
+        conf.SetServiceVersion("1.2.3"),
     )
+
+    // If adapter changed by code, You must call log.Client.Reset()
+    // to apply it.
+    log.Config.Set(conf.SetAdapter(adapters.AdapterKafka))
+    log.Client.Reset()
 }
 
 func main(){
+    // Wait for a while
+    // until all logs publish completed.
+    //
+    // If the Close method `log.Client.Close()` is not set, Some logs
+    // end of the application may be lost.
     defer log.Client.Close()
 
+    // ... ...
+    
     log.Debug("debug info")
-    log.Debugf("debug at MessageQueue[topic=%s, queue=%d]", "Topic", 1)
-
-    // With open tracing on context.
-    log.Debugfc(ctx, "debug at MessageQueue[topic=%s, queue=%d]", "Topic", 1)
+    log.Infof("info message: adapter=%s, level=%v", conf.Adapter, conf.Level)
+    
+    // ... ...
 }
 ```
 
@@ -31,11 +51,9 @@ func main(){
 - [X] `Term` - Print log content on console.
 - [X] `File` - Write log to local file.
 - [X] `Kafka` - Publish log to kafka.
-- [ ] `SLS` - Aliyunn SLS service.
+- [ ] `SLS` - Aliyun SLS service.
 
 ### Configurations
-
-##### YAML
 
 Load config file `config/log.yaml` when package initialized. Use default if not specified.
 
@@ -54,26 +72,6 @@ term:
   color: false
 ```
 
-##### CODE
-
-You must config them with coder.
-
-```
-func init() {
-    log.Config.Set(	
-        conf.SetAdapter(adapters.AdapterTerm),
-        conf.SetLevel(conf.Info),
-
-        conf.SetServiceEnvironment("192.168.10.110"), // testing
-        conf.SetServiceAddr("172.16.0.110"),          // 172.16.0.110
-		conf.SetServicePort(app.Config.Port),         // 8080
-		conf.SetServiceName(app.Config.Name),         // MyAPP
-		conf.SetServiceVersion(app.Config.Version),   // 1.2.3
-    )
-}
-
-```
-
 ## Formatter
 
 ```log
@@ -84,10 +82,27 @@ func init() {
 [2023-02-16 09:10:11.246][FATAL][PID=3721] fatal message
 ```
 
-##### Custom
+System formatter
 
 ```
+log.Client.GetAdapterRegistry().SetFormatter(formatters.NewFileFormatter())
+log.Client.GetAdapterRegistry().SetFormatter(formatters.NewJsonFormatter())
+```
+
+Customer formatter
+
+```
+type MyFormatter struct{}
+
+func (o *MyFormatter) Body(line *base.Line) []byte {
+    // ...
+}
+
+func (o *MyFormatter) String(line *base.Line) string {
+    // ...
+}
+
 func init(){
-    log.Client.GetAdapterRegistry().SetFormatter(&formatter{})
+    log.Client.GetAdapterRegistry().SetFormatter(&MyFormatter{})
 }
 ```
