@@ -33,6 +33,7 @@ func (o *TermFormatter) String(line *base.Line) (str string) {
 		line.Level,
 	)
 
+	// Append duration.
 	if line.Duration > 0 {
 		str += fmt.Sprintf("{D=%v}", line.Duration)
 	}

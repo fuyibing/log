@@ -59,7 +59,7 @@ func (o *parser) init() *parser {
 
 func (o *parser) initDefaults() {
 	var (
-		regexDuration = regexp.MustCompile(`(?i)\[(d|dur|duration)=(\d+\.?\d*)\]`)
+		regexDuration = regexp.MustCompile(`(?i)\[(d|dur|duration)=(\d+\.?\d*)\]\s*`)
 	)
 
 	o.Set("duration", func(line *Line) {
@@ -71,6 +71,7 @@ func (o *parser) initDefaults() {
 		if m := regexDuration.FindStringSubmatch(line.Text); len(m) == 3 {
 			if f, fe := strconv.ParseFloat(m[2], 64); fe == nil {
 				line.Duration = f
+				line.Text = regexDuration.ReplaceAllString(line.Text, "")
 			}
 		}
 	})

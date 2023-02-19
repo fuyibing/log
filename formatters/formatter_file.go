@@ -25,6 +25,19 @@ func (o *FileFormatter) Body(line *base.Line) []byte {
 	return []byte(o.String(line))
 }
 
+// String
+// generate log line as text.
+//
+// About Keyword.
+//   D  : Duration
+//   P  : Process id of os
+//   SN : Registered service name
+//   T  : Trace id
+//   TS : Span id of trace
+//   TP : Parent Span id of trace
+//   TV : Span version
+//   R  : HTTP Request URL
+//   RM : HTTP Request Method
 func (o *FileFormatter) String(line *base.Line) (str string) {
 	// Prefix.
 	str = conf.Config.GetPrefix()
@@ -40,26 +53,29 @@ func (o *FileFormatter) String(line *base.Line) (str string) {
 		str += fmt.Sprintf("[%s:%d]", s, conf.Config.GetServicePort())
 	}
 
-	// Service: name.
-	if s := conf.Config.GetServiceName(); s != "" {
-		str += fmt.Sprintf("[S=%s]", s)
+	// PID.
+	str += fmt.Sprintf("{P=%d}", conf.Config.GetPid())
+
+	// Duration.
+	if line.Duration > 0 {
+		str += fmt.Sprintf("{D=%v}", line.Duration)
 	}
 
-	// PID.
-	str += fmt.Sprintf("[P=%d]", conf.Config.GetPid())
+	// Service: name.
+	if s := conf.Config.GetServiceName(); s != "" {
+		str += fmt.Sprintf("{SN=%s}", s)
+	}
 
 	// Open Tracing.
 	if t := line.Tracing(); t != nil {
-		str += fmt.Sprintf("[T=%s][TS=%s][TP=%s][TV=%v]",
-			t.TraceId,
-			t.SpanId,
-			t.ParentSpanId,
+		str += fmt.Sprintf("{T=%s}{TS=%s}{TP=%s}{TV=%v}",
+			t.TraceId, t.SpanId, t.ParentSpanId,
 			t.GenVersion(line.TracingOffset()),
 		)
 
 		// Append http request location.
-		if t.HttpRequestMethod != "" && t.HttpRequestUrl != "" {
-			str += fmt.Sprintf("[R=%s][RM=%s]",
+		if t.Http {
+			str += fmt.Sprintf("{R=%s}{RM=%s}",
 				t.HttpRequestUrl,
 				t.HttpRequestMethod,
 			)

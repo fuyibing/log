@@ -8,15 +8,21 @@ import (
 	"github.com/fuyibing/log/v8/adapters"
 	"github.com/fuyibing/log/v8/base"
 	"github.com/fuyibing/log/v8/conf"
+	"github.com/fuyibing/log/v8/formatters"
 	"regexp"
 )
 
 func init() {
 	log.Config.Set(
+		// conf.SetAdapter(adapters.AdapterFile),
 		conf.SetAdapter(adapters.AdapterTerm),
 		conf.SetLevel(conf.Debug),
 		conf.SetTermColor(true),
 	)
+
+	log.Client.Reset()
+
+	log.Client.GetAdapterRegistry().SetFormatter(formatters.NewJsonFormatter())
 
 	regexDemo := regexp.MustCompile(`\s+demo\s+`)
 
