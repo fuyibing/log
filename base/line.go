@@ -25,6 +25,8 @@ type (
 	}
 )
 
+// Release
+// instance to pool.
 func (o *Line) Release() {
 	Pool.ReleaseLine(o)
 }
@@ -33,14 +35,21 @@ func (o *Line) Release() {
 // collect variables into fields from text.
 func (o *Line) TextParse() { Parser.Parse(o) }
 
+// Tracing
+// return tracing instance if configured.
 func (o *Line) Tracing() *trace.Tracing {
 	return o.tracing
 }
 
+// TracingOffset
+// return line offset of trace span.
 func (o *Line) TracingOffset() int32 {
 	return o.tracingOffset
 }
 
+// WithContext
+// read tracing from context, increment offset if success
+// checked.
 func (o *Line) WithContext(ctx context.Context) *Line {
 	if o.ctx = ctx; o.ctx != nil {
 		if cv := o.ctx.Value(conf.OpenTracingKey); cv != nil {
