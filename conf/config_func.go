@@ -3,18 +3,20 @@
 
 package conf
 
-func (o *configuration) GetAdapter() string           { return o.Adapter }
-func (o *configuration) GetAsyncDisabled() bool       { return o.AsyncDisabled }
-func (o *configuration) GetFile() FileConfiguration   { return o.File }
-func (o *configuration) GetKafka() KafkaConfiguration { return o.Kafka }
-func (o *configuration) GetLevel() Level              { return o.Level }
-func (o *configuration) GetPid() int                  { return o.pid }
-func (o *configuration) GetPrefix() string            { return o.Prefix }
-func (o *configuration) GetServiceHost() string       { return o.ServiceHost }
-func (o *configuration) GetServiceName() string       { return o.ServiceName }
-func (o *configuration) GetServicePort() int          { return o.ServicePort }
-func (o *configuration) GetTerm() TermConfiguration   { return o.Term }
-func (o *configuration) GetTimeFormat() string        { return o.TimeFormat }
+func (o *configuration) GetAdapter() string            { return o.Adapter }
+func (o *configuration) GetAsyncDisabled() bool        { return o.AsyncDisabled }
+func (o *configuration) GetFile() FileConfiguration    { return o.File }
+func (o *configuration) GetKafka() KafkaConfiguration  { return o.Kafka }
+func (o *configuration) GetLevel() Level               { return o.Level }
+func (o *configuration) GetPid() int                   { return o.pid }
+func (o *configuration) GetPrefix() string             { return o.Prefix }
+func (o *configuration) GetServiceAddr() string        { return o.ServiceAddr }
+func (o *configuration) GetServiceEnvironment() string { return o.ServiceEnvironment }
+func (o *configuration) GetServiceName() string        { return o.ServiceName }
+func (o *configuration) GetServicePort() int           { return o.ServicePort }
+func (o *configuration) GetServiceVersion() string     { return o.ServiceVersion }
+func (o *configuration) GetTerm() TermConfiguration    { return o.Term }
+func (o *configuration) GetTimeFormat() string         { return o.TimeFormat }
 
 // Batch mode.
 

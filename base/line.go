@@ -14,9 +14,10 @@ type (
 	// Line
 	// log line definitions.
 	Line struct {
-		Level conf.Level
-		Text  string
-		Time  time.Time
+		Duration float64
+		Level    conf.Level
+		Text     string
+		Time     time.Time
 
 		ctx           context.Context
 		tracing       *trace.Tracing
@@ -57,6 +58,7 @@ func (o *Line) after() *Line {
 	o.tracing = nil
 	o.tracingOffset = 0
 
+	o.Duration = 0
 	o.Level = ""
 	o.Text = ""
 	return o

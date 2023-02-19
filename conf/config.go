@@ -22,9 +22,11 @@ type (
 		GetParentSpanId() string
 		GetPid() int
 		GetPrefix() string
-		GetServiceHost() string
+		GetServiceAddr() string
+		GetServiceEnvironment() string
 		GetServiceName() string
 		GetServicePort() int
+		GetServiceVersion() string
 		GetSpanId() string
 		GetTerm() TermConfiguration
 		GetTimeFormat() string
@@ -41,14 +43,16 @@ type (
 	}
 
 	configuration struct {
-		Adapter       string `yaml:"adapter"`
-		AsyncDisabled bool   `yaml:"async-disabled"`
-		Level         Level  `yaml:"level"`
-		Prefix        string `yaml:"prefix"`
-		ServiceHost   string `yaml:"service-host"`
-		ServiceName   string `yaml:"service-name"`
-		ServicePort   int    `yaml:"service-port"`
-		TimeFormat    string `yaml:"time-format"`
+		Adapter            string `yaml:"adapter"`
+		AsyncDisabled      bool   `yaml:"async-disabled"`
+		Level              Level  `yaml:"level"`
+		Prefix             string `yaml:"prefix"`
+		ServiceAddr        string `yaml:"service-addr"`
+		ServiceEnvironment string `yaml:"service-environment"`
+		ServiceName        string `yaml:"service-name"`
+		ServicePort        int    `yaml:"service-port"`
+		ServiceVersion     string `yaml:"service-version"`
+		TimeFormat         string `yaml:"time-format"`
 
 		// Basic: batch mode.
 

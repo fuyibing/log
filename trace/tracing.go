@@ -20,7 +20,11 @@ type (
 		TraceId      string
 		Version      string
 
-		RequestMethod, RequestUrl string
+		Http                              bool
+		HttpHeaders                       map[string][]string
+		HttpProtocol                      string
+		HttpRequestMethod, HttpRequestUrl string
+		HttpUserAgent                     string
 
 		offset, previous int32
 		parent           *Tracing

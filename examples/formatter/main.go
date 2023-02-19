@@ -8,12 +8,13 @@ import (
 	"github.com/fuyibing/log/v8/adapters"
 	"github.com/fuyibing/log/v8/base"
 	"github.com/fuyibing/log/v8/conf"
+	"github.com/fuyibing/log/v8/formatters"
 )
 
 // Custom formatter.
 type formatter struct{}
 
-func (*formatter) Body(line *base.Line) []byte { return nil }
+func (*formatter) Body(_ *base.Line) []byte { return nil }
 
 func (*formatter) String(line *base.Line) string {
 	return "my formatter: " + line.Text
@@ -24,14 +25,20 @@ func init() {
 		conf.SetAdapter(adapters.AdapterTerm),
 		conf.SetLevel(conf.Debug),
 		conf.SetTermColor(true),
+
+		conf.SetServiceAddr("172.16.0.100"),
+		conf.SetServiceEnvironment("production"),
+		conf.SetServiceName("mbs"),
+		conf.SetServiceVersion("3.1.2"),
+		conf.SetServicePort(8101),
 	)
 
 	// Start log client and accept request.
 	log.Client.Reset()
 
 	// Override default formatter.
-	log.Client.GetAdapterRegistry().
-		SetFormatter(&formatter{})
+	// log.Client.GetAdapterRegistry().SetFormatter(&formatter{})
+	log.Client.GetAdapterRegistry().SetFormatter(formatters.NewJsonFormatter())
 }
 
 func main() {

@@ -12,26 +12,36 @@ import (
 type (
 	JsonFormatter struct{}
 
-	// JsonLine
-	// for kafka.
 	JsonLine struct {
-		Datetime    int64   `json:"datetime"`
-		Duration    float64 `json:"duration"`
-		Level       string  `json:"level"`
-		Pid         int     `json:"pid"`
-		ServiceHost string  `json:"service_host"`
-		ServiceName string  `json:"service_name"`
-		ServicePort int     `json:"service_port"`
+		Content  string  `json:"content"`
+		Level    string  `json:"level"`
+		Start    int64   `json:"start"`
+		Duration float64 `json:"duration,omitempty"`
 
-		ParentSpanId string `json:"parent_span_id"`
-		SpanId       string `json:"span_id"`
-		SpanVersion  string `json:"span_version"`
-		TraceId      string `json:"trace_id"`
+		ParentSpanId string `json:"parent_span_id,omitempty"`
+		SpanId       string `json:"span_id,omitempty"`
+		SpanVersion  string `json:"span_version,omitempty"`
+		TraceId      string `json:"trace_id,omitempty"`
 
-		RequestMethod string `json:"request_method"`
-		RequestUrl    string `json:"request_url"`
+		Property *JsonProperty `json:"property,omitempty"`
+		Resource *JsonResource `json:"resource,omitempty"`
+	}
 
-		Content string `json:"content"`
+	JsonProperty struct {
+		HttpHeaders       map[string][]string `json:"http.headers,omitempty"`
+		HttpProtocol      string              `json:"http.protocol,omitempty"`
+		HttpRequestMethod string              `json:"http.request.method,omitempty"`
+		HttpRequestUrl    string              `json:"http.request.url,omitempty"`
+		HttpUserAgent     string              `json:"http.user.agent,omitempty"`
+	}
+
+	JsonResource struct {
+		DeployAddress     string `json:"deploy.address,omitempty"`
+		DeployEnvironment string `json:"deploy.environment,omitempty"`
+		DeployPort        int    `json:"deploy.port,omitempty"`
+		ProcessId         int    `json:"process.pid,omitempty"`
+		ServiceName       string `json:"service.name,omitempty"`
+		ServiceVersion    string `json:"service.version,omitempty"`
 	}
 )
 
@@ -44,7 +54,7 @@ func NewJsonFormatter() *JsonFormatter {
 // /////////////////////////////////////////////////////////////
 
 func (o *JsonFormatter) Body(line *base.Line) []byte {
-	body, _ := json.Marshal((&JsonLine{}).init(line))
+	body, _ := json.Marshal((&JsonLine{}).apply(line))
 	return body
 }
 
@@ -58,26 +68,41 @@ func (o *JsonFormatter) String(line *base.Line) string {
 
 func (o *JsonFormatter) init() *JsonFormatter { return o }
 
-func (o *JsonLine) init(line *base.Line) *JsonLine {
-	// Basic fields
+func (o *JsonLine) apply(line *base.Line) *JsonLine {
+	// Basic fields.
 	o.Content = line.Text
-	o.Datetime = line.Time.UnixMilli()
+	o.Duration = line.Duration
+	o.Start = line.Time.UnixMilli()
 	o.Level = line.Level.String()
-	o.Pid = conf.Config.GetPid()
-	o.ServiceHost = conf.Config.GetServiceHost()
-	o.ServiceName = conf.Config.GetServiceName()
-	o.ServicePort = conf.Config.GetServicePort()
 
-	// Open tracing fields.
-	if t := line.Tracing(); t != nil {
-		o.ParentSpanId = t.ParentSpanId
-		o.SpanId = t.SpanId
-		o.SpanVersion = t.GenVersion(line.TracingOffset())
-		o.TraceId = t.TraceId
+	// Resource fields.
+	o.Resource = &JsonResource{
+		DeployAddress:     conf.Config.GetServiceAddr(),
+		DeployEnvironment: conf.Config.GetServiceEnvironment(),
+		DeployPort:        conf.Config.GetServicePort(),
+		ProcessId:         conf.Config.GetPid(),
+		ServiceName:       conf.Config.GetServiceName(),
+		ServiceVersion:    conf.Config.GetServiceVersion(),
+	}
 
-		// HTTP Request fields.
-		o.RequestMethod = t.RequestMethod
-		o.RequestUrl = t.RequestUrl
+	// Property fields.
+	o.Property = &JsonProperty{}
+
+	// OpenTracing inherit.
+	if tracing := line.Tracing(); tracing != nil {
+		o.ParentSpanId = tracing.ParentSpanId
+		o.SpanId = tracing.SpanId
+		o.SpanVersion = tracing.GenVersion(line.TracingOffset())
+		o.TraceId = tracing.TraceId
+
+		// Inherit http fields.
+		if tracing.Http {
+			o.Property.HttpHeaders = tracing.HttpHeaders
+			o.Property.HttpProtocol = tracing.HttpProtocol
+			o.Property.HttpRequestMethod = tracing.HttpRequestMethod
+			o.Property.HttpRequestUrl = tracing.HttpRequestUrl
+			o.Property.HttpUserAgent = tracing.HttpUserAgent
+		}
 	}
 
 	return o

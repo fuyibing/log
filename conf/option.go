@@ -15,6 +15,13 @@ type (
 // Basic: normal
 // /////////////////////////////////////////////////////////////
 
+// SetAdapter
+// specify log publish kind.
+//
+// After this, you must call log.Reset() to replace and apply,
+// otherwise it not work.
+//
+// Default: term
 func SetAdapter(s string) Option {
 	return func(c *configuration) {
 		c.Adapter = s
@@ -50,9 +57,15 @@ func SetPrefix(s string) Option {
 	}
 }
 
-func SetServiceHost(s string) Option {
+func SetServiceAddr(s string) Option {
 	return func(c *configuration) {
-		c.ServiceHost = s
+		c.ServiceAddr = s
+	}
+}
+
+func SetServiceEnvironment(s string) Option {
+	return func(c *configuration) {
+		c.ServiceEnvironment = s
 	}
 }
 
@@ -65,6 +78,12 @@ func SetServiceName(s string) Option {
 func SetServicePort(n int) Option {
 	return func(c *configuration) {
 		c.ServicePort = n
+	}
+}
+
+func SetServiceVersion(s string) Option {
+	return func(c *configuration) {
+		c.ServiceVersion = s
 	}
 }
 

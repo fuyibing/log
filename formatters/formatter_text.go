@@ -36,7 +36,7 @@ func (o *TextFormatter) String(line *base.Line) (str string) {
 	)
 
 	// Service: host + port.
-	if s := conf.Config.GetServiceHost(); s != "" {
+	if s := conf.Config.GetServiceAddr(); s != "" {
 		str += fmt.Sprintf("[%s:%d]", s, conf.Config.GetServicePort())
 	}
 
@@ -58,10 +58,10 @@ func (o *TextFormatter) String(line *base.Line) (str string) {
 		)
 
 		// Append http request location.
-		if t.RequestMethod != "" && t.RequestUrl != "" {
+		if t.HttpRequestMethod != "" && t.HttpRequestUrl != "" {
 			str += fmt.Sprintf("[R=%s][RM=%s]",
-				t.RequestUrl,
-				t.RequestMethod,
+				t.HttpRequestUrl,
+				t.HttpRequestMethod,
 			)
 		}
 	}

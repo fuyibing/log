@@ -30,8 +30,16 @@ func NewChild(ctx context.Context) context.Context {
 				t.TraceId = ct.TraceId
 				t.Version = ct.GenVersion(ct.GetPrevious())
 
-				t.RequestMethod = ct.RequestMethod
-				t.RequestUrl = ct.RequestUrl
+				// Inherit parent http properties.
+
+				if ct.Http {
+					t.Http = true
+					t.HttpHeaders = ct.HttpHeaders
+					t.HttpProtocol = ct.HttpProtocol
+					t.HttpRequestMethod = ct.HttpRequestMethod
+					t.HttpRequestUrl = ct.HttpRequestUrl
+					t.HttpUserAgent = ct.HttpUserAgent
+				}
 
 				return context.WithValue(context.Background(), conf.OpenTracingKey, t)
 			}
@@ -62,8 +70,13 @@ func NewRequest(req *http.Request) context.Context {
 	}
 
 	// Assign request info.
-	t.RequestUrl = req.RequestURI
-	t.RequestMethod = req.Method
+
+	t.Http = true
+	t.HttpHeaders = req.Header
+	t.HttpProtocol = req.Proto
+	t.HttpRequestUrl = req.RequestURI
+	t.HttpRequestMethod = req.Method
+	t.HttpUserAgent = req.UserAgent()
 
 	// Return created with value.
 	return context.WithValue(context.Background(),
