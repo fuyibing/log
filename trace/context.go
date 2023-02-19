@@ -9,29 +9,36 @@ import (
 	"net/http"
 )
 
+// NewContext
+// return root trace context.
 func NewContext() context.Context {
+	// Prepare tracing
+	// and generate trace id.
 	t := (&Tracing{}).init()
 	t.TraceId = t.genTraceId()
 
-	// Return created with value.
-	return context.WithValue(context.Background(),
-		conf.OpenTracingKey,
-		t,
-	)
+	// Root trace context
+	// returned.
+	return context.WithValue(root, conf.OpenTracingKey, t)
 }
 
+// NewChild
+// return child trace context. Return root trace context if parent
+// not specified.
 func NewChild(ctx context.Context) context.Context {
+	// Check parent tracing.
 	if ctx != nil {
 		if cv := ctx.Value(conf.OpenTracingKey); cv != nil {
 			if ct, ok := cv.(*Tracing); ok {
-				t := (&Tracing{}).init()
-				t.WithParent(ct)
+				// Prepare tracing
+				// and set required fields.
+				t := (&Tracing{}).init().WithParent(ct)
 				t.ParentSpanId = ct.SpanId
 				t.TraceId = ct.TraceId
 				t.Version = ct.GenVersion(ct.GetPrevious())
 
-				// Inherit parent http properties.
-
+				// Inherit
+				// parent fields.
 				if ct.Http {
 					t.Http = true
 					t.HttpHeaders = ct.HttpHeaders
@@ -41,14 +48,20 @@ func NewChild(ctx context.Context) context.Context {
 					t.HttpUserAgent = ct.HttpUserAgent
 				}
 
-				return context.WithValue(context.Background(), conf.OpenTracingKey, t)
+				// Child trace context
+				// returned.
+				return context.WithValue(root, conf.OpenTracingKey, t)
 			}
 		}
 	}
 
+	// Use root trace
+	// returned.
 	return NewContext()
 }
 
+// NewRequest
+// create trace context based on http request.
 func NewRequest(req *http.Request) context.Context {
 	t := (&Tracing{}).init()
 
@@ -78,9 +91,7 @@ func NewRequest(req *http.Request) context.Context {
 	t.HttpRequestMethod = req.Method
 	t.HttpUserAgent = req.UserAgent()
 
-	// Return created with value.
-	return context.WithValue(context.Background(),
-		conf.OpenTracingKey,
-		t,
-	)
+	// Request trace context
+	// returned.
+	return context.WithValue(root, conf.OpenTracingKey, t)
 }

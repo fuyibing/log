@@ -41,7 +41,12 @@ type (
 //   return "0.0"		// First log of the same tracer
 //   return "0.3.0"
 //   return "0.3.1"
-func (o *Tracing) GenVersion(n int32) string { return fmt.Sprintf("%v.%d", o.Version, n) }
+func (o *Tracing) GenVersion(n int32) string {
+	if o.Version == "" {
+		return fmt.Sprintf("%d", n)
+	}
+	return fmt.Sprintf("%v.%d", o.Version, n)
+}
 
 // GetIncrement
 // increment offset then return previous value.
@@ -52,30 +57,51 @@ func (o *Tracing) GetIncrement() int32 {
 
 // GetOffset
 // return current offset.
-func (o *Tracing) GetOffset() int32 { return o.offset }
+func (o *Tracing) GetOffset() int32 {
+	return o.offset
+}
 
 // GetPrevious
 // return previous offset value.
-func (o *Tracing) GetPrevious() int32 { return o.previous }
+func (o *Tracing) GetPrevious() int32 {
+	return o.previous
+}
 
 // WithParent
 // bind parent tracing to current.
-func (o *Tracing) WithParent(p *Tracing) { o.parent = p }
+func (o *Tracing) WithParent(p *Tracing) *Tracing {
+	o.parent = p
+	return o
+}
 
 // /////////////////////////////////////////////////////////////
 // Access methods
 // /////////////////////////////////////////////////////////////
 
+// genSpanId
+// generate and return span id string.
 func (o *Tracing) genSpanId() string {
-	return strings.ReplaceAll(uuid.NewString(), "-", "")[8:16]
+	return strings.ReplaceAll(
+		uuid.NewString(),
+		"-",
+		"",
+	)[8:16]
 }
 
+// genTraceId
+// generate and return trace id.
 func (o *Tracing) genTraceId() string {
-	return strings.ReplaceAll(uuid.NewString(), "-", "")
+	return strings.ReplaceAll(
+		uuid.NewString(),
+		"-",
+		"",
+	)
 }
 
+// init
+// trace fields.
 func (o *Tracing) init() *Tracing {
 	o.SpanId = o.genSpanId()
-	o.Version = "0"
+	o.Version = StartVersion
 	return o
 }
