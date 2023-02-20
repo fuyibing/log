@@ -53,7 +53,7 @@ func main(){
 - [X] `Kafka` - Publish log to kafka.
 - [ ] `SLS` - Aliyun SLS service.
 
-### Configurations
+## Configurations
 
 Load config file `config/log.yaml` when package initialized. Use default if not specified.
 
@@ -74,22 +74,14 @@ term:
 
 ## Formatter
 
-```log
-[2023-02-16 09:10:11.235][DEBUG][PID=3721] debug message
-[2023-02-16 09:10:11.235][INFO][PID=3721] info message
-[2023-02-16 09:10:11.241][WARN][PID=3721] warning message
-[2023-02-16 09:10:11.244][ERROR][PID=3721] error message
-[2023-02-16 09:10:11.246][FATAL][PID=3721] fatal message
-```
-
-System formatter
+### System
 
 ```
 log.Client.GetAdapterRegistry().SetFormatter(formatters.NewFileFormatter())
 log.Client.GetAdapterRegistry().SetFormatter(formatters.NewJsonFormatter())
 ```
 
-Customer formatter
+### Custom
 
 ```
 type MyFormatter struct{}
@@ -107,9 +99,9 @@ func init(){
 }
 ```
 
-### Example
+## Example
 
-> The example run with config file.
+### YAML.
 
 ```yaml
 # path: config/log.yaml
@@ -121,14 +113,14 @@ term:
   color: true
 ```
 
-> Run code
+### Run example
 
 ```shell
 cd examples/config-file
 go run main.go
 ```
 
-> Code
+### Code
 
 ```text
 func main(){
@@ -149,7 +141,7 @@ func main(){
 }
 ```
 
-> Print at terminal
+### Output
 
 ```text
 [19:16:46.4406][DEBUG][P=65221] debug
