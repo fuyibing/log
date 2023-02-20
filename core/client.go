@@ -13,8 +13,6 @@ import (
 
 type (
 	Client interface {
-		ClientExported
-
 		// Close
 		// log client, block process until all lines completed.
 		Close()
@@ -27,27 +25,13 @@ type (
 		// return client lines bucket.
 		GetBucket() Bucket
 
+		// PushIntoBucket
+		// push log into bucket.
+		PushIntoBucket(ctx context.Context, level conf.Level, property map[string]interface{}, text string, args ...interface{})
+
 		// Reset
 		// adapter handler.
 		Reset()
-	}
-
-	ClientExported interface {
-		Debug(text string)
-		Debugf(text string, args ...interface{})
-		Debugfc(ctx context.Context, text string, args ...interface{})
-		Info(text string)
-		Infof(text string, args ...interface{})
-		Infofc(ctx context.Context, text string, args ...interface{})
-		Warn(text string)
-		Warnf(text string, args ...interface{})
-		Warnfc(ctx context.Context, text string, args ...interface{})
-		Error(text string)
-		Errorf(text string, args ...interface{})
-		Errorfc(ctx context.Context, text string, args ...interface{})
-		Fatal(text string)
-		Fatalf(text string, args ...interface{})
-		Fatalfc(ctx context.Context, text string, args ...interface{})
 	}
 
 	client struct {

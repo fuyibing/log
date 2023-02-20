@@ -16,6 +16,7 @@ type (
 	Line struct {
 		Duration float64
 		Level    conf.Level
+		Property map[string]interface{}
 		Text     string
 		Time     time.Time
 

@@ -23,16 +23,8 @@ type (
 		SpanVersion  string `json:"span_version,omitempty"`
 		TraceId      string `json:"trace_id,omitempty"`
 
-		Property *JsonProperty `json:"property,omitempty"`
-		Resource *JsonResource `json:"resource,omitempty"`
-	}
-
-	JsonProperty struct {
-		HttpHeaders       map[string][]string `json:"http.headers,omitempty"`
-		HttpProtocol      string              `json:"http.protocol,omitempty"`
-		HttpRequestMethod string              `json:"http.request.method,omitempty"`
-		HttpRequestUrl    string              `json:"http.request.url,omitempty"`
-		HttpUserAgent     string              `json:"http.user.agent,omitempty"`
+		Property map[string]interface{} `json:"property,omitempty"`
+		Resource *JsonResource          `json:"resource,omitempty"`
 	}
 
 	JsonResource struct {
@@ -86,7 +78,9 @@ func (o *JsonLine) apply(line *base.Line) *JsonLine {
 	}
 
 	// Property fields.
-	o.Property = &JsonProperty{}
+	if o.Property == nil {
+		o.Property = make(map[string]interface{})
+	}
 
 	// OpenTracing inherit.
 	if tracing := line.Tracing(); tracing != nil {
@@ -97,11 +91,11 @@ func (o *JsonLine) apply(line *base.Line) *JsonLine {
 
 		// Inherit http fields.
 		if tracing.Http {
-			o.Property.HttpHeaders = tracing.HttpHeaders
-			o.Property.HttpProtocol = tracing.HttpProtocol
-			o.Property.HttpRequestMethod = tracing.HttpRequestMethod
-			o.Property.HttpRequestUrl = tracing.HttpRequestUrl
-			o.Property.HttpUserAgent = tracing.HttpUserAgent
+			o.Property["http.headers"] = tracing.HttpHeaders
+			o.Property["http.protocol"] = tracing.HttpProtocol
+			o.Property["http.request.method"] = tracing.HttpRequestMethod
+			o.Property["http.request.url"] = tracing.HttpRequestUrl
+			o.Property["http.user.agent"] = tracing.HttpUserAgent
 		}
 	}
 

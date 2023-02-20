@@ -5,25 +5,26 @@ package log
 
 import (
 	"context"
+	"github.com/fuyibing/log/v8/conf"
 )
 
 // Level=Debug
 
 func Debug(text string) {
 	if Config.DebugOn() {
-		Client.Debug(text)
+		Client.PushIntoBucket(nil, conf.Debug, nil, text)
 	}
 }
 
 func Debugf(text string, args ...interface{}) {
 	if Config.DebugOn() {
-		Client.Debugf(text, args...)
+		Client.PushIntoBucket(nil, conf.Debug, nil, text, args...)
 	}
 }
 
 func Debugfc(ctx context.Context, text string, args ...interface{}) {
 	if Config.DebugOn() {
-		Client.Debugfc(ctx, text, args...)
+		Client.PushIntoBucket(ctx, conf.Debug, nil, text, args...)
 	}
 }
 
@@ -31,19 +32,19 @@ func Debugfc(ctx context.Context, text string, args ...interface{}) {
 
 func Info(text string) {
 	if Config.InfoOn() {
-		Client.Info(text)
+		Client.PushIntoBucket(nil, conf.Info, nil, text)
 	}
 }
 
 func Infof(text string, args ...interface{}) {
 	if Config.InfoOn() {
-		Client.Infof(text, args...)
+		Client.PushIntoBucket(nil, conf.Info, nil, text, args...)
 	}
 }
 
 func Infofc(ctx context.Context, text string, args ...interface{}) {
 	if Config.InfoOn() {
-		Client.Infofc(ctx, text, args...)
+		Client.PushIntoBucket(ctx, conf.Info, nil, text, args...)
 	}
 }
 
@@ -51,19 +52,19 @@ func Infofc(ctx context.Context, text string, args ...interface{}) {
 
 func Warn(text string) {
 	if Config.WarnOn() {
-		Client.Warn(text)
+		Client.PushIntoBucket(nil, conf.Warn, nil, text)
 	}
 }
 
 func Warnf(text string, args ...interface{}) {
 	if Config.WarnOn() {
-		Client.Warnf(text, args...)
+		Client.PushIntoBucket(nil, conf.Warn, nil, text, args...)
 	}
 }
 
 func Warnfc(ctx context.Context, text string, args ...interface{}) {
 	if Config.WarnOn() {
-		Client.Warnfc(ctx, text, args...)
+		Client.PushIntoBucket(ctx, conf.Warn, nil, text, args...)
 	}
 }
 
@@ -71,19 +72,19 @@ func Warnfc(ctx context.Context, text string, args ...interface{}) {
 
 func Error(text string) {
 	if Config.ErrorOn() {
-		Client.Error(text)
+		Client.PushIntoBucket(nil, conf.Error, nil, text)
 	}
 }
 
 func Errorf(text string, args ...interface{}) {
 	if Config.ErrorOn() {
-		Client.Errorf(text, args...)
+		Client.PushIntoBucket(nil, conf.Error, nil, text, args...)
 	}
 }
 
 func Errorfc(ctx context.Context, text string, args ...interface{}) {
 	if Config.ErrorOn() {
-		Client.Errorfc(ctx, text, args...)
+		Client.PushIntoBucket(ctx, conf.Error, nil, text, args...)
 	}
 }
 
@@ -91,19 +92,19 @@ func Errorfc(ctx context.Context, text string, args ...interface{}) {
 
 func Fatal(text string) {
 	if Config.FatalOn() {
-		Client.Fatal(text)
+		Client.PushIntoBucket(nil, conf.Fatal, nil, text)
 	}
 }
 
 func Fatalf(text string, args ...interface{}) {
 	if Config.FatalOn() {
-		Client.Fatalf(text, args...)
+		Client.PushIntoBucket(nil, conf.Fatal, nil, text, args...)
 	}
 }
 
 func Fatalfc(ctx context.Context, text string, args ...interface{}) {
 	if Config.FatalOn() {
-		Client.Fatalfc(ctx, text, args...)
+		Client.PushIntoBucket(ctx, conf.Fatal, nil, text, args...)
 	}
 }
 
@@ -111,18 +112,18 @@ func Fatalfc(ctx context.Context, text string, args ...interface{}) {
 
 func Panic(text string) {
 	if Config.FatalOn() {
-		Client.Fatal(text)
+		Client.PushIntoBucket(nil, conf.Fatal, nil, text)
 	}
 }
 
 func Panicf(text string, args ...interface{}) {
 	if Config.FatalOn() {
-		Client.Fatalf(text, args...)
+		Client.PushIntoBucket(nil, conf.Fatal, nil, text, args...)
 	}
 }
 
 func Panicfc(ctx context.Context, text string, args ...interface{}) {
 	if Config.FatalOn() {
-		Client.Fatalfc(ctx, text, args...)
+		Client.PushIntoBucket(ctx, conf.Fatal, nil, text, args...)
 	}
 }

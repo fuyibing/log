@@ -4,6 +4,7 @@
 package formatters
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/fuyibing/log/v8/base"
 	"github.com/fuyibing/log/v8/conf"
@@ -79,6 +80,13 @@ func (o *FileFormatter) String(line *base.Line) (str string) {
 				t.HttpRequestUrl,
 				t.HttpRequestMethod,
 			)
+		}
+	}
+
+	// Property.
+	if line.Property != nil {
+		if buf, err := json.Marshal(line.Property); err == nil {
+			str += fmt.Sprintf(" %s", buf)
 		}
 	}
 

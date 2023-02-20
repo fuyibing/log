@@ -11,66 +11,6 @@ import (
 	"sync/atomic"
 )
 
-func (o *client) Debug(text string) {
-	o.PushIntoBucket(nil, conf.Debug, text)
-}
-
-func (o *client) Debugf(text string, args ...interface{}) {
-	o.PushIntoBucket(nil, conf.Debug, text, args...)
-}
-
-func (o *client) Debugfc(ctx context.Context, text string, args ...interface{}) {
-	o.PushIntoBucket(ctx, conf.Debug, text, args...)
-}
-
-func (o *client) Info(text string) {
-	o.PushIntoBucket(nil, conf.Info, text)
-}
-
-func (o *client) Infof(text string, args ...interface{}) {
-	o.PushIntoBucket(nil, conf.Info, text, args...)
-}
-
-func (o *client) Infofc(ctx context.Context, text string, args ...interface{}) {
-	o.PushIntoBucket(ctx, conf.Info, text, args...)
-}
-
-func (o *client) Warn(text string) {
-	o.PushIntoBucket(nil, conf.Warn, text)
-}
-
-func (o *client) Warnf(text string, args ...interface{}) {
-	o.PushIntoBucket(nil, conf.Warn, text, args...)
-}
-
-func (o *client) Warnfc(ctx context.Context, text string, args ...interface{}) {
-	o.PushIntoBucket(ctx, conf.Warn, text, args...)
-}
-
-func (o *client) Error(text string) {
-	o.PushIntoBucket(nil, conf.Error, text)
-}
-
-func (o *client) Errorf(text string, args ...interface{}) {
-	o.PushIntoBucket(nil, conf.Error, text, args...)
-}
-
-func (o *client) Errorfc(ctx context.Context, text string, args ...interface{}) {
-	o.PushIntoBucket(ctx, conf.Error, text, args...)
-}
-
-func (o *client) Fatal(text string) {
-	o.PushIntoBucket(nil, conf.Fatal, text)
-}
-
-func (o *client) Fatalf(text string, args ...interface{}) {
-	o.PushIntoBucket(nil, conf.Fatal, text, args...)
-}
-
-func (o *client) Fatalfc(ctx context.Context, text string, args ...interface{}) {
-	o.PushIntoBucket(ctx, conf.Fatal, text, args...)
-}
-
 // /////////////////////////////////////////////////////////////
 // Lines operators
 // /////////////////////////////////////////////////////////////
@@ -136,10 +76,11 @@ func (o *client) PopFromBucket() {
 	}
 }
 
-func (o *client) PushIntoBucket(ctx context.Context, level conf.Level, text string, args ...interface{}) {
+func (o *client) PushIntoBucket(ctx context.Context, level conf.Level, property map[string]interface{}, text string, args ...interface{}) {
 	// Acquire
 	// line from pool.
 	line := base.Pool.AcquireLine().WithContext(ctx)
+	line.Property = property
 	line.Level = level
 	line.Text = fmt.Sprintf(text, args...)
 	line.TextParse()

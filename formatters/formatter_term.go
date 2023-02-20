@@ -4,6 +4,7 @@
 package formatters
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/fuyibing/log/v8/base"
 	"github.com/fuyibing/log/v8/conf"
@@ -43,6 +44,13 @@ func (o *TermFormatter) String(line *base.Line) (str string) {
 		str += fmt.Sprintf("{%s=%v}", t.SpanId, t.GenVersion(line.TracingOffset()))
 		if t.Http {
 			str += fmt.Sprintf("{%s=%s}", t.HttpRequestMethod, t.HttpRequestUrl)
+		}
+	}
+
+	// Property.
+	if line.Property != nil {
+		if buf, err := json.Marshal(line.Property); err == nil {
+			str += fmt.Sprintf(" %s", buf)
 		}
 	}
 
