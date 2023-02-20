@@ -64,6 +64,7 @@ func (o *JsonLine) apply(line *base.Line) *JsonLine {
 	// Basic fields.
 	o.Content = line.Text
 	o.Duration = line.Duration
+	o.Property = line.Property
 	o.Start = line.Time.UnixMilli()
 	o.Level = line.Level.String()
 
