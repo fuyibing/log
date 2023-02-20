@@ -1,27 +1,9 @@
 #
 # log client based on yaml configuration
 #
-adapter: "term"
-level: "debug"
-time-format: "15:04:05.999999"
-
-# Batch mode
-batch-concurrency: 3
-batch-limit: 150
-
-# Open tracing.
-
-# usage: adapter=file
-#        use default if fields not configured
-#file:
-
-# usage: adapter=kafka
-#        use default if fields not configured
-kafka:
-  addresses:
-    - ""
-  topic: "topic"
-
-# usage: adapter=term
+adapter: term
+level: debug
+time-format: 15:04:05.9999
+async-disabled: true
 term:
   color: true

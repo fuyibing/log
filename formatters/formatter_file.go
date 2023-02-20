@@ -55,28 +55,28 @@ func (o *FileFormatter) String(line *base.Line) (str string) {
 	}
 
 	// PID.
-	str += fmt.Sprintf("{P=%d}", conf.Config.GetPid())
+	str += fmt.Sprintf("[P=%d]", conf.Config.GetPid())
 
 	// Duration.
 	if line.Duration > 0 {
-		str += fmt.Sprintf("{D=%v}", line.Duration)
+		str += fmt.Sprintf("[D=%v]", line.Duration)
 	}
 
 	// Service: name.
 	if s := conf.Config.GetServiceName(); s != "" {
-		str += fmt.Sprintf("{SN=%s}", s)
+		str += fmt.Sprintf("[SN=%s]", s)
 	}
 
 	// Open Tracing.
 	if t := line.Tracing(); t != nil {
-		str += fmt.Sprintf("{T=%s}{TS=%s}{TP=%s}{TV=%v}",
+		str += fmt.Sprintf("[T=%s][TS=%s][TP=%s][TV=%v]",
 			t.TraceId, t.SpanId, t.ParentSpanId,
 			t.GenVersion(line.TracingOffset()),
 		)
 
 		// Append http request location.
 		if t.Http {
-			str += fmt.Sprintf("{R=%s}{RM=%s}",
+			str += fmt.Sprintf("[R=%s][RM=%s]",
 				t.HttpRequestUrl,
 				t.HttpRequestMethod,
 			)

@@ -4,30 +4,30 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/fuyibing/log/v8"
-	"github.com/fuyibing/log/v8/conf"
-	"time"
+	"github.com/fuyibing/log/v8/formatters"
 )
 
 func init() {
-	log.Config.Set(
-		conf.SetAsyncDisabled(true),
-		conf.SetTimeFormat("05.999"),
-		conf.SetServiceAddr("127.0.0.1"),
-		conf.SetServicePort(8080),
-	)
-	log.Client.Reset()
+	// log.Client.Reset()
+	log.Client.GetAdapterRegistry().SetFormatter(&formatters.FileFormatter{})
 }
 
 func main() {
 	// Close log client. Ensure that all data in the
 	// memory queue are processed.
-	defer func() {
-		time.Sleep(time.Second * 3)
-		log.Client.Close()
-	}()
+	defer log.Client.Close()
 
-	buf, _ := json.Marshal(log.Config)
-	log.Infof("configuration: %s", buf)
+	log.Debug("debug")
+	log.Infof("text format, id=%d, type=%s", 100, "demo")
+	log.Map{"id": 100, "type": "demo"}.Infof("with map config")
+
+	c1 := log.NewContext()
+	log.Debugfc(c1, "debug")
+	log.Infofc(c1, "text format, id=%d, type=%s", 100, "demo")
+	log.Map{"id": 100, "type": "demo"}.Infofc(c1, "with map config")
+
+	c2 := log.NewChild(c1)
+	log.Infofc(c2, "child of map 1")
+	log.Infofc(c2, "child of map 2")
 }
