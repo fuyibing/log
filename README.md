@@ -2,11 +2,11 @@
 
 Publish application log to adapter with `ASNYC` mode. Support kafka, file, terminal.
 
-```
+```go
 import "github.com/fuyibing/log/v8"
 ```
 
-```
+```go
 func init(){
     // Follow configurations are optional. All of follows can be
     // configured in `config/log.yaml`. Filled with default if not
@@ -76,14 +76,27 @@ term:
 
 ### System
 
+##### Terminal
+
+```go
+log.Client.GetAdapterRegistry().SetFormatter(formatters.NewTermFormatter())
 ```
+
+##### File
+
+```go
 log.Client.GetAdapterRegistry().SetFormatter(formatters.NewFileFormatter())
+```
+
+##### JSON
+
+```go
 log.Client.GetAdapterRegistry().SetFormatter(formatters.NewJsonFormatter())
 ```
 
 ### Custom
 
-```
+```go
 type MyFormatter struct{}
 
 func (o *MyFormatter) Body(line *base.Line) []byte {
@@ -122,7 +135,7 @@ go run main.go
 
 ### Code
 
-```text
+```go
 func main(){
     defer log.Client.Close()
 
@@ -143,7 +156,7 @@ func main(){
 
 ### Output
 
-```text
+```log
 [19:16:46.4406][DEBUG][P=65221] debug
 [19:16:46.4407][INFO][P=65221] text format, id=100, type=demo
 [19:16:46.4407][INFO][P=65221] {"id":100,"type":"demo"} with map config
