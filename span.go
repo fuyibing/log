@@ -22,7 +22,7 @@ import (
 )
 
 // Span
-// returns a cores.Span component from context.Context stored value.
+// 从上下文上读取链路跨度, 若不存在则返回 nil.
 func Span(ctx context.Context) (span cores.Span, exists bool) {
 	if v := ctx.Value(base.ContextKeySpan); v != nil {
 		span, exists = v.(cores.Span)
