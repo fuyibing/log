@@ -25,6 +25,7 @@ import (
 	"github.com/fuyibing/util/v8/process"
 	"net/http"
 	"sync"
+	"time"
 )
 
 var (
@@ -64,10 +65,22 @@ func (o *management) NewTraceFromRequest(req *http.Request, name string) cores.T
 }
 
 // Start manager, block goroutine.
-func (o *management) Start(ctx context.Context) error { return o.processor.Start(ctx) }
+func (o *management) Start(ctx context.Context) error {
+	return o.processor.Start(ctx)
+}
 
 // Stop manager.
-func (o *management) Stop() { o.processor.Stop() }
+func (o *management) Stop() {
+	o.processor.Stop()
+
+	// Sleep 100ms until processor stopped.
+	for {
+		if o.processor.Stopped() {
+			return
+		}
+		time.Sleep(time.Millisecond * 100)
+	}
+}
 
 // /////////////////////////////////////////////////////////////////////////////
 // Manager events
