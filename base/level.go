@@ -40,7 +40,7 @@ var (
 )
 
 // Int
-// 转成整型.
+// 日志级别转成整型.
 func (o Level) Int() int {
 	if i, ok := levelText[o]; ok {
 		return i
@@ -49,7 +49,7 @@ func (o Level) Int() int {
 }
 
 // String
-// 转成字符串.
+// 日志级别转成字符串.
 func (o Level) String() string {
 	return string(o)
 }
