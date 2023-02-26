@@ -1,4 +1,4 @@
-# LogTrace
+# 链路日志
 
 `OpenTelemetry`
 `Telemetry`
@@ -6,5 +6,5 @@
 
 ----
 
-Send custom message log to exporters,
+集成链路(Trace)与日志(Log), 遵循 Open Telemetry 标准。
 
