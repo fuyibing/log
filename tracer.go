@@ -19,7 +19,20 @@ import (
 	"context"
 	"github.com/fuyibing/log/v5/base"
 	"github.com/fuyibing/log/v5/cores"
+	"net/http"
 )
+
+func NewTrace(name string) cores.Trace {
+	return Manager.NewTrace(name)
+}
+
+func NewTraceFromContext(ctx context.Context, name string) cores.Trace {
+	return Manager.NewTraceFromContext(ctx, name)
+}
+
+func NewTraceFromRequest(req *http.Request, name string) cores.Trace {
+	return Manager.NewTraceFromRequest(req, name)
+}
 
 // Trace
 // returns a core.Trace component from context.Context stored value.

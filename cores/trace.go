@@ -41,7 +41,7 @@ type (
 )
 
 // NewTrace
-// returns a Trace component.
+// returns a root cores.Trace component.
 func NewTrace(name string) Trace {
 	return NewTraceFromContext(
 		context.Background(),
@@ -50,8 +50,16 @@ func NewTrace(name string) Trace {
 }
 
 // NewTraceFromContext
-// returns a Trace component from a context.Context.
+// returns a cores.Trace component with context values.
 func NewTraceFromContext(ctx context.Context, name string) Trace {
+	// Reuse previous Trace.
+	if v := ctx.Value(base.ContentKeyTrace); v != nil {
+		if vc, ok := v.(Trace); ok {
+			return vc
+		}
+	}
+
+	// Return a Trace component with default properties.
 	o := (&trace{name: name}).
 		init().
 		initContext(ctx).
