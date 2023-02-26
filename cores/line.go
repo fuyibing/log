@@ -25,6 +25,9 @@ type (
 	// Line
 	// is the component of the log.
 	Line interface {
+		// Add key/value pair on line.
+		Add(key string, value interface{}) Line
+
 		// GetAttr
 		// returns an Attr component of the log.
 		GetAttr() Attr
@@ -59,6 +62,11 @@ func NewLine(level base.Level, text string, args ...interface{}) Line {
 		text:  fmt.Sprintf(text, args...),
 		time:  time.Now(),
 	}
+}
+
+func (o *line) Add(key string, value interface{}) Line {
+	o.attr.Add(key, value)
+	return o
 }
 
 // GetAttr

@@ -20,7 +20,6 @@ import (
 	"github.com/fuyibing/log/v5/conf"
 	"github.com/fuyibing/log/v5/cores"
 	"github.com/fuyibing/log/v5/exporters/logger_term"
-	"github.com/fuyibing/log/v5/exporters/tracer_jaeger"
 )
 
 func init() {
@@ -32,11 +31,10 @@ func init() {
 		conf.ServicePort(3721),
 	)
 
-	cores.Registry.
-		RegisterLoggerExporter(logger_term.NewExporter()).
-		// RegisterTracerExporter(tracer_term.NewExporter())
-		RegisterTracerExporter(tracer_jaeger.NewExporter()).
-		Update()
+	cores.Registry.RegisterLoggerExporter(logger_term.NewExporter())
+	// cores.Registry.RegisterTracerExporter(tracer_term.NewExporter())
+	// cores.Registry.RegisterTracerExporter(tracer_jaeger.NewExporter())
+	cores.Registry.Update()
 }
 
 func main() {
@@ -46,7 +44,11 @@ func main() {
 		Add("key", "value").
 		Info("log.Field.Info()")
 
-	spa := cores.NewSpan("span")
+	log.Field{}.
+		Add("key", "value").
+		Info("log.Field.Info()")
+
+	spa := log.NewTrace("trace").NewSpan("span")
 	defer spa.End()
 
 	spa.Logger().

@@ -106,8 +106,7 @@ func (o *Exporter) format(log cores.Line) (content string) {
 	content = fmt.Sprintf("[%-15s][%5v] %s%s",
 		log.GetTime().Format(o.TimeFormat),
 		log.GetLevel(),
-		attr,
-		log.GetText(),
+		attr, log.GetText(),
 	)
 
 	// Enable color.

@@ -30,13 +30,20 @@ type (
 	//   log.Field{}.
 	//       Add("key", "value").
 	//       Debug("message content: %d", 1)
-	Field map[string]interface{}
+	Field struct {
+		data map[string]interface{}
+	}
+	// map[string]interface{}
 )
 
 // Add
 // key/value pair on component.
 func (f Field) Add(key string, value interface{}) Field {
-	f[key] = value
+	if f.data == nil {
+		f.data = make(map[string]interface{})
+	}
+
+	f.data[key] = value
 	return f
 }
 
@@ -44,7 +51,7 @@ func (f Field) Add(key string, value interface{}) Field {
 // send key/value component to log exporter with debug level.
 func (f Field) Debug(text string, args ...interface{}) {
 	if conf.Config.DebugOn() {
-		cores.Registry.LoggerPush(f, base.Debug, text, args...)
+		cores.Registry.LoggerPush(f.data, base.Debug, text, args...)
 	}
 }
 
@@ -52,7 +59,7 @@ func (f Field) Debug(text string, args ...interface{}) {
 // send key/value component to log exporter with error level.
 func (f Field) Error(text string, args ...interface{}) {
 	if conf.Config.ErrorOn() {
-		cores.Registry.LoggerPush(f, base.Error, text, args...)
+		cores.Registry.LoggerPush(f.data, base.Error, text, args...)
 	}
 }
 
@@ -60,7 +67,7 @@ func (f Field) Error(text string, args ...interface{}) {
 // send key/value component to log exporter with fatal level.
 func (f Field) Fatal(text string, args ...interface{}) {
 	if conf.Config.FatalOn() {
-		cores.Registry.LoggerPush(f, base.Fatal, text, args...)
+		cores.Registry.LoggerPush(f.data, base.Fatal, text, args...)
 	}
 }
 
@@ -68,7 +75,7 @@ func (f Field) Fatal(text string, args ...interface{}) {
 // send key/value component to log exporter with info level.
 func (f Field) Info(text string, args ...interface{}) {
 	if conf.Config.InfoOn() {
-		cores.Registry.LoggerPush(f, base.Info, text, args...)
+		cores.Registry.LoggerPush(f.data, base.Info, text, args...)
 	}
 }
 
@@ -76,6 +83,6 @@ func (f Field) Info(text string, args ...interface{}) {
 // send key/value component to log exporter with warning level.
 func (f Field) Warn(text string, args ...interface{}) {
 	if conf.Config.WarnOn() {
-		cores.Registry.LoggerPush(f, base.Warn, text, args...)
+		cores.Registry.LoggerPush(f.data, base.Warn, text, args...)
 	}
 }

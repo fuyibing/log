@@ -80,17 +80,29 @@ func (o *registry) LoggerExporter() LoggerExporter {
 }
 
 func (o *registry) LoggerPush(data interface{}, level base.Level, text string, args ...interface{}) {
-	if o.loggerEnabled {
-		x := NewLine(level, text, args...)
-
-		if m, ok := data.(map[string]interface{}); ok {
-			for k, v := range m {
-				x.GetAttr().Add(k, v)
-			}
-		}
-
-		o.loggerExporter.Push(x)
+	// Ignore log if not enabled.
+	if !o.loggerEnabled {
+		return
 	}
+
+	// Init log line.
+	log := NewLine(level, text, args...)
+	log.GetAttr().With(data)
+
+	// Push to exporter.
+	o.loggerExporter.Push(log)
+
+	// // Log fields.
+	// if data != nil {
+	// 	m, ok := data.(map[string]interface{})
+	// 	fmt.Printf("---------- convert: %v\n", ok)
+	// 	// println("convert: ", ok)
+	// 	if ok {
+	// 		for k, v := range m {
+	// 			log.Add(k, v)
+	// 		}
+	// 	}
+	// }
 }
 
 func (o *registry) TracerEnabled() bool {

@@ -39,6 +39,8 @@ type (
 		// Marshal
 		// encode as json byte.
 		Marshal() ([]byte, error)
+
+		With(v interface{}) Attr
 	}
 
 	attr struct {
@@ -92,4 +94,32 @@ func (o *attr) Marshal() (buf []byte, err error) {
 		buf, err = json.Marshal(o.data)
 	}
 	return
+}
+
+func (o *attr) With(data interface{}) Attr {
+	if data == nil {
+		return o
+	}
+
+	// Attr mapping.
+	if m, ok := data.(Attr); ok {
+		o.Lock()
+		defer o.Unlock()
+		for k, v := range m.GetMap() {
+			o.data[k] = v
+		}
+		return o
+	}
+
+	// Map type.
+	if m, ok := data.(map[string]interface{}); ok {
+		o.Lock()
+		defer o.Unlock()
+		for k, v := range m {
+			o.data[k] = v
+		}
+		return o
+	}
+
+	return o
 }

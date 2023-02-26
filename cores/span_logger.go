@@ -107,9 +107,7 @@ func (o *SpanLogger) send(level base.Level, text string, args ...interface{}) {
 
 	// Call logger exporter and push if enabled.
 	if Registry.LoggerEnabled() {
-		v := NewLine(level, text, args...)
-		v.GetAttr().Copy(o.attr)
-		Registry.LoggerExporter().Push(v)
+		Registry.LoggerPush(o.attr, level, text, args...)
 	}
 
 	// Release to pool when ended.
