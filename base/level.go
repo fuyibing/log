@@ -19,6 +19,8 @@ package base
 // 日志级别.
 type Level string
 
+// 预定义日志级别枚举值.
+
 const (
 	Off   Level = "OFF"
 	Debug Level = "DEBUG"
@@ -27,6 +29,8 @@ const (
 	Error Level = "ERROR"
 	Fatal Level = "FATAL"
 )
+
+// 预定义级别与整型映射.
 
 var (
 	levelText = map[Level]int{
