@@ -1,0 +1,14 @@
+# directories
+
+.bak/
+.idea
+.vscode
+.DS_STORE
+
+logs/
+
+# files
+
+*.log
+
+go.sum
