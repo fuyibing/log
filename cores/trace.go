@@ -24,10 +24,18 @@ import (
 
 type (
 	// Trace
-	// is the creator of Span.
+	// 链路接口.
 	Trace interface {
+		// GetContext
+		// 获取 Trace 上下文.
 		GetContext() context.Context
+
+		// GetTraceId
+		// 获取 TraceId.
 		GetTraceId() TraceId
+
+		// NewSpan
+		// 基于此 Trace 创建 Span 跨度.
 		NewSpan(name string) Span
 	}
 
@@ -62,8 +70,9 @@ func NewTraceFromContext(ctx context.Context, name string) Trace {
 	// Return a Trace component with default properties.
 	o := (&trace{name: name}).
 		init().
-		initContext(ctx).
-		initTraceId()
+		initContext(ctx)
+
+	o.traceId = Identify.GenTraceId()
 	return o
 }
 
@@ -77,14 +86,20 @@ func NewTraceFromRequest(req *http.Request, name string) Trace {
 	return o
 }
 
+// GetContext
+// 获取 Trace 上下文.
 func (o *trace) GetContext() context.Context {
 	return o.ctx
 }
 
+// GetTraceId
+// 获取 TraceId.
 func (o *trace) GetTraceId() TraceId {
 	return o.traceId
 }
 
+// NewSpan
+// 基于此 Trace 创建 Span 跨度.
 func (o *trace) NewSpan(name string) Span {
 	s := (&span{name: name}).
 		init().
@@ -95,30 +110,37 @@ func (o *trace) NewSpan(name string) Span {
 	return s
 }
 
+// init
+// 构造链路.
 func (o *trace) init() *trace {
 	o.attr = NewAttr()
 	return o
 }
 
+// initContext
+// 初始化 Trace 上下文.
 func (o *trace) initContext(ctx context.Context) *trace {
 	o.ctx = context.WithValue(ctx, base.ContextKeySpan, o)
 	return o
 }
 
+// initRequest
+// 基于 HTTP 请求参数, 初始化链路.
 func (o *trace) initRequest(req *http.Request) *trace {
-	// Append header options.
+	// 请求参数.
+	// 将 HTTP 请求参数加到 Trace 属性.
 	o.attr.Add(base.ResourceHttpRequestUrl, req.RequestURI).
 		Add(base.ResourceHttpRequestMethod, req.RequestURI).
 		Add(base.ResourceHttpHeader, req.Header).
 		Add(base.ResourceHttpUserAgent, req.UserAgent()).
 		Add(base.ResourceHttpProtocol, req.Proto)
 
-	// Parse Open Tracing values.
+	// OpenTracing.
+	// 解析 OpenTracing 参数为 TraceId.
 	if ht := req.Header.Get(conf.Config.GetOpenTracingTraceId()); ht != "" {
-		// Hex trace id.
 		o.traceId = Identify.HexTraceId(ht)
 
-		// Hex span id.
+		// 上游 Span 解析 SpanId.
 		if hs := req.Header.Get(conf.Config.GetOpenTracingSpanId()); hs != "" {
 			o.spanId = Identify.HexSpanId(hs)
 		}
@@ -126,12 +148,7 @@ func (o *trace) initRequest(req *http.Request) *trace {
 		return o
 	}
 
-	// Default trace id.
-	o.traceId = Identify.GenTraceId()
-	return o
-}
-
-func (o *trace) initTraceId() *trace {
+	// 生成新 TraceId.
 	o.traceId = Identify.GenTraceId()
 	return o
 }
