@@ -33,7 +33,7 @@ const (
 // 预定义级别与整型映射.
 
 var (
-	levelText = map[Level]int{
+	levelTextToInteger = map[Level]int{
 		Off:   1,
 		Fatal: 2,
 		Error: 3,
@@ -46,7 +46,7 @@ var (
 // Int
 // 日志级别转成整型.
 func (o Level) Int() int {
-	if i, ok := levelText[o]; ok {
+	if i, ok := levelTextToInteger[o]; ok {
 		return i
 	}
 	return 0
@@ -57,4 +57,3 @@ func (o Level) Int() int {
 func (o Level) String() string {
 	return string(o)
 }
-
