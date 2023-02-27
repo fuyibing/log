@@ -28,12 +28,30 @@ import (
 )
 
 var (
+	// Manager
+	// 管理器入口.
 	Manager Management
 )
 
 type (
+	// Management
+	// 管理器接口.
+	//
+	// 本管理器在首次引入时自动读取配置文件(config/log.yaml)参数. 若未定义配置文件
+	// 则需要在启动服务前通过代码配置.
 	Management interface {
+		// Start
+		// 启动管理器.
+		//
+		// 调用在项目 main 的入口处, 全局仅定义一次, 此方法为阻塞模式, 需使用 go
+		// 协程调用, 当启动后, 异步模式生效.
 		Start(ctx context.Context) error
+
+		// Stop
+		// 退出管理器.
+		//
+		// 在服务退出前调用, 调用后可以确保异步处理的 Log/Trace 能正常完成, 避免
+		// 丢失.
 		Stop()
 	}
 
@@ -42,12 +60,14 @@ type (
 	}
 )
 
-// Start manager, block goroutine.
+// Start
+// 启动管理器.
 func (o *management) Start(ctx context.Context) error {
 	return o.processor.Start(ctx)
 }
 
-// Stop manager.
+// Stop
+// 退出管理器.
 func (o *management) Stop() {
 	o.processor.Stop()
 
