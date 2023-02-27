@@ -43,87 +43,50 @@ const (
 
 type (
 	// Exporter
-	// an exporter component for logger, print on terminal/console.
+	// Log 输出到 Terminal/Console.
 	Exporter struct {
+		formatter  Formatter
 		processing int32
 		processor  process.Processor
-
-		Color      bool
-		TimeFormat string
 	}
 )
 
-// NewExporter
-// returns an exporter component.
-func NewExporter() *Exporter {
-	return (&Exporter{
-		Color:      defaultColor,
-		TimeFormat: defaultTimeFormat,
-	}).init()
-}
-
-// /////////////////////////////////////////////////////////////////////////////
-// Exporter: interface methods
-// /////////////////////////////////////////////////////////////////////////////
+func New() *Exporter { return (&Exporter{}).init() }
 
 // Processor
-// returns a processor component.
-func (o *Exporter) Processor() process.Processor {
-	return o.processor
-}
+// 执行器.
+func (o *Exporter) Processor() process.Processor { return o.processor }
 
 // Push
-// log to exporter to do write / publish operation.
+// 输出日志.
 func (o *Exporter) Push(logs ...cores.Line) {
 	atomic.AddInt32(&o.processing, 1)
 	defer atomic.AddInt32(&o.processing, -1)
 
+	// 遍历日志.
 	for _, log := range logs {
-		_, _ = fmt.Fprintf(os.Stdout, fmt.Sprintf("%s\n", o.format(log)))
+		_, _ = fmt.Fprintf(os.Stdout,
+			fmt.Sprintf("%s\n",
+				o.formatter.Format(log),
+			),
+		)
 	}
 }
 
-// /////////////////////////////////////////////////////////////////////////////
-// Exporter: internal methods
-// /////////////////////////////////////////////////////////////////////////////
-
-// /////////////////////////////////////////////////////////////////////////////
-// Exporter: access methods
-// /////////////////////////////////////////////////////////////////////////////
-
-func (o *Exporter) format(log cores.Line) (content string) {
-	var (
-		attr = ""
-	)
-
-	if buf, err := log.GetAttr().Marshal(); err == nil {
-		if attr = string(buf); attr != "" {
-			attr += " "
-		}
-	}
-
-	// Build log content.
-	content = fmt.Sprintf("[%-15s][%5v] %s%s",
-		log.GetTime().Format(o.TimeFormat),
-		log.GetLevel(),
-		attr, log.GetText(),
-	)
-
-	// Enable color.
-	if o.Color {
-		if c, ok := colors[log.GetLevel()]; ok {
-			content = fmt.Sprintf("%c[%d;%d;%dm%s%c[0m",
-				0x1B, 0, c[1], c[0], content, 0x1B,
-			)
-		}
-	}
-
-	return
+// SetFormatter
+// 设置格式化.
+func (o *Exporter) SetFormatter(formatter Formatter) *Exporter {
+	o.formatter = formatter
+	return o
 }
 
-// /////////////////////////////////////////////////////////////////////////////
-// Exporter: events
-// /////////////////////////////////////////////////////////////////////////////
+func (o *Exporter) init() *Exporter {
+	o.formatter = (&formatter{}).init()
+	o.processor = process.New("term-logger-exporter").
+		After(o.onAfter).
+		Callback(o.onCall)
+	return o
+}
 
 func (o *Exporter) onAfter(ctx context.Context) (ignored bool) {
 	if atomic.LoadInt32(&o.processing) == 0 {
@@ -131,10 +94,6 @@ func (o *Exporter) onAfter(ctx context.Context) (ignored bool) {
 	}
 	time.Sleep(time.Millisecond)
 	return o.onAfter(ctx)
-}
-
-func (o *Exporter) onBefore(_ context.Context) (ignored bool) {
-	return
 }
 
 func (o *Exporter) onCall(ctx context.Context) (ignored bool) {
@@ -148,16 +107,4 @@ func (o *Exporter) onCall(ctx context.Context) (ignored bool) {
 
 func (o *Exporter) onPanic(_ context.Context, _ interface{}) {
 	cores.Registry.Debugger("%s panic: %v", o.processor.Name())
-}
-
-// /////////////////////////////////////////////////////////////////////////////
-// Exporter: init and constructor
-// /////////////////////////////////////////////////////////////////////////////
-
-func (o *Exporter) init() *Exporter {
-	o.processor = process.New("term-logger-exporter").
-		After(o.onAfter).
-		Before(o.onBefore).
-		Callback(o.onCall)
-	return o
 }

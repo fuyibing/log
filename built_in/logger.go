@@ -37,7 +37,7 @@ const (
 func (b BuiltinLogger) Exporter() cores.LoggerExporter {
 	switch b {
 	case LoggerTerm:
-		return logger_term.NewExporter()
+		return logger_term.New()
 	}
 	return nil
 }

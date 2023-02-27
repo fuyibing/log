@@ -38,31 +38,23 @@ var (
 
 type (
 	// Exporter
-	// an exporter component for tracer, print on terminal/console.
+	// Span 输出到 Terminal/Console.
 	Exporter struct {
 		processing int32
 		processor  process.Processor
 	}
 )
 
-// NewExporter
-// returns an exporter component.
-func NewExporter() *Exporter {
-	return (&Exporter{}).init()
-}
-
-// /////////////////////////////////////////////////////////////////////////////
-// Exporter: interface methods
-// /////////////////////////////////////////////////////////////////////////////
+func New() *Exporter { return (&Exporter{}).init() }
 
 // Processor
-// returns a processor component.
+// 执行器.
 func (o *Exporter) Processor() process.Processor {
 	return o.processor
 }
 
 // Push
-// log to exporter to do write / publish operation.
+// 输出日志.
 func (o *Exporter) Push(spans ...cores.Span) {
 	atomic.AddInt32(&o.processing, 1)
 	defer atomic.AddInt32(&o.processing, -1)
@@ -71,10 +63,6 @@ func (o *Exporter) Push(spans ...cores.Span) {
 		o.printSpan(span)
 	}
 }
-
-// /////////////////////////////////////////////////////////////////////////////
-// Exporter: internal methods
-// /////////////////////////////////////////////////////////////////////////////
 
 func (o *Exporter) printSpan(span cores.Span) {
 	// Append Span info.
@@ -134,20 +122,20 @@ func (o *Exporter) withColor(level base.Level, content string) string {
 	return content
 }
 
-// /////////////////////////////////////////////////////////////////////////////
-// Exporter: events
-// /////////////////////////////////////////////////////////////////////////////
+func (o *Exporter) init() *Exporter {
+	o.processor = process.New("term-tracer-exporter").
+		After(o.onAfter).
+		Callback(o.onCall)
+	return o
+}
 
 func (o *Exporter) onAfter(ctx context.Context) (ignored bool) {
 	if atomic.LoadInt32(&o.processing) == 0 {
 		return
 	}
+
 	time.Sleep(time.Millisecond)
 	return o.onAfter(ctx)
-}
-
-func (o *Exporter) onBefore(_ context.Context) (ignored bool) {
-	return
 }
 
 func (o *Exporter) onCall(ctx context.Context) (ignored bool) {
@@ -161,16 +149,4 @@ func (o *Exporter) onCall(ctx context.Context) (ignored bool) {
 
 func (o *Exporter) onPanic(_ context.Context, _ interface{}) {
 	cores.Registry.Debugger("%s panic: %v", o.processor.Name())
-}
-
-// /////////////////////////////////////////////////////////////////////////////
-// Exporter: init and constructor
-// /////////////////////////////////////////////////////////////////////////////
-
-func (o *Exporter) init() *Exporter {
-	o.processor = process.New("term-tracer-exporter").
-		After(o.onAfter).
-		Before(o.onBefore).
-		Callback(o.onCall)
-	return o
 }

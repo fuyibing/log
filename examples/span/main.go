@@ -38,7 +38,7 @@ func init() {
 	conf.LogExporter("kafka")
 	conf.LogLevel("debug")
 
-	cores.Registry.RegisterLoggerExporter(logger_term.NewExporter())
+	cores.Registry.RegisterLoggerExporter(logger_term.New())
 	// cores.Registry.RegisterTracerExporter(tracer_term.NewExporter())
 	// cores.Registry.RegisterTracerExporter(tracer_jaeger.NewExporter())
 	cores.Registry.Update()

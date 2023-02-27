@@ -32,7 +32,7 @@ import (
 
 type (
 	// Exporter
-	// an exporter component for tracer, publish to jaeger.
+	// 输出 Span 日志到 Jaeger.
 	Exporter struct {
 		formatter  Formatter
 		processing int32
@@ -40,26 +40,16 @@ type (
 	}
 )
 
-// NewExporter
-// returns an exporter component.
-func NewExporter() *Exporter {
-	return (&Exporter{
-		formatter: (&formatter{}).init(),
-	}).init()
+func New() *Exporter {
+	return (&Exporter{}).init()
 }
-
-// /////////////////////////////////////////////////////////////////////////////
-// Exporter: interface methods
-// /////////////////////////////////////////////////////////////////////////////
 
 // Processor
-// returns a processor component.
-func (o *Exporter) Processor() process.Processor {
-	return o.processor
-}
+// 执行器.
+func (o *Exporter) Processor() process.Processor { return o.processor }
 
 // Push
-// log to exporter to do write / publish operation.
+// 输出日志.
 func (o *Exporter) Push(spans ...cores.Span) {
 	atomic.AddInt32(&o.processing, 1)
 	defer atomic.AddInt32(&o.processing, -1)
@@ -69,7 +59,8 @@ func (o *Exporter) Push(spans ...cores.Span) {
 	}
 }
 
-// Upload span to jaeger.
+// Upload
+// 上报日志.
 func (o *Exporter) Upload(buf *bytes.Buffer) (err error) {
 	var (
 		req = fasthttp.AcquireRequest()
@@ -100,6 +91,15 @@ func (o *Exporter) Upload(buf *bytes.Buffer) (err error) {
 // Exporter: events
 // /////////////////////////////////////////////////////////////////////////////
 
+func (o *Exporter) init() *Exporter {
+	o.formatter = (&formatter{}).init()
+	o.processor = process.New("jaeger-tracer-exporter").
+		After(o.onAfter).
+		Before(o.onBefore).
+		Callback(o.onCall)
+	return o
+}
+
 func (o *Exporter) onAfter(ctx context.Context) (ignored bool) {
 	if atomic.LoadInt32(&o.processing) == 0 {
 		return
@@ -123,16 +123,4 @@ func (o *Exporter) onCall(ctx context.Context) (ignored bool) {
 
 func (o *Exporter) onPanic(_ context.Context, _ interface{}) {
 	cores.Registry.Debugger("%s panic: %v", o.processor.Name())
-}
-
-// /////////////////////////////////////////////////////////////////////////////
-// Exporter: init and constructor
-// /////////////////////////////////////////////////////////////////////////////
-
-func (o *Exporter) init() *Exporter {
-	o.processor = process.New("jaeger-tracer-exporter").
-		After(o.onAfter).
-		Before(o.onBefore).
-		Callback(o.onCall)
-	return o
 }

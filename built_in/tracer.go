@@ -39,9 +39,9 @@ const (
 func (b BuiltinTracer) Exporter() cores.TracerExporter {
 	switch b {
 	case TracerJaeger:
-		return tracer_jaeger.NewExporter()
+		return tracer_jaeger.New()
 	case TracerTerm:
-		return tracer_term.NewExporter()
+		return tracer_term.New()
 	}
 	return nil
 }
