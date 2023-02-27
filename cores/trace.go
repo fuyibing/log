@@ -121,7 +121,7 @@ func (o *trace) initRequest(req *http.Request) *trace {
 	// 请求参数.
 	// 从HTTP请求中读取参数记录到Trace组件的关系属性.
 	o.attr.Add(base.ResourceHttpRequestUrl, req.RequestURI).
-		Add(base.ResourceHttpRequestMethod, req.RequestURI).
+		Add(base.ResourceHttpRequestMethod, req.Method).
 		Add(base.ResourceHttpHeader, req.Header).
 		Add(base.ResourceHttpUserAgent, req.UserAgent()).
 		Add(base.ResourceHttpProtocol, req.Proto)
