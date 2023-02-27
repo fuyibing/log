@@ -21,12 +21,12 @@ import (
 
 type (
 	// TraceId
-	// is a unique identity of a trace.
+	// 链路Trace的ID.
 	TraceId [16]byte
 )
 
 // String
-// returns the hex string representation form of a TraceId, length is 32.
+// 转成32个字符长度的字符串.
 func (t TraceId) String() string {
 	return hex.EncodeToString(t[:])
 }

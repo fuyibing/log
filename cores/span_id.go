@@ -21,12 +21,12 @@ import (
 
 type (
 	// SpanId
-	// is a unique identity of a Span in a trace.
+	// 链路Span的跨度ID.
 	SpanId [8]byte
 )
 
 // String
-// returns the hex string representation form of a SpanId, length is 16.
+// 转成16个字符长度的字符串.
 func (s SpanId) String() string {
 	return hex.EncodeToString(s[:])
 }

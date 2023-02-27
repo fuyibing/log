@@ -22,39 +22,30 @@ import (
 
 type (
 	// SpanTime
-	// is the component of a Span lifetime.
+	// 用于Span的时间组件.
 	SpanTime interface {
 		// End
-		// set end time of the Span.
+		// 结束Span.
 		End() SpanTime
 
 		// GetDuration
-		// returns a time.Duration of the Span lifetime.
+		// 获取Span耗时.
 		GetDuration() time.Duration
 
 		// GetEnd
-		// returns a time.Time of the Span ended.
+		// 获取Span结束时间.
 		GetEnd() time.Time
 
 		// GetStart
-		// returns a time.Time of the Span started.
+		// 获取Span开始时间.
 		GetStart() time.Time
 	}
 
 	spanTime struct {
 		sync.RWMutex
-
-		start time.Time
-		end   time.Time
+		start, end time.Time
 	}
 )
-
-// func NewSpan(name string) Span {
-// 	return (&span{name: name}).
-// 		init().
-// 		initRelations(nil, Identify.GenTraceId(), SpanId{}).
-// 		initContext(nil)
-// }
 
 // NewSpanTime
 // returns a SpanTime component.

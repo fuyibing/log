@@ -49,7 +49,7 @@ type (
 )
 
 // NewTrace
-// returns a root cores.Trace component.
+// 创建新 Trace 链路, 一般在入口创建.
 func NewTrace(name string) Trace {
 	return NewTraceFromContext(
 		context.Background(),
@@ -58,16 +58,16 @@ func NewTrace(name string) Trace {
 }
 
 // NewTraceFromContext
-// returns a cores.Trace component with context values.
+// 基于 context.Context 创建 Trace, 若上游已经定义则复用, 反之新建.
 func NewTraceFromContext(ctx context.Context, name string) Trace {
-	// Reuse previous Trace.
+	// 复用上游 Trace 链路.
 	if v := ctx.Value(base.ContentKeyTrace); v != nil {
 		if vc, ok := v.(Trace); ok {
 			return vc
 		}
 	}
 
-	// Return a Trace component with default properties.
+	// 新建链路.
 	o := (&trace{name: name}).
 		init().
 		initContext(ctx)
@@ -77,7 +77,7 @@ func NewTraceFromContext(ctx context.Context, name string) Trace {
 }
 
 // NewTraceFromRequest
-// returns a Trace component from a http request.
+// 基于 HTTP 请求创建 Trace, 兼容 OpenTracing.
 func NewTraceFromRequest(req *http.Request, name string) Trace {
 	o := (&trace{name: name}).
 		init().
