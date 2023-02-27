@@ -55,7 +55,7 @@ log.Manager.Start(ctx)
 defer log.Manager.Stop()
 ```
 
-## 怎么使用
+## 用法
 
 ### 简单
 
@@ -71,7 +71,7 @@ log.Field{}.Add("key", "value").Info("message")
 log.Field{}.Add("key", "value").Info("message id=%d", 1)
 ```
 
-## 链路
+### 链路
 
 ```text
 trace := log.NewTrace("trace")
