@@ -24,18 +24,18 @@ import (
 
 type (
 	// Trace
-	// 链路接口.
+	// 链路Trace组件.
 	Trace interface {
 		// GetContext
-		// 获取 Trace 上下文.
+		// 获取Trace上下文.
 		GetContext() context.Context
 
 		// GetTraceId
-		// 获取 TraceId.
+		// 获取TraceId组件.
 		GetTraceId() TraceId
 
 		// NewSpan
-		// 基于此 Trace 创建 Span 跨度.
+		// 基于此Trace创建Span组件.
 		NewSpan(name string) Span
 	}
 
@@ -49,25 +49,20 @@ type (
 )
 
 // NewTrace
-// 创建新 Trace 链路, 一般在入口创建.
-func NewTrace(name string) Trace {
-	return NewTraceFromContext(
-		context.Background(),
-		name,
-	)
-}
+// 创建根Trace组件, 一般在入口创建.
+func NewTrace(name string) Trace { return NewTraceFromContext(context.Background(), name) }
 
 // NewTraceFromContext
-// 基于 context.Context 创建 Trace, 若上游已经定义则复用, 反之新建.
+// 基于context.Context创建Trace组件, 若上游已定义则复用, 反之新建.
 func NewTraceFromContext(ctx context.Context, name string) Trace {
-	// 复用上游 Trace 链路.
+	// 复用上游Trace组件.
 	if v := ctx.Value(base.ContentKeyTrace); v != nil {
 		if vc, ok := v.(Trace); ok {
 			return vc
 		}
 	}
 
-	// 新建链路.
+	// 新建Trace组件.
 	o := (&trace{name: name}).
 		init().
 		initContext(ctx)
@@ -77,7 +72,7 @@ func NewTraceFromContext(ctx context.Context, name string) Trace {
 }
 
 // NewTraceFromRequest
-// 基于 HTTP 请求创建 Trace, 兼容 OpenTracing.
+// 基于HTTP请求创建Trace组件, 兼容OpenTracing.
 func NewTraceFromRequest(req *http.Request, name string) Trace {
 	o := (&trace{name: name}).
 		init().
@@ -87,19 +82,15 @@ func NewTraceFromRequest(req *http.Request, name string) Trace {
 }
 
 // GetContext
-// 获取 Trace 上下文.
-func (o *trace) GetContext() context.Context {
-	return o.ctx
-}
+// 获取Trace上下文.
+func (o *trace) GetContext() context.Context { return o.ctx }
 
 // GetTraceId
-// 获取 TraceId.
-func (o *trace) GetTraceId() TraceId {
-	return o.traceId
-}
+// 获取TraceId组件.
+func (o *trace) GetTraceId() TraceId { return o.traceId }
 
 // NewSpan
-// 基于此 Trace 创建 Span 跨度.
+// 基于此Trace创建Span组件.
 func (o *trace) NewSpan(name string) Span {
 	s := (&span{name: name}).
 		init().
@@ -118,17 +109,17 @@ func (o *trace) init() *trace {
 }
 
 // initContext
-// 初始化 Trace 上下文.
+// 初始化Trace上下文.
 func (o *trace) initContext(ctx context.Context) *trace {
 	o.ctx = context.WithValue(ctx, base.ContextKeySpan, o)
 	return o
 }
 
 // initRequest
-// 基于 HTTP 请求参数, 初始化链路.
+// 基于HTTP请求, 初始化链路.
 func (o *trace) initRequest(req *http.Request) *trace {
 	// 请求参数.
-	// 将 HTTP 请求参数加到 Trace 属性.
+	// 从HTTP请求中读取参数记录到Trace组件的关系属性.
 	o.attr.Add(base.ResourceHttpRequestUrl, req.RequestURI).
 		Add(base.ResourceHttpRequestMethod, req.RequestURI).
 		Add(base.ResourceHttpHeader, req.Header).
@@ -136,19 +127,18 @@ func (o *trace) initRequest(req *http.Request) *trace {
 		Add(base.ResourceHttpProtocol, req.Proto)
 
 	// OpenTracing.
-	// 解析 OpenTracing 参数为 TraceId.
+	// 从HTTP的Header解析TraceId组件.
 	if ht := req.Header.Get(conf.Config.GetOpenTracingTraceId()); ht != "" {
 		o.traceId = Identify.HexTraceId(ht)
 
-		// 上游 Span 解析 SpanId.
+		// 从HTTP的Header解析SpanId组件.
 		if hs := req.Header.Get(conf.Config.GetOpenTracingSpanId()); hs != "" {
 			o.spanId = Identify.HexSpanId(hs)
 		}
-
 		return o
 	}
 
-	// 生成新 TraceId.
+	// 生成TraceId组件.
 	o.traceId = Identify.GenTraceId()
 	return o
 }

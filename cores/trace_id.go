@@ -21,7 +21,7 @@ import (
 
 type (
 	// TraceId
-	// 链路Trace的ID.
+	// 用于Trace的ID组件.
 	TraceId [16]byte
 )
 

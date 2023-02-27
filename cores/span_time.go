@@ -25,19 +25,19 @@ type (
 	// 用于Span的时间组件.
 	SpanTime interface {
 		// End
-		// 结束Span.
+		// 结束SpanTime组件.
 		End() SpanTime
 
 		// GetDuration
-		// 获取Span耗时.
+		// 获取SpanTime耗时.
 		GetDuration() time.Duration
 
 		// GetEnd
-		// 获取Span结束时间.
+		// 获取SpanTime结束时间.
 		GetEnd() time.Time
 
 		// GetStart
-		// 获取Span开始时间.
+		// 获取SpanTime开始时间.
 		GetStart() time.Time
 	}
 
@@ -48,42 +48,42 @@ type (
 )
 
 // NewSpanTime
-// returns a SpanTime component.
-func NewSpanTime() SpanTime {
-	return &spanTime{
-		start: time.Now(),
-	}
-}
+// 创建SpanTime时间组件
+func NewSpanTime() SpanTime { return &spanTime{start: time.Now()} }
 
 // End
-// set end time of the Span.
+// 结束SpanTime组件.
 func (o *spanTime) End() SpanTime {
 	o.Lock()
+	defer o.Unlock()
+
 	o.end = time.Now()
-	o.Unlock()
 	return o
 }
 
 // GetDuration
-// returns a time.Duration of the Span lifetime.
+// 获取SpanTime耗时.
 func (o *spanTime) GetDuration() time.Duration {
 	o.RLock()
 	defer o.RUnlock()
+
 	return o.end.Sub(o.start)
 }
 
 // GetEnd
-// returns a time.Time of the Span ended.
+// 获取SpanTime结束时间.
 func (o *spanTime) GetEnd() time.Time {
 	o.RLock()
 	defer o.RUnlock()
+
 	return o.end
 }
 
 // GetStart
-// returns a time.Time of the Span started.
+// 获取SpanTime开始时间.
 func (o *spanTime) GetStart() time.Time {
 	o.RLock()
 	defer o.RUnlock()
+
 	return o.start
 }

@@ -21,7 +21,7 @@ import (
 
 type (
 	// SpanId
-	// 链路Span的跨度ID.
+	// 用于Span的ID组件.
 	SpanId [8]byte
 )
 
