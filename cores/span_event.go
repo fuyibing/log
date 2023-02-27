@@ -17,7 +17,9 @@ package cores
 
 type (
 	// SpanEvent
-	// is the component for Span lifetime.
+	// 用于Span的后置事件.
+	//
+	// 当Span的End方法被调用后, 执行注册的事件列表.
 	SpanEvent interface {
 		Do(sp Span)
 	}

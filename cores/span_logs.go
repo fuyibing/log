@@ -24,11 +24,11 @@ type (
 	// 用于Span的Log组件.
 	SpanLogs interface {
 		// Add
-		// lines on SpanLogs.
+		// 添加Log列表.
 		Add(lines ...Line) SpanLogs
 
 		// GetLines
-		// return log line list of the SpanLogs component.
+		// 读取Log列表.
 		GetLines() []Line
 	}
 
@@ -39,24 +39,21 @@ type (
 )
 
 // NewSpanLogs
-// returns a SpanLogs component.
-func NewSpanLogs() SpanLogs {
-	return &spanLogs{
-		lines: make([]Line, 0),
-	}
-}
+// 创建SpanLogs组件.
+func NewSpanLogs() SpanLogs { return &spanLogs{lines: make([]Line, 0)} }
 
 // Add
-// lines on SpanLogs.
+// 添加Log列表.
 func (o *spanLogs) Add(lines ...Line) SpanLogs {
 	o.Lock()
 	defer o.Unlock()
+
 	o.lines = append(o.lines, lines...)
 	return o
 }
 
 // GetLines
-// return log line list of the SpanLogs component.
+// 读取Log列表.
 func (o *spanLogs) GetLines() []Line {
 	o.RLock()
 	defer o.RUnlock()

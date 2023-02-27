@@ -58,7 +58,7 @@ func (o *SpanLogger) Add(key string, value interface{}) *SpanLogger {
 }
 
 // Debug
-// send custom message to log exporter with debug level.
+// 记录为 debug 级日志.
 func (o *SpanLogger) Debug(text string, args ...interface{}) {
 	if conf.Config.DebugOn() {
 		o.send(base.Debug, text, args...)
@@ -66,7 +66,7 @@ func (o *SpanLogger) Debug(text string, args ...interface{}) {
 }
 
 // Error
-// send custom message to log exporter with error level.
+// 记录为 error 级日志.
 func (o *SpanLogger) Error(text string, args ...interface{}) {
 	if conf.Config.ErrorOn() {
 		o.send(base.Error, text, args...)
@@ -74,7 +74,7 @@ func (o *SpanLogger) Error(text string, args ...interface{}) {
 }
 
 // Fatal
-// send custom message to log exporter with fatal level.
+// 记录为 fatal 级日志.
 func (o *SpanLogger) Fatal(text string, args ...interface{}) {
 	if conf.Config.FatalOn() {
 		o.send(base.Fatal, text, args...)
@@ -82,7 +82,7 @@ func (o *SpanLogger) Fatal(text string, args ...interface{}) {
 }
 
 // Info
-// send custom message to log exporter with info level.
+// 记录为 info 级日志.
 func (o *SpanLogger) Info(text string, args ...interface{}) {
 	if conf.Config.InfoOn() {
 		o.send(base.Info, text, args...)
@@ -90,7 +90,7 @@ func (o *SpanLogger) Info(text string, args ...interface{}) {
 }
 
 // Warn
-// send custom message to log exporter with warning level.
+// 记录为 warning 级日志.
 func (o *SpanLogger) Warn(text string, args ...interface{}) {
 	if conf.Config.WarnOn() {
 		o.send(base.Warn, text, args...)
@@ -98,19 +98,19 @@ func (o *SpanLogger) Warn(text string, args ...interface{}) {
 }
 
 // send
-// custom log message to exporter.
+// 发送Log数据.
 func (o *SpanLogger) send(level base.Level, text string, args ...interface{}) {
-	// Create a Line component then add on SpanLogs component.
+	// 创建用户Log并加到Span组件中.
 	x := NewLine(level, text, args...)
 	x.GetAttr().Copy(o.attr)
 	o.span.GetLogs().Add(x)
 
-	// Call logger exporter and push if enabled.
+	// 同时推送普通Log.
 	if Registry.LoggerEnabled() {
 		Registry.LoggerPush(o.attr, level, text, args...)
 	}
 
-	// Release to pool when ended.
+	// 释放实例回池.
 	o.attr = nil
 	o.span = nil
 	spanLoggerPool.Put(o)

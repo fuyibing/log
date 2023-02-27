@@ -23,58 +23,58 @@ import (
 
 type (
 	// Span
-	// is the individual component of a trace.
+	// 用于Trace的跨度组件.
 	Span interface {
 		// AddEvent
-		// add SpanEvent on the Span component.
+		// 添加后置事件.
 		AddEvent(events ...SpanEvent) Span
 
 		// Child
-		// returns a child Span component.
+		// 创建子Span组件.
 		Child(name string) Span
 
 		// End
-		// stop Span recorder.
+		// 结束Span.
 		End()
 
 		// GetAttr
-		// return Attr component of the Span.
+		// 获取Span的属性组件.
 		GetAttr() Attr
 
 		// GetContext
-		// returns a context.Context of the Span.
+		// 获取Span的上下文.
 		GetContext() context.Context
 
 		// GetLogs
-		// return SpanLogs component of the Span.
+		// 获取Span的日志组件.
 		GetLogs() SpanLogs
 
 		// GetName
-		// return name of the Span.
+		// 获取Span组件名称.
 		GetName() string
 
 		// GetSpanId
-		// returns a SpanId identify of the Span.
+		// 获取Span的ID组件.
 		GetSpanId() SpanId
 
 		// GetParentSpanId
-		// returns a parent SpanId identify of the Span.
+		// 获取Span的上游ID组件.
 		GetParentSpanId() SpanId
 
 		// GetSpanTime
-		// returns a SpanTime component of the Span.
+		// 获取Span的时间组件.
 		GetSpanTime() SpanTime
 
 		// GetTrace
-		// returns a Trace component of the Span.
+		// 获取Span的隶属Trace组件.
 		GetTrace() Trace
 
 		// GetTraceId
-		// returns a TraceId identify of the Span.
+		// 获取Span的TraceId组件.
 		GetTraceId() TraceId
 
 		// Logger
-		// returns a SpanLogger component.
+		// 获取Span的Log组件.
 		Logger() *SpanLogger
 	}
 
@@ -94,16 +94,17 @@ type (
 )
 
 // AddEvent
-// add SpanEvent on the Span component.
+// 添加后置事件.
 func (o *span) AddEvent(events ...SpanEvent) Span {
 	o.Lock()
 	defer o.Unlock()
+
 	o.events = append(o.events, events...)
 	return o
 }
 
 // Child
-// returns a child Span component.
+// 创建子Span组件.
 func (o *span) Child(name string) Span {
 	return (&span{name: name}).
 		init().
@@ -112,35 +113,31 @@ func (o *span) Child(name string) Span {
 }
 
 // End
-// stop Span recorder.
+// 结束Span.
 func (o *span) End() {
 	o.spanTime.End()
 
-	// Push span to exporter if enabled.
+	// 推送Span到Exporter.
 	if Registry.TracerEnabled() {
 		Registry.TracerExporter().Push(o)
 	}
 
-	// Call registered events.
+	// 执行已注册后置事件.
 	for _, event := range o.events {
 		event.Do(o)
 	}
 }
 
 // GetAttr
-// return Attr component of the Span.
-func (o *span) GetAttr() Attr {
-	return o.attr
-}
+// 获取Span的属性组件.
+func (o *span) GetAttr() Attr { return o.attr }
 
 // GetContext
-// returns a context.Context of the Span.
-func (o *span) GetContext() context.Context {
-	return o.ctx
-}
+// 获取Span的上下文.
+func (o *span) GetContext() context.Context { return o.ctx }
 
 // GetLogs
-// return SpanLogs component of the Span.
+// 获取Span的日志组件.
 func (o *span) GetLogs() SpanLogs {
 	o.RLock()
 	defer o.RUnlock()
@@ -149,34 +146,32 @@ func (o *span) GetLogs() SpanLogs {
 }
 
 // GetName
-// 获取 Span 名称.
+// 获取Span组件名称.
 func (o *span) GetName() string { return o.name }
 
 // GetSpanId
-// 获取 Span 的ID.
+// 获取Span的ID组件.
 func (o *span) GetSpanId() SpanId { return o.spanId }
 
 // GetParentSpanId
-// 获取 Span 的上游ID.
+// 获取Span的上游ID组件.
 func (o *span) GetParentSpanId() SpanId { return o.parentSpanId }
 
 // GetSpanTime
-// 获取 Span 的时间组件 SpanTime.
+// 获取Span的时间组件.
 func (o *span) GetSpanTime() SpanTime { return o.spanTime }
 
 // GetTrace
-// 获取 Trace 实例.
+// 获取Span的隶属Trace组件.
 func (o *span) GetTrace() Trace { return o.trace }
 
 // GetTraceId
-// 获取 TraceId.
+// 获取Span的TraceId组件.
 func (o *span) GetTraceId() TraceId { return o.traceId }
 
 // Logger
-// 获取 Log 组件.
-func (o *span) Logger() *SpanLogger {
-	return NewSpanLogger(o)
-}
+// 获取Span的Log组件.
+func (o *span) Logger() *SpanLogger { return NewSpanLogger(o) }
 
 // init
 // 初始化 Span 跨度.
