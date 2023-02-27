@@ -27,7 +27,7 @@ var (
 
 type (
 	// SpanLogger
-	// is the component for record custom log message.
+	// 用于Span的Logger操作组件.
 	SpanLogger struct {
 		attr Attr
 		span Span
@@ -35,7 +35,7 @@ type (
 )
 
 // NewSpanLogger
-// return a SpanLogger component to record logs.
+// 创建SpanLogger组件.
 func NewSpanLogger(span Span) (sl *SpanLogger) {
 	if v := spanLoggerPool.Get(); v != nil {
 		sl = v.(*SpanLogger)
@@ -51,7 +51,7 @@ func NewSpanLogger(span Span) (sl *SpanLogger) {
 }
 
 // Add
-// key/value pair on logger.
+// 添加日志KV属性.
 func (o *SpanLogger) Add(key string, value interface{}) *SpanLogger {
 	o.attr.Add(key, value)
 	return o

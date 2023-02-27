@@ -21,7 +21,7 @@ import (
 
 type (
 	// SpanLogs
-	// is the component of the Span logs.
+	// 用于Span的Log组件.
 	SpanLogs interface {
 		// Add
 		// lines on SpanLogs.
@@ -60,5 +60,6 @@ func (o *spanLogs) Add(lines ...Line) SpanLogs {
 func (o *spanLogs) GetLines() []Line {
 	o.RLock()
 	defer o.RUnlock()
+
 	return o.lines
 }
