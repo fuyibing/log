@@ -11,20 +11,16 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-02-25
+// date: 2023-02-27
 
 package conf
 
 import (
-	"sync"
+	"encoding/json"
+	"testing"
 )
 
-var (
-	Config Interface
-)
-
-func init() {
-	new(sync.Once).Do(func() {
-		Config = (&configuration{}).init()
-	})
+func TestConfiguration(t *testing.T) {
+	buf, _ := json.MarshalIndent(Config, "", "    ")
+	t.Logf("configurations: \n%s", string(buf))
 }

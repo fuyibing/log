@@ -11,20 +11,29 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-02-25
+// date: 2023-02-27
 
 package conf
 
 import (
-	"sync"
+	"strings"
 )
 
-var (
-	Config Interface
+type (
+	InterfaceTracer interface {
+		GetTracerExporter() string
+		GetTracerTopic() string
+		GetJaegerTracer() JaegerTracerConfiguration
+	}
 )
 
-func init() {
-	new(sync.Once).Do(func() {
-		Config = (&configuration{}).init()
-	})
+func (o *configuration) GetTracerExporter() string { return strings.ToLower(o.TracerExporter) }
+func (o *configuration) GetTracerTopic() string    { return o.TracerTopic }
+
+func TracerExporter(s string) Option {
+	return func(c *configuration) { c.TracerExporter = s }
+}
+
+func TracerTopic(s string) Option {
+	return func(c *configuration) { c.TracerTopic = s }
 }

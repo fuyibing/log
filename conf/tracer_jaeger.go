@@ -16,10 +16,23 @@
 package conf
 
 type (
+	// JaegerTracerConfiguration
+	// 适配 Jaeger 配置参数.
 	JaegerTracerConfiguration interface {
+		// GetContentType
+		// 请求格式.
 		GetContentType() string
+
+		// GetEndpoint
+		// 请求地址.
 		GetEndpoint() string
+
+		// GetPassword
+		// 鉴权密码.
 		GetPassword() string
+
+		// GetUsername
+		// 鉴权用户名.
 		GetUsername() string
 	}
 
@@ -31,34 +44,54 @@ type (
 	}
 )
 
+// GetJaegerTracer
+// 获取 Jaeger 配置集合.
+func (o *configuration) GetJaegerTracer() JaegerTracerConfiguration { return o.JaegerTracer }
+
+// GetContentType
+// 请求格式.
 func (o *jaegerTracerConfiguration) GetContentType() string { return o.ContentType }
-func (o *jaegerTracerConfiguration) GetEndpoint() string    { return o.Endpoint }
-func (o *jaegerTracerConfiguration) GetPassword() string    { return o.Password }
-func (o *jaegerTracerConfiguration) GetUsername() string    { return o.Username }
 
-// /////////////////////////////////////////////////////////////////////////////
-// Set option
-// /////////////////////////////////////////////////////////////////////////////
+// GetEndpoint
+// 请求地址.
+func (o *jaegerTracerConfiguration) GetEndpoint() string { return o.Endpoint }
 
+// GetPassword
+// 鉴权密码.
+func (o *jaegerTracerConfiguration) GetPassword() string { return o.Password }
+
+// GetUsername
+// 鉴权用户名.
+func (o *jaegerTracerConfiguration) GetUsername() string { return o.Username }
+
+// initDefaults
+// 构造配置.
+func (o *jaegerTracerConfiguration) initDefaults() {}
+
+// JaegerTracerContentType
+// 设置请求格式.
+//
+// 默认: application/x-thrift
 func JaegerTracerContentType(s string) Option {
 	return func(c *configuration) { c.JaegerTracer.ContentType = s }
 }
 
+// JaegerTracerEndpoint
+// 设置请求地址.
+//
+// 例如: http://localhost:14268/api/traces
 func JaegerTracerEndpoint(s string) Option {
 	return func(c *configuration) { c.JaegerTracer.Endpoint = s }
 }
 
+// JaegerTracerPassword
+// 设置鉴权密码.
 func JaegerTracerPassword(s string) Option {
 	return func(c *configuration) { c.JaegerTracer.Password = s }
 }
 
+// JaegerTracerUsername
+// 设置鉴权用户名.
 func JaegerTracerUsername(s string) Option {
 	return func(c *configuration) { c.JaegerTracer.Username = s }
-}
-
-// /////////////////////////////////////////////////////////////////////////////
-// Jaeger Trace Configuration: access and constructor
-// /////////////////////////////////////////////////////////////////////////////
-
-func (o *jaegerTracerConfiguration) initDefaults() {
 }

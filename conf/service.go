@@ -11,49 +11,30 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-02-25
+// date: 2023-02-27
 
 package conf
 
-import (
-	"github.com/fuyibing/log/v5/base"
+type (
+	InterfaceService interface {
+		GetServiceName() string
+		GetServicePort() int
+		GetServiceVersion() string
+	}
 )
 
-type Option func(c *configuration)
-
-func LogLevel(l base.Level) Option {
-	return func(c *configuration) {
-		c.LoggerLevel = l
-		c.updateState()
-	}
-}
+func (o *configuration) GetServiceName() string    { return o.ServiceName }
+func (o *configuration) GetServicePort() int       { return o.ServicePort }
+func (o *configuration) GetServiceVersion() string { return o.ServiceVersion }
 
 func ServiceName(s string) Option {
-	return func(c *configuration) {
-		c.ServiceName = s
-	}
+	return func(c *configuration) { c.ServiceName = s }
 }
 
 func ServicePort(p int) Option {
-	return func(c *configuration) {
-		c.ServicePort = p
-	}
+	return func(c *configuration) { c.ServicePort = p }
 }
 
 func ServiceVersion(s string) Option {
-	return func(c *configuration) {
-		c.ServiceVersion = s
-	}
-}
-
-func TracerExporter(s string) Option {
-	return func(c *configuration) {
-		c.TracerExporter = s
-	}
-}
-
-func TracerTopic(s string) Option {
-	return func(c *configuration) {
-		c.TracerTopic = s
-	}
+	return func(c *configuration) { c.ServiceVersion = s }
 }

@@ -23,155 +23,116 @@ import (
 )
 
 type (
-	Configuration interface {
-		GetJaegerTracer() JaegerTracerConfiguration
-
-		GetLoggerExporter() string
-		GetLoggerLevel() base.Level
-
-		GetOpenTracingSample() string
-		GetOpenTracingSpanId() string
-		GetOpenTracingTraceId() string
-
-		GetServiceName() string
-		GetServicePort() int
-		GetServiceVersion() string
-
-		GetTracerExporter() string
-		GetTracerTopic() string
-
-		DebugOn() bool
-		ErrorOn() bool
-		FatalOn() bool
-		InfoOn() bool
-		WarnOn() bool
-
+	// Interface
+	// 暴露配置接口.
+	Interface interface {
+		// With
+		// 绑定配置选项.
 		With(opts ...Option)
+
+		InterfaceLogger
+		InterfaceOpentracing
+		InterfaceService
+		InterfaceTracer
 	}
 
+	// Option
+	// 配置选项.
+	Option func(c *configuration)
+
+	// 配置字段.
 	configuration struct {
+		// Logger
+
 		LoggerExporter string     `yaml:"logger-exporter"`
 		LoggerLevel    base.Level `yaml:"logger-level"`
+
+		// Opentracing
 
 		OpenTracingSample  string `yaml:"open-tracing-sample"`
 		OpenTracingSpanId  string `yaml:"open-tracing-span-id"`
 		OpenTracingTraceId string `yaml:"open-tracing-trace-id"`
 
+		// Service
+
 		ServiceName    string `yaml:"service-name"`
 		ServicePort    int    `yaml:"service-port"`
 		ServiceVersion string `yaml:"service-version"`
 
-		TracerExporter string `yaml:"tracer-exporter"`
-		TracerTopic    string `yaml:"tracer-topic"`
+		// Tracer
 
-		JaegerTracer *jaegerTracerConfiguration `yaml:"jaeger-tracer"`
+		TracerExporter string                     `yaml:"tracer-exporter"`
+		TracerTopic    string                     `yaml:"tracer-topic"`
+		JaegerTracer   *jaegerTracerConfiguration `yaml:"jaeger-tracer"`
+
+		// State
 
 		debugOn, infoOn, warnOn, errorOn, fatalOn bool
 	}
 )
 
-// /////////////////////////////////////////////////////////////////////////////
-// Configuration: logger fields
-// /////////////////////////////////////////////////////////////////////////////
-
-func (o *configuration) GetLoggerExporter() string  { return strings.ToLower(o.LoggerExporter) }
-func (o *configuration) GetLoggerLevel() base.Level { return o.LoggerLevel }
-
-// /////////////////////////////////////////////////////////////////////////////
-// Configuration: get open tracing definitions
-// /////////////////////////////////////////////////////////////////////////////
-
-func (o *configuration) GetOpenTracingSample() string  { return o.OpenTracingSample }
-func (o *configuration) GetOpenTracingSpanId() string  { return o.OpenTracingSpanId }
-func (o *configuration) GetOpenTracingTraceId() string { return o.OpenTracingTraceId }
-
-func (o *configuration) GetServiceName() string    { return o.ServiceName }
-func (o *configuration) GetServicePort() int       { return o.ServicePort }
-func (o *configuration) GetServiceVersion() string { return o.ServiceVersion }
-
-// /////////////////////////////////////////////////////////////////////////////
-// Configuration: tracer
-// /////////////////////////////////////////////////////////////////////////////
-
-func (o *configuration) GetTracerExporter() string { return strings.ToLower(o.TracerExporter) }
-func (o *configuration) GetTracerTopic() string    { return o.TracerTopic }
-
-// /////////////////////////////////////////////////////////////////////////////
-// Configuration: log state
-// /////////////////////////////////////////////////////////////////////////////
-
-func (o *configuration) DebugOn() bool { return o.debugOn }
-func (o *configuration) ErrorOn() bool { return o.errorOn }
-func (o *configuration) FatalOn() bool { return o.fatalOn }
-func (o *configuration) InfoOn() bool  { return o.infoOn }
-func (o *configuration) WarnOn() bool  { return o.warnOn }
-
+// With
+// 绑定配置选项.
 func (o *configuration) With(opts ...Option) {
 	for _, opt := range opts {
 		opt(o)
 	}
 }
 
-// /////////////////////////////////////////////////////////////////////////////
-// Configuration: children
-// /////////////////////////////////////////////////////////////////////////////
-
-func (o *configuration) GetJaegerTracer() JaegerTracerConfiguration { return o.JaegerTracer }
-
-// /////////////////////////////////////////////////////////////////////////////
-// Configuration: access and constructor
-// /////////////////////////////////////////////////////////////////////////////
-
+// init
+// 配置构造.
 func (o *configuration) init() *configuration {
 	o.scan()
-
 	o.initDefaults()
 	o.initChild()
-
-	o.updateState()
+	o.updateLevelState()
 	return o
 }
 
+// initChild
+// 子配置构造.
 func (o *configuration) initChild() *configuration {
-	// Tracer: jaeger.
 	if o.JaegerTracer == nil {
 		o.JaegerTracer = &jaegerTracerConfiguration{}
 	}
 
-	// Tracer: init jaeger defaults
 	o.JaegerTracer.initDefaults()
 	return o
 }
 
+// initDefaults
+// 赋默认值.
 func (o *configuration) initDefaults() {
-	// OpenTracing: Sample
+	// 调用请求链.
+
 	if o.OpenTracingSample == "" {
 		o.OpenTracingSample = base.OpenTracingSample
 	}
-
-	// OpenTracing: SpanId
 	if o.OpenTracingSpanId == "" {
 		o.OpenTracingSpanId = base.OpenTracingSpanId
 	}
-
-	// OpenTracing: TraceId
 	if o.OpenTracingTraceId == "" {
 		o.OpenTracingTraceId = base.OpenTracingTraceId
 	}
 
-	// LogLevel: is lower string verify.
+	// 默认日志适配.
+	if o.LoggerExporter == "" {
+		o.LoggerExporter = base.DefaultLoggerExporter
+	}
+
+	// 日志名转大写.
 	if s := o.LoggerLevel.String(); s != "" {
 		o.LoggerLevel = base.Level(strings.ToUpper(s))
 	}
 
-	// LogLevel: use default level.
+	// 默认日志级别.
 	if o.LoggerLevel.Int() == 0 {
-		o.LoggerLevel = base.Info
+		o.LoggerLevel = base.DefaultLoggerLevel
 	}
 }
 
-// scan read yaml content from config/log.yaml, then assign fields value on
-// configuration.
+// scan
+// 扫描并读取配置文件, 将配置参数映射到对应的字段上.
 func (o *configuration) scan() {
 	for _, path := range []string{"config/log.yaml", "../config/log.yaml"} {
 		if buf, err := os.ReadFile(path); err == nil {
@@ -182,13 +143,15 @@ func (o *configuration) scan() {
 	}
 }
 
-func (o *configuration) updateState() {
+// updateLevelState
+// 更新日志级别状态.
+func (o *configuration) updateLevelState() {
 	li := o.LoggerLevel.Int()
-	ls := li > base.Off.Int()
+	lo := li > base.Off.Int()
 
-	o.debugOn = ls && li >= base.Debug.Int()
-	o.infoOn = ls && li >= base.Info.Int()
-	o.warnOn = ls && li >= base.Warn.Int()
-	o.errorOn = ls && li >= base.Error.Int()
-	o.fatalOn = ls && li >= base.Fatal.Int()
+	o.debugOn = lo && li >= base.Debug.Int()
+	o.infoOn = lo && li >= base.Info.Int()
+	o.warnOn = lo && li >= base.Warn.Int()
+	o.errorOn = lo && li >= base.Error.Int()
+	o.fatalOn = lo && li >= base.Fatal.Int()
 }
