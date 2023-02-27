@@ -22,24 +22,26 @@ import (
 
 type (
 	// Attr
-	// is the component for tracer, used on Trace, Span, Line components.
+	// 链路属性组件, 用于 Trace, Span, Line 组件.
 	Attr interface {
 		// Add
-		// key/value pair into an Attr component.
+		// 向本组件添加KV键值对.
 		Add(key string, value interface{}) Attr
 
 		// Copy
-		// key/value pair from a source to an Attr component.
+		// 复制源组件的KV键值对, 并加到本组件.
 		Copy(s Attr) Attr
 
 		// GetMap
-		// returns a map struct of the Attr component.
+		// 返回本组件KV键值对的Map结构.
 		GetMap() map[string]interface{}
 
 		// Marshal
-		// encode as json byte.
+		// 转成JSON格式.
 		Marshal() ([]byte, error)
 
+		// With
+		// 绑定任意类型数据到KV键值对.
 		With(v interface{}) Attr
 	}
 
@@ -50,7 +52,7 @@ type (
 )
 
 // NewAttr
-// returns an Attr component.
+// 创建链路属性组件.
 func NewAttr() Attr {
 	return &attr{
 		data: make(map[string]interface{}),
@@ -58,19 +60,21 @@ func NewAttr() Attr {
 }
 
 // Add
-// key/value pair into an Attr component.
+// 向本组件添加KV键值对.
 func (o *attr) Add(key string, value interface{}) Attr {
 	o.Lock()
 	defer o.Unlock()
+
 	o.data[key] = value
 	return o
 }
 
 // Copy
-// key/value pair from a source to an Attr component.
+// 复制源组件的KV键值对, 并加到本组件.
 func (o *attr) Copy(s Attr) Attr {
 	o.Lock()
 	defer o.Unlock()
+
 	for key, value := range s.GetMap() {
 		o.data[key] = value
 	}
@@ -78,43 +82,43 @@ func (o *attr) Copy(s Attr) Attr {
 }
 
 // GetMap
-// returns a map struct of the Attr component.
+// 返回本组件KV键值对的Map结构.
 func (o *attr) GetMap() map[string]interface{} {
 	o.RLock()
 	defer o.RUnlock()
+
 	return o.data
 }
 
 // Marshal
-// encode as json byte.
+// 转成JSON格式.
 func (o *attr) Marshal() (buf []byte, err error) {
 	o.RLock()
 	defer o.RUnlock()
+
 	if len(o.data) > 0 {
 		buf, err = json.Marshal(o.data)
 	}
 	return
 }
 
+// With
+// 绑定任意类型数据到KV键值对.
 func (o *attr) With(data interface{}) Attr {
 	if data == nil {
 		return o
 	}
 
-	// Attr mapping.
+	// 同类型复杂.
 	if m, ok := data.(Attr); ok {
-		o.Lock()
-		defer o.Unlock()
-		for k, v := range m.GetMap() {
-			o.data[k] = v
-		}
-		return o
+		return o.Copy(m)
 	}
 
-	// Map type.
+	// Map映射.
 	if m, ok := data.(map[string]interface{}); ok {
 		o.Lock()
 		defer o.Unlock()
+
 		for k, v := range m {
 			o.data[k] = v
 		}

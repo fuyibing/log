@@ -25,28 +25,28 @@ import (
 
 var (
 	// Identify
-	// generator for identify string.
+	// 全局ID生成器实例.
 	Identify IdentifyGenerator
 )
 
 type (
 	// IdentifyGenerator
-	// generate ids of a trace.
+	// ID生成器接口.
 	IdentifyGenerator interface {
 		// GenSpanId
-		// return a SpanId identify with rand number.
+		// 生成 SpanId 随机值.
 		GenSpanId() SpanId
 
 		// GenTraceId
-		// return a TraceId identify with rand number.
+		// 生成 TraceId 随机值.
 		GenTraceId() TraceId
 
 		// HexSpanId
-		// return a SpanId identify with hex string.
+		// 基于长度为16的字符串, 反向生成 SpanId.
 		HexSpanId(s string) SpanId
 
 		// HexTraceId
-		// return a TraceId identify with hex string.
+		// 基于长度为32的字符串, 反向生成 TraceId.
 		HexTraceId(s string) TraceId
 	}
 
@@ -59,27 +59,29 @@ type (
 )
 
 // GenSpanId
-// return a SpanId identify with rand number.
+// 生成 SpanId 随机值.
 func (o *identify) GenSpanId() SpanId {
 	o.Lock()
 	defer o.Unlock()
+
 	s := SpanId{}
 	o.random.Read(s[:])
 	return s
 }
 
 // GenTraceId
-// return a TraceId identify with rand number.
+// 生成 TraceId 随机值.
 func (o *identify) GenTraceId() TraceId {
 	o.Lock()
 	defer o.Unlock()
+
 	s := TraceId{}
 	o.random.Read(s[:])
 	return s
 }
 
 // HexSpanId
-// return a SpanId identify with hex string.
+// 基于长度为16的字符串, 反向生成 SpanId.
 func (o *identify) HexSpanId(s string) SpanId {
 	res := SpanId{}
 	if d, de := hex.DecodeString(s); de == nil {
@@ -89,7 +91,7 @@ func (o *identify) HexSpanId(s string) SpanId {
 }
 
 // HexTraceId
-// return a TraceId identify with hex string.
+// 基于长度为32的字符串, 反向生成 TraceId.
 func (o *identify) HexTraceId(s string) TraceId {
 	res := TraceId{}
 	if d, de := hex.DecodeString(s); de == nil {
@@ -97,10 +99,6 @@ func (o *identify) HexTraceId(s string) TraceId {
 	}
 	return res
 }
-
-// /////////////////////////////////////////////////////////////////////////////
-// Identify: constructor
-// /////////////////////////////////////////////////////////////////////////////
 
 func (o *identify) init() *identify {
 	o.err = eb.Read(cr.Reader, eb.LittleEndian, &o.data)
