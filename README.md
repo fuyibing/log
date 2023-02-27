@@ -31,21 +31,21 @@ jaeger-tracer:
 手动配置
 
 ```text
-    conf.Config.With(
-		conf.ServiceName("my-app"),
-		conf.ServicePort(8080),
-		conf.ServiceVersion("1.2.3"),
+conf.Config.With(
+    conf.ServiceName("my-app"),
+    conf.ServicePort(8080),
+    conf.ServiceVersion("1.2.3"),
 
-		conf.LogExporter("term"),
-		conf.LogLevel("info"),
+    conf.LogExporter("term"),
+    conf.LogLevel("info"),
 
-		conf.TracerExporter("jaeger"),
-		conf.TracerTopic("log-trace"),
-		conf.JaegerTracerContentType("application/x-thrift"),
-		conf.JaegerTracerEndpoint("http://localhost:14268/api/traces"),
-	)
+    conf.TracerExporter("jaeger"),
+    conf.TracerTopic("log-trace"),
+    conf.JaegerTracerContentType("application/x-thrift"),
+    conf.JaegerTracerEndpoint("http://localhost:14268/api/traces"),
+)
 
-	cores.Registry.Update()
+cores.Registry.Update()
 ```
 
 管理器服务, 使用前调用 `log.Manager.Start` 方法启动服务, 并在服务退出前 `log.Manager.Stop` 方法退出.
