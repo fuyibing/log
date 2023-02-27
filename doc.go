@@ -11,26 +11,14 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-02-26
+// date: 2023-02-27
 
+// Package log.
+//
+// 集成 Trace 的 Log 中间件, 遵循 OpenTelemetry 规范. Log 部分支持 term,
+// file, kafka, aliyun sls 可配置, Trace 部分支持 term, jaeger, zipkin,
+// aliyun sls. 其中 term (输出在终端控制台) 模式一般在开发环境时使用, 此模式下
+// Log/Trace 为同步模式, 反之为异步.
+//
+// 配置: config/log.yaml
 package log
-
-import (
-	"context"
-	"github.com/fuyibing/log/v5/base"
-	"github.com/fuyibing/log/v5/cores"
-)
-
-// Span
-// 从上下文上读取链路跨度, 若不存在则返回nil.
-//
-// 场景: 一般使用在链路跨度的中间过程中, 例如在一个链路跨度中使用了SQL语句, 可以将
-// SQL打印在链路的日志列表中.
-//
-// 效果: /examples/images/log.span.png
-func Span(ctx context.Context) (span cores.Span, exists bool) {
-	if v := ctx.Value(base.ContextKeySpan); v != nil {
-		span, exists = v.(cores.Span)
-	}
-	return
-}

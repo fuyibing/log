@@ -40,7 +40,7 @@ func main() {
 	}()
 
 	go func() {
-		tr := log.Manager.NewTrace("trace")
+		tr := log.NewTrace("trace")
 		sp := tr.NewSpan("span")
 		defer sp.End()
 

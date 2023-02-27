@@ -22,22 +22,18 @@ import (
 )
 
 type (
-	// Field additional key/value pairs component for log.
+	// Field
+	// 应用于日志输出的键/值对附加信息.
 	//
-	// Attention: do not use it in different goroutine, it is not security,
-	// it would fire a panic error.
-	//
-	//   log.Field{}.
-	//       Add("key", "value").
-	//       Debug("message content: %d", 1)
+	// 此支持非必须, 便于输出易读的格式化数据. 当日志输出选择在中间件(如:aliyun sls)中时
+	// 可将此结构标准化成易查询、易索引的数据.
 	Field struct {
 		data map[string]interface{}
 	}
-	// map[string]interface{}
 )
 
 // Add
-// key/value pair on component.
+// 添加 K/V 键值对.
 func (f Field) Add(key string, value interface{}) Field {
 	if f.data == nil {
 		f.data = make(map[string]interface{})
@@ -48,7 +44,7 @@ func (f Field) Add(key string, value interface{}) Field {
 }
 
 // Debug
-// send key/value component to log exporter with debug level.
+// 记录为 debug 级日志.
 func (f Field) Debug(text string, args ...interface{}) {
 	if conf.Config.DebugOn() {
 		cores.Registry.LoggerPush(f.data, base.Debug, text, args...)
@@ -56,7 +52,7 @@ func (f Field) Debug(text string, args ...interface{}) {
 }
 
 // Error
-// send key/value component to log exporter with error level.
+// 记录为 error 级日志.
 func (f Field) Error(text string, args ...interface{}) {
 	if conf.Config.ErrorOn() {
 		cores.Registry.LoggerPush(f.data, base.Error, text, args...)
@@ -64,7 +60,7 @@ func (f Field) Error(text string, args ...interface{}) {
 }
 
 // Fatal
-// send key/value component to log exporter with fatal level.
+// 记录为 fatal 级日志.
 func (f Field) Fatal(text string, args ...interface{}) {
 	if conf.Config.FatalOn() {
 		cores.Registry.LoggerPush(f.data, base.Fatal, text, args...)
@@ -72,7 +68,7 @@ func (f Field) Fatal(text string, args ...interface{}) {
 }
 
 // Info
-// send key/value component to log exporter with info level.
+// 记录为 info 级日志.
 func (f Field) Info(text string, args ...interface{}) {
 	if conf.Config.InfoOn() {
 		cores.Registry.LoggerPush(f.data, base.Info, text, args...)
@@ -80,7 +76,7 @@ func (f Field) Info(text string, args ...interface{}) {
 }
 
 // Warn
-// send key/value component to log exporter with warning level.
+// 记录为 warning 级日志.
 func (f Field) Warn(text string, args ...interface{}) {
 	if conf.Config.WarnOn() {
 		cores.Registry.LoggerPush(f.data, base.Warn, text, args...)

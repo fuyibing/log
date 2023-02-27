@@ -22,7 +22,7 @@ import (
 )
 
 // Debug
-// send custom message to log exporter with debug level.
+// 记录为 debug 级日志.
 func Debug(text string, args ...interface{}) {
 	if conf.Config.DebugOn() {
 		cores.Registry.LoggerPush(nil, base.Debug, text, args...)
@@ -30,7 +30,7 @@ func Debug(text string, args ...interface{}) {
 }
 
 // Error
-// send custom message to log exporter with error level.
+// 记录为 error 级日志.
 func Error(text string, args ...interface{}) {
 	if conf.Config.ErrorOn() {
 		cores.Registry.LoggerPush(nil, base.Error, text, args...)
@@ -38,7 +38,7 @@ func Error(text string, args ...interface{}) {
 }
 
 // Fatal
-// send custom message to log exporter with fatal level.
+// 记录为 fatal 级日志.
 func Fatal(text string, args ...interface{}) {
 	if conf.Config.FatalOn() {
 		cores.Registry.LoggerPush(nil, base.Fatal, text, args...)
@@ -46,7 +46,7 @@ func Fatal(text string, args ...interface{}) {
 }
 
 // Info
-// send custom message to log exporter with info level.
+// 记录为 info 级日志.
 func Info(text string, args ...interface{}) {
 	if conf.Config.InfoOn() {
 		cores.Registry.LoggerPush(nil, base.Info, text, args...)
@@ -54,7 +54,7 @@ func Info(text string, args ...interface{}) {
 }
 
 // Warn
-// send custom message to log exporter with warning level.
+// 记录为 warning 级日志.
 func Warn(text string, args ...interface{}) {
 	if conf.Config.WarnOn() {
 		cores.Registry.LoggerPush(nil, base.Warn, text, args...)

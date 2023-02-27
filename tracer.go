@@ -23,19 +23,22 @@ import (
 )
 
 func NewTrace(name string) cores.Trace {
-	return Manager.NewTrace(name)
+	return cores.NewTrace(name)
 }
 
 func NewTraceFromContext(ctx context.Context, name string) cores.Trace {
-	return Manager.NewTraceFromContext(ctx, name)
+	return cores.NewTraceFromContext(ctx, name)
 }
 
 func NewTraceFromRequest(req *http.Request, name string) cores.Trace {
-	return Manager.NewTraceFromRequest(req, name)
+	return cores.NewTraceFromRequest(req, name)
 }
 
 // Trace
-// returns a core.Trace component from context.Context stored value.
+// 从上下文上读取链路, 若不存在则返回nil.
+//
+// 此方法为只读, 在实际开发过程中若需要基于上下文创建链路可使用
+// NewTraceFromContext 方法替代.
 func Trace(ctx context.Context) (trace cores.Trace, exists bool) {
 	if v := ctx.Value(base.ContentKeyTrace); v != nil {
 		trace, exists = v.(cores.Trace)

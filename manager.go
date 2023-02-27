@@ -23,7 +23,6 @@ import (
 	"github.com/fuyibing/log/v5/exporters/tracer_jaeger"
 	"github.com/fuyibing/log/v5/exporters/tracer_term"
 	"github.com/fuyibing/util/v8/process"
-	"net/http"
 	"sync"
 	"time"
 )
@@ -34,9 +33,6 @@ var (
 
 type (
 	Management interface {
-		NewTrace(name string) cores.Trace
-		NewTraceFromContext(ctx context.Context, name string) cores.Trace
-		NewTraceFromRequest(req *http.Request, name string) cores.Trace
 		Start(ctx context.Context) error
 		Stop()
 	}
@@ -45,24 +41,6 @@ type (
 		processor process.Processor
 	}
 )
-
-// NewTrace
-// returns a root cores.Trace component.
-func (o *management) NewTrace(name string) cores.Trace {
-	return cores.NewTrace(name)
-}
-
-// NewTraceFromContext
-// returns a cores.Trace component with context values.
-func (o *management) NewTraceFromContext(ctx context.Context, name string) cores.Trace {
-	return cores.NewTraceFromContext(ctx, name)
-}
-
-// NewTraceFromRequest
-// returns a cores.Trace component with http request values.
-func (o *management) NewTraceFromRequest(req *http.Request, name string) cores.Trace {
-	return cores.NewTraceFromRequest(req, name)
-}
 
 // Start manager, block goroutine.
 func (o *management) Start(ctx context.Context) error {
