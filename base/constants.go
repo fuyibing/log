@@ -19,8 +19,9 @@ const (
 	ContextKeySpan  = "__OPEN_TELEMETRY_SPAN__"
 	ContentKeyTrace = "__OPEN_TELEMETRY_TRACE__"
 
-	DefaultLoggerExporter = "term"
-	DefaultLoggerLevel    = "INFO"
+	DefaultLoggerExporter    = "term"
+	DefaultLoggerLevel       = "INFO"
+	DefaultOpenTracingSample = "1"
 
 	OpenTracingSample  = "X-B3-Sample"
 	OpenTracingSpanId  = "X-B3-Spanid"

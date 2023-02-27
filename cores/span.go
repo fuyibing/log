@@ -18,6 +18,8 @@ package cores
 import (
 	"context"
 	"github.com/fuyibing/log/v5/base"
+	"github.com/fuyibing/log/v5/conf"
+	"net/http"
 	"sync"
 )
 
@@ -28,6 +30,12 @@ type (
 		// AddEvent
 		// 添加后置事件.
 		AddEvent(events ...SpanEvent) Span
+
+		// BindRequest
+		// 绑定HTTP请求.
+		//
+		// 将Span参数, 绑定到HTTP请求的Header上, 用于向下游传递链路参数.
+		BindRequest(req *http.Request)
 
 		// Child
 		// 创建子Span组件.
@@ -101,6 +109,12 @@ func (o *span) AddEvent(events ...SpanEvent) Span {
 
 	o.events = append(o.events, events...)
 	return o
+}
+
+func (o *span) BindRequest(req *http.Request) {
+	req.Header.Set(conf.Config.GetOpenTracingTraceId(), o.traceId.String())
+	req.Header.Set(conf.Config.GetOpenTracingSpanId(), o.spanId.String())
+	req.Header.Set(conf.Config.GetOpenTracingSample(), base.DefaultOpenTracingSample)
 }
 
 // Child
