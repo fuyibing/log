@@ -17,10 +17,11 @@ package conf
 
 import (
 	"encoding/json"
+	"runtime"
 	"testing"
 )
 
 func TestConfiguration(t *testing.T) {
 	buf, _ := json.MarshalIndent(Config, "", "    ")
-	t.Logf("configurations: \n%s", string(buf))
+	t.Logf("configurations: %s\n%s", runtime.GOOS, string(buf))
 }

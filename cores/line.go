@@ -23,25 +23,26 @@ import (
 
 type (
 	// Line
-	// is the component of the log.
+	// 用户日志.
 	Line interface {
-		// Add key/value pair on line.
+		// Add
+		// 添加KV键值对到日志属性.
 		Add(key string, value interface{}) Line
 
 		// GetAttr
-		// returns an Attr component of the log.
+		// 获取日志的KV属性.
 		GetAttr() Attr
 
 		// GetLevel
-		// returns a base.Level of the log.
+		// 获取日志级别.
 		GetLevel() base.Level
 
 		// GetText
-		// returns content of the log.
+		// 获取日志正文.
 		GetText() string
 
 		// GetTime
-		// returns a time.Time of the log begin.
+		// 获取日志记录时间.
 		GetTime() time.Time
 	}
 
@@ -54,7 +55,7 @@ type (
 )
 
 // NewLine
-// return a component for custom log.
+// 创建用户日志实例.
 func NewLine(level base.Level, text string, args ...interface{}) Line {
 	return &line{
 		attr:  NewAttr(),
@@ -64,31 +65,25 @@ func NewLine(level base.Level, text string, args ...interface{}) Line {
 	}
 }
 
+// Add
+// 添加KV键值对到日志属性.
 func (o *line) Add(key string, value interface{}) Line {
 	o.attr.Add(key, value)
 	return o
 }
 
 // GetAttr
-// returns an Attr component of the log.
-func (o *line) GetAttr() Attr {
-	return o.attr
-}
+// 获取日志的KV属性.
+func (o *line) GetAttr() Attr { return o.attr }
 
 // GetLevel
-// returns a base.Level of the log.
-func (o *line) GetLevel() base.Level {
-	return o.level
-}
+// 获取日志级别.
+func (o *line) GetLevel() base.Level { return o.level }
 
 // GetText
-// returns content of the log.
-func (o *line) GetText() string {
-	return o.text
-}
+// 获取日志正文.
+func (o *line) GetText() string { return o.text }
 
 // GetTime
-// returns a time.Time of the log begin.
-func (o *line) GetTime() time.Time {
-	return o.time
-}
+// 获取日志记录时间.
+func (o *line) GetTime() time.Time { return o.time }

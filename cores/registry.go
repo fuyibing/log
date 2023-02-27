@@ -27,34 +27,77 @@ import (
 )
 
 var (
+	// Registry
+	// 注册管理器.
 	Registry RegistryManager
 )
 
 type (
 	// LoggerExporter
-	// .
+	// Logger 输出接口.
 	LoggerExporter interface {
+		// Processor
+		// 获取执行器.
 		Processor() process.Processor
+
+		// Push
+		// 发布 Log 日志.
 		Push(lines ...Line)
 	}
 
 	// TracerExporter
-	// .
+	// Tracer 输出接口.
 	TracerExporter interface {
+		// Processor
+		// 获取执行器.
 		Processor() process.Processor
+
+		// Push
+		// 发布 Span 跨度.
 		Push(spans ...Span)
 	}
 
+	// RegistryManager
+	// 注册管理器接口.
 	RegistryManager interface {
+		// Debugger
+		// 打印调试信息.
 		Debugger(text string, args ...interface{})
+
+		// LoggerEnabled
+		// 获取 Logger 启用状态.
 		LoggerEnabled() bool
+
+		// LoggerExporter
+		// 获取 Logger 输出接口.
 		LoggerExporter() LoggerExporter
+
+		// LoggerPush
+		// 发布日志到 Logger 输出接口.
 		LoggerPush(data interface{}, level base.Level, text string, args ...interface{})
+
+		// RegisterLoggerExporter
+		// 注册 Logger 输出接口.
 		RegisterLoggerExporter(v LoggerExporter) RegistryManager
+
+		// RegisterTracerExporter
+		// 注册 Tracer 输出接口.
 		RegisterTracerExporter(v TracerExporter) RegistryManager
+
+		// Resource
+		// 获取资源属性.
 		Resource() Attr
+
+		// TracerEnabled
+		// 获取 Tracer 启用状态.
 		TracerEnabled() bool
+
+		// TracerExporter
+		// 获取 Tracer 输出接口.
 		TracerExporter() TracerExporter
+
+		// Update
+		// 更新属性.
 		Update()
 	}
 
@@ -67,85 +110,107 @@ type (
 	}
 )
 
+// Debugger
+// 打印调试信息.
 func (o *registry) Debugger(text string, args ...interface{}) {
-	println(fmt.Sprintf(text, args...))
+	_, _ = fmt.Fprintf(os.Stdout, fmt.Sprintf(text, args...)+"\n")
 }
 
+// LoggerEnabled
+// 获取 Logger 启用状态.
 func (o *registry) LoggerEnabled() bool {
 	return o.loggerEnabled
 }
 
+// LoggerExporter
+// 获取 Logger 输出接口.
 func (o *registry) LoggerExporter() LoggerExporter {
 	return o.loggerExporter
 }
 
+// LoggerPush
+// 发布日志到 Logger 输出接口.
 func (o *registry) LoggerPush(data interface{}, level base.Level, text string, args ...interface{}) {
-	// Ignore log if not enabled.
+	// 忽略 Log.
 	if !o.loggerEnabled {
 		return
 	}
 
-	// Init log line.
+	// 创建 Log 并转发.
 	log := NewLine(level, text, args...)
 	log.GetAttr().With(data)
-
-	// Push to exporter.
 	o.loggerExporter.Push(log)
 }
 
+// TracerEnabled
+// 获取 Tracer 启用状态.
 func (o *registry) TracerEnabled() bool {
 	return o.tracerEnabled
 }
 
+// TracerExporter
+// 获取 Tracer 输出接口.
 func (o *registry) TracerExporter() TracerExporter {
 	return o.tracerExporter
 }
 
+// RegisterLoggerExporter
+// 注册 Logger 输出接口.
 func (o *registry) RegisterLoggerExporter(v LoggerExporter) RegistryManager {
 	o.loggerExporter = v
 	o.loggerEnabled = v != nil
 	return o
 }
 
+// RegisterTracerExporter
+// 注册 Tracer 输出接口.
 func (o *registry) RegisterTracerExporter(v TracerExporter) RegistryManager {
 	o.tracerExporter = v
 	o.tracerEnabled = v != nil
 	return o
 }
 
+// Resource
+// 获取资源属性.
 func (o *registry) Resource() Attr {
 	return o.resource
 }
 
+// Update
+// 更新属性.
 func (o *registry) Update() {
 	o.initResource()
 	o.initResourceService()
 }
 
+// init
+// 注册中心构造.
 func (o *registry) init() *registry {
 	o.resource = NewAttr()
 	return o
 }
 
 // initResource
-// initialize resource key/value pairs.
+// 初始化系统参数.
 func (o *registry) initResource() {
-	// Process info.
+	// 进程与环境.
 	//
 	// - runtime.pid: process id
 	// - runtime.version: go version
 	o.resource.Add(base.ResourceProcessId, os.Getpid())
 	o.resource.Add(base.ResourceEnvironment, runtime.Version())
 
-	// Host name.
+	// 主机名.
 	if s, se := os.Hostname(); se == nil {
 		o.resource.Add(base.ResourceHostName, s)
 	}
 
-	// Server arch platform.
-	o.resource.Add(base.ResourceArch, runtime.GOARCH)
+	// 系统与内核
+	// 例如: darwin amd64.
+	o.resource.Add(base.ResourceArch, runtime.GOOS+" "+runtime.GOARCH)
 
-	// Host addr, IPv4.
+	// 主机IP列表.
+	// 例如: 172.16.0.103
 	if l, le := net.InterfaceAddrs(); le == nil {
 		ls := make([]string, 0)
 		for _, la := range l {
@@ -159,6 +224,8 @@ func (o *registry) initResource() {
 	}
 }
 
+// initResourceService
+// 初始化服务参数.
 func (o *registry) initResourceService() {
 	if s := conf.Config.GetServiceName(); s != "" {
 		o.resource.Add(base.ResourceServiceName, s)
