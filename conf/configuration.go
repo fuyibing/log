@@ -74,7 +74,7 @@ type (
 // Configuration: logger fields
 // /////////////////////////////////////////////////////////////////////////////
 
-func (o *configuration) GetLoggerExporter() string  { return o.LoggerExporter }
+func (o *configuration) GetLoggerExporter() string  { return strings.ToLower(o.LoggerExporter) }
 func (o *configuration) GetLoggerLevel() base.Level { return o.LoggerLevel }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -93,7 +93,7 @@ func (o *configuration) GetServiceVersion() string { return o.ServiceVersion }
 // Configuration: tracer
 // /////////////////////////////////////////////////////////////////////////////
 
-func (o *configuration) GetTracerExporter() string { return o.TracerExporter }
+func (o *configuration) GetTracerExporter() string { return strings.ToLower(o.TracerExporter) }
 func (o *configuration) GetTracerTopic() string    { return o.TracerTopic }
 
 // /////////////////////////////////////////////////////////////////////////////

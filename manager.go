@@ -17,11 +17,9 @@ package log
 
 import (
 	"context"
+	"github.com/fuyibing/log/v5/built_in"
 	"github.com/fuyibing/log/v5/conf"
 	"github.com/fuyibing/log/v5/cores"
-	"github.com/fuyibing/log/v5/exporters/logger_term"
-	"github.com/fuyibing/log/v5/exporters/tracer_jaeger"
-	"github.com/fuyibing/log/v5/exporters/tracer_term"
 	"github.com/fuyibing/util/v8/process"
 	"sync"
 	"time"
@@ -71,59 +69,61 @@ func (o *management) Start(ctx context.Context) error {
 func (o *management) Stop() {
 	o.processor.Stop()
 
-	// Sleep 100ms until processor stopped.
-	for {
+	// 等待完成.
+	// 每 100 毫秒检查 Log/Trace 是否上报完成, 直到上报完成或30秒超时后退出.
+	var (
+		duration = time.Millisecond * 100
+		limit    = 300
+	)
+	for i := 0; i < limit; i++ {
 		if o.processor.Stopped() {
-			return
+			break
 		}
-		time.Sleep(time.Millisecond * 100)
+		time.Sleep(duration)
 	}
 }
 
-// /////////////////////////////////////////////////////////////////////////////
-// Manager events
-// /////////////////////////////////////////////////////////////////////////////
-
+// init
+// 构造管理器.
 func (o *management) init() *management {
+	// 创建执行器.
 	o.processor = process.New("log-tracer").
-		Before(o.onBeforeLogger, o.onBeforeTracer).
-		Callback(o.onCallBefore, o.onCallListen).
+		Before(o.onBuiltinLogger, o.onBuiltinTracer, o.onBeforeDone).
+		Callback(o.onListen).
 		Panic(o.onPanic)
 	return o
 }
 
-func (o *management) onBeforeLogger(_ context.Context) (ignored bool) {
-	name := conf.Config.GetLoggerExporter()
-	switch name {
-	case "term":
-		exporter := logger_term.NewExporter()
-		o.processor.Add(exporter.Processor())
-		cores.Registry.RegisterLoggerExporter(exporter)
-	}
-	return
-}
-
-func (o *management) onBeforeTracer(_ context.Context) (ignored bool) {
-	name := conf.Config.GetTracerExporter()
-	switch name {
-	case "term":
-		exporter := tracer_term.NewExporter()
-		o.processor.Add(exporter.Processor())
-		cores.Registry.RegisterTracerExporter(exporter)
-	case "jaeger":
-		exporter := tracer_jaeger.NewExporter()
-		o.processor.Add(exporter.Processor())
-		cores.Registry.RegisterTracerExporter(exporter)
-	}
-	return
-}
-
-func (o *management) onCallBefore(_ context.Context) (ignored bool) {
+// onBeforeDone
+// 启动前校验.
+func (o *management) onBeforeDone(_ context.Context) (ignored bool) {
 	cores.Registry.Update()
 	return
 }
 
-func (o *management) onCallListen(ctx context.Context) (ignored bool) {
+// onBuiltinLogger
+// 校验内置 Logger.
+func (o *management) onBuiltinLogger(_ context.Context) (ignored bool) {
+	if exporter := built_in.BuiltinLogger(conf.Config.GetLoggerExporter()).Exporter(); exporter != nil {
+		cores.Registry.RegisterLoggerExporter(exporter)
+		o.processor.Add(exporter.Processor())
+	}
+	return
+}
+
+// onBuiltinTracer
+// 校验内置 Tracer.
+func (o *management) onBuiltinTracer(_ context.Context) (ignored bool) {
+	if exporter := built_in.BuiltinTracer(conf.Config.GetTracerExporter()).Exporter(); exporter != nil {
+		cores.Registry.RegisterTracerExporter(exporter)
+		o.processor.Add(exporter.Processor())
+	}
+	return
+}
+
+// onListen
+// 阻塞并监听上下文信号.
+func (o *management) onListen(ctx context.Context) (ignored bool) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -132,6 +132,8 @@ func (o *management) onCallListen(ctx context.Context) (ignored bool) {
 	}
 }
 
+// onPanic
+// 管理器运行异常.
 func (o *management) onPanic(_ context.Context, v interface{}) {
 	cores.Registry.Debugger("log.Manager fatal: %v", v)
 }
