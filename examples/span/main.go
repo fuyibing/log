@@ -24,12 +24,19 @@ import (
 
 func init() {
 	conf.Config.With(
+		conf.TracerExporter("kafka"),
 		conf.TracerTopic("log-trace"),
 
 		conf.ServiceName("my-app"),
 		conf.ServiceVersion("1.2.3"),
 		conf.ServicePort(3721),
+
+		conf.JaegerTracerContentType("application/x-thrift"),
+		conf.JaegerTracerEndpoint("http://localhost:14268/api/traces"),
 	)
+
+	conf.LogExporter("kafka")
+	conf.LogLevel("debug")
 
 	cores.Registry.RegisterLoggerExporter(logger_term.NewExporter())
 	// cores.Registry.RegisterTracerExporter(tracer_term.NewExporter())
