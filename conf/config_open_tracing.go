@@ -16,7 +16,7 @@
 package conf
 
 import (
-	"github.com/fuyibing/log/v5/base"
+	"github.com/fuyibing/log/v5/traces"
 )
 
 type ConfigOpenTracing interface {
@@ -31,12 +31,12 @@ func (o *config) GetOpenTracingTraceId() string { return o.OpenTracingTraceId }
 
 func (o *config) initDefaultsOpenTracing() {
 	if o.OpenTracingTraceId == "" {
-		o.OpenTracingTraceId = base.OpenTracingTraceId
+		o.OpenTracingTraceId = traces.OpenTracingTraceId
 	}
 	if o.OpenTracingSpanId == "" {
-		o.OpenTracingSpanId = base.OpenTracingSpanId
+		o.OpenTracingSpanId = traces.OpenTracingSpanId
 	}
 	if o.OpenTracingSampled == "" {
-		o.OpenTracingSampled = base.OpenTracingSampled
+		o.OpenTracingSampled = traces.OpenTracingSampled
 	}
 }

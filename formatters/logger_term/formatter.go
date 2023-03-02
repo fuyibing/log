@@ -17,17 +17,17 @@ package logger_term
 
 import (
 	"fmt"
-	"github.com/fuyibing/log/v5/base"
+	"github.com/fuyibing/log/v5/traces"
 )
 
 var (
 	// 终端着色.
-	termColor = map[base.Level][]int{
-		base.Debug: {37, 0},  // Text: gray, Background: white
-		base.Info:  {34, 0},  // Text: blue, Background: white
-		base.Warn:  {33, 0},  // Text: yellow, Background: white
-		base.Error: {31, 0},  // Text: red, Background: white
-		base.Fatal: {33, 41}, // Text: yellow, Background: red
+	termColor = map[traces.Level][]int{
+		traces.Debug: {37, 0},  // Text: gray, Background: white
+		traces.Info:  {34, 0},  // Text: blue, Background: white
+		traces.Warn:  {33, 0},  // Text: yellow, Background: white
+		traces.Error: {31, 0},  // Text: red, Background: white
+		traces.Fatal: {33, 41}, // Text: yellow, Background: red
 	}
 )
 
@@ -37,15 +37,15 @@ type (
 	Formatter struct{}
 )
 
-func NewFormatter() base.LoggerFormatter { return &Formatter{} }
+func NewFormatter() traces.LoggerFormatter { return &Formatter{} }
 
 // Byte
 // 转成Byte切片.
-func (o *Formatter) Byte(_ base.Log) []byte { return nil }
+func (o *Formatter) Byte(_ traces.Log) []byte { return nil }
 
 // String
 // 转成字符串.
-func (o *Formatter) String(v base.Log) (text string) {
+func (o *Formatter) String(v traces.Log) (text string) {
 	// 基础信息.
 	// - 时间
 	// - 级别

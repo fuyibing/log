@@ -22,8 +22,8 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"github.com/fuyibing/log/v5/base"
 	"github.com/fuyibing/log/v5/conf"
+	"github.com/fuyibing/log/v5/traces"
 	"github.com/fuyibing/util/v8/process"
 	"net/http"
 	"sync/atomic"
@@ -39,13 +39,13 @@ type Exporter struct {
 	processor  process.Processor
 }
 
-func New() base.TracerExporter { return (&Exporter{}).init() }
+func New() traces.TracerExporter { return (&Exporter{}).init() }
 
 // Processor 获取类进程.
 func (o *Exporter) Processor() process.Processor { return o.processor }
 
 // Send 发送日志.
-func (o *Exporter) Send(span base.Span) (err error) {
+func (o *Exporter) Send(span traces.Span) (err error) {
 	atomic.AddInt32(&o.processing, 1)
 	defer atomic.AddInt32(&o.processing, -1)
 
@@ -58,7 +58,7 @@ func (o *Exporter) Send(span base.Span) (err error) {
 }
 
 // SetFormatter 设置格式化.
-func (o *Exporter) SetFormatter(formatter base.TracerFormatter) {}
+func (o *Exporter) SetFormatter(formatter traces.TracerFormatter) {}
 
 // Uploader
 // 上报日志.
@@ -114,7 +114,7 @@ func (o *Exporter) onBefore(_ context.Context) (ignored bool) {
 }
 
 func (o *Exporter) onCall(ctx context.Context) (ignored bool) {
-	base.InternalInfo("<%s> tracer listening", o.name)
+	traces.InternalInfo("<%s> tracer listening", o.name)
 
 	for {
 		select {
@@ -125,5 +125,5 @@ func (o *Exporter) onCall(ctx context.Context) (ignored bool) {
 }
 
 func (o *Exporter) onPanic(_ context.Context, v interface{}) {
-	base.InternalError("<%s> %v", o.name, v)
+	traces.InternalError("<%s> %v", o.name, v)
 }

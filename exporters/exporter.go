@@ -17,7 +17,7 @@ package exporters
 
 import (
 	"fmt"
-	"github.com/fuyibing/log/v5/base"
+	"github.com/fuyibing/log/v5/traces"
 	"net"
 	"os"
 	"runtime"
@@ -34,34 +34,34 @@ type (
 	// ExporterManager
 	// 上报管理器.
 	ExporterManager interface {
-		GetLogger() base.LoggerExporter
-		GetTracer() base.TracerExporter
-		PutLogger(v base.Log)
-		PutTracer(v base.Span)
-		SetLogger(v base.LoggerExporter)
-		SetTracer(v base.TracerExporter)
+		GetLogger() traces.LoggerExporter
+		GetTracer() traces.TracerExporter
+		PutLogger(v traces.Log)
+		PutTracer(v traces.Span)
+		SetLogger(v traces.LoggerExporter)
+		SetTracer(v traces.TracerExporter)
 	}
 
 	exporter struct {
 		loggerEnabled  bool
-		loggerExporter base.LoggerExporter
+		loggerExporter traces.LoggerExporter
 		tracerEnabled  bool
-		tracerExporter base.TracerExporter
+		tracerExporter traces.TracerExporter
 	}
 )
 
-func (o *exporter) GetLogger() base.LoggerExporter {
+func (o *exporter) GetLogger() traces.LoggerExporter {
 	return o.loggerExporter
 }
 
-func (o *exporter) GetTracer() base.TracerExporter {
+func (o *exporter) GetTracer() traces.TracerExporter {
 	return o.tracerExporter
 }
 
-func (o *exporter) PutLogger(v base.Log) {
+func (o *exporter) PutLogger(v traces.Log) {
 	if o.loggerEnabled {
 		if err := o.loggerExporter.Send(v); err != nil {
-			base.InternalError("<%s> send error: %v",
+			traces.InternalError("<%s> send error: %v",
 				o.loggerExporter.Processor().Name(),
 				err,
 			)
@@ -69,10 +69,10 @@ func (o *exporter) PutLogger(v base.Log) {
 	}
 }
 
-func (o *exporter) PutTracer(v base.Span) {
+func (o *exporter) PutTracer(v traces.Span) {
 	if o.tracerEnabled {
 		if err := o.tracerExporter.Send(v); err != nil {
-			base.InternalError("<%s> send error: %v",
+			traces.InternalError("<%s> send error: %v",
 				o.tracerExporter.Processor().Name(),
 				err,
 			)
@@ -80,12 +80,12 @@ func (o *exporter) PutTracer(v base.Span) {
 	}
 }
 
-func (o *exporter) SetLogger(v base.LoggerExporter) {
+func (o *exporter) SetLogger(v traces.LoggerExporter) {
 	o.loggerEnabled = v != nil
 	o.loggerExporter = v
 }
 
-func (o *exporter) SetTracer(v base.TracerExporter) {
+func (o *exporter) SetTracer(v traces.TracerExporter) {
 	o.tracerEnabled = v != nil
 	o.tracerExporter = v
 }
@@ -100,13 +100,13 @@ func (o *exporter) init() *exporter {
 }
 
 func (o *exporter) initResource() {
-	base.Resource.Add(base.ResourceProcessId, os.Getpid()).
-		Add(base.ResourceArch, fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH)).
-		Add(base.ResourceEnvironment, runtime.Version())
+	traces.Resource.Add(traces.ResourceProcessId, os.Getpid()).
+		Add(traces.ResourceArch, fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH)).
+		Add(traces.ResourceEnvironment, runtime.Version())
 
 	// 主机名.
 	if s, se := os.Hostname(); se == nil {
-		base.Resource.Add(base.ResourceHostName, s)
+		traces.Resource.Add(traces.ResourceHostName, s)
 	}
 
 	// 主机IP列表.
@@ -120,6 +120,6 @@ func (o *exporter) initResource() {
 				}
 			}
 		}
-		base.Resource.Add(base.ResourceHostAddress, strings.Join(ls, ", "))
+		traces.Resource.Add(traces.ResourceHostAddress, strings.Join(ls, ", "))
 	}
 }

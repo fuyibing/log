@@ -20,32 +20,32 @@ package tracer_term
 import (
 	"context"
 	"fmt"
-	"github.com/fuyibing/log/v5/base"
 	"github.com/fuyibing/log/v5/formatters/tracer_term"
+	"github.com/fuyibing/log/v5/traces"
 	"github.com/fuyibing/util/v8/process"
 	"os"
 )
 
 type Exporter struct {
-	formatter  base.TracerFormatter
+	formatter  traces.TracerFormatter
 	name       string
 	processing int32
 	processor  process.Processor
 }
 
-func New() base.TracerExporter { return (&Exporter{}).init() }
+func New() traces.TracerExporter { return (&Exporter{}).init() }
 
 // Processor 获取类进程.
 func (o *Exporter) Processor() process.Processor { return o.processor }
 
 // Send 发送日志.
-func (o *Exporter) Send(span base.Span) error {
+func (o *Exporter) Send(span traces.Span) error {
 	_, err := fmt.Fprintf(os.Stdout, fmt.Sprintf("%s\n", o.format(span)))
 	return err
 }
 
 // SetFormatter 设置格式化.
-func (o *Exporter) SetFormatter(formatter base.TracerFormatter) {
+func (o *Exporter) SetFormatter(formatter traces.TracerFormatter) {
 	o.formatter = formatter
 }
 
@@ -53,7 +53,7 @@ func (o *Exporter) SetFormatter(formatter base.TracerFormatter) {
 // Access and constructor
 // /////////////////////////////////////////////////////////////////////////////
 
-func (o *Exporter) format(v base.Span) string {
+func (o *Exporter) format(v traces.Span) string {
 	if o.formatter != nil {
 		return o.formatter.String(v)
 	}
@@ -84,5 +84,5 @@ func (o *Exporter) onCall(ctx context.Context) (ignored bool) {
 }
 
 func (o *Exporter) onPanic(_ context.Context, v interface{}) {
-	base.InternalError("<%s> %v", o.name, v)
+	traces.InternalError("<%s> %v", o.name, v)
 }

@@ -20,30 +20,30 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
-	"github.com/fuyibing/log/v5/base"
 	"github.com/fuyibing/log/v5/conf"
 	"github.com/fuyibing/log/v5/exporters/tracer_jaeger/jaeger"
 	"github.com/fuyibing/log/v5/exporters/tracer_jaeger/thrift"
+	"github.com/fuyibing/log/v5/traces"
 	"strconv"
 )
 
 type (
 	Formatter interface {
-		Generate(sps ...base.Span) (batch *jaeger.Batch)
-		Thrift(list ...base.Span) (buf *bytes.Buffer, err error)
+		Generate(sps ...traces.Span) (batch *jaeger.Batch)
+		Thrift(list ...traces.Span) (buf *bytes.Buffer, err error)
 	}
 
 	formatter struct{}
 )
 
-func (o *formatter) Generate(list ...base.Span) (batch *jaeger.Batch) {
+func (o *formatter) Generate(list ...traces.Span) (batch *jaeger.Batch) {
 	return &jaeger.Batch{
 		Process: o.buildProcess(),
 		Spans:   o.buildSpans(list...),
 	}
 }
 
-func (o *formatter) Thrift(list ...base.Span) (buf *bytes.Buffer, err error) {
+func (o *formatter) Thrift(list ...traces.Span) (buf *bytes.Buffer, err error) {
 	var (
 		bat = o.Generate(list...)
 		ctx = context.Background()
@@ -62,7 +62,7 @@ func (o *formatter) Thrift(list ...base.Span) (buf *bytes.Buffer, err error) {
 // Formatter: access
 // /////////////////////////////////////////////////////////////////////////////
 
-func (o *formatter) buildLogs(list []base.Log) []*jaeger.Log {
+func (o *formatter) buildLogs(list []traces.Log) []*jaeger.Log {
 	logs := make([]*jaeger.Log, 0)
 
 	for _, x := range list {
@@ -82,11 +82,11 @@ func (o *formatter) buildLogs(list []base.Log) []*jaeger.Log {
 func (o *formatter) buildProcess() *jaeger.Process {
 	return &jaeger.Process{
 		ServiceName: conf.Config.GetTracerTopic(),
-		Tags:        o.buildTagsMapper(base.Resource),
+		Tags:        o.buildTagsMapper(traces.Resource),
 	}
 }
 
-func (o *formatter) buildSpan(sp base.Span) *jaeger.Span {
+func (o *formatter) buildSpan(sp traces.Span) *jaeger.Span {
 	var (
 		tid  = sp.GetTrace().GetTraceId()
 		pid  = sp.GetParentSpanId()
@@ -113,7 +113,7 @@ func (o *formatter) buildSpan(sp base.Span) *jaeger.Span {
 	return span
 }
 
-func (o *formatter) buildSpans(sps ...base.Span) []*jaeger.Span {
+func (o *formatter) buildSpans(sps ...traces.Span) []*jaeger.Span {
 	list := make([]*jaeger.Span, 0)
 	for _, sp := range sps {
 		list = append(list, o.buildSpan(sp))
@@ -125,7 +125,7 @@ func (o *formatter) buildReference() (refs []*jaeger.SpanRef) {
 	return nil
 }
 
-func (o *formatter) buildTagsMapper(attrs ...base.Attribute) []*jaeger.Tag {
+func (o *formatter) buildTagsMapper(attrs ...traces.Attribute) []*jaeger.Tag {
 	var (
 		tags = make([]*jaeger.Tag, 0)
 	)

@@ -13,7 +13,7 @@
 // author: wsfuyibing <websearch@163.com>
 // date: 2023-03-01
 
-package base
+package traces
 
 import (
 	"bytes"

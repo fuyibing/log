@@ -17,7 +17,7 @@ package tracer_term
 
 import (
 	"fmt"
-	"github.com/fuyibing/log/v5/base"
+	"github.com/fuyibing/log/v5/traces"
 	"strings"
 )
 
@@ -27,15 +27,15 @@ type (
 	Formatter struct{}
 )
 
-func NewFormatter() base.TracerFormatter { return &Formatter{} }
+func NewFormatter() traces.TracerFormatter { return &Formatter{} }
 
 // Byte
 // 转成Byte切片.
-func (o *Formatter) Byte(_ base.Span) []byte { return nil }
+func (o *Formatter) Byte(_ traces.Span) []byte { return nil }
 
 // String
 // 转成字符串.
-func (o *Formatter) String(v base.Span) string {
+func (o *Formatter) String(v traces.Span) string {
 	// 基础信息.
 	//
 	// - # [SID=string][PID=string][TID=string] duration=37 us

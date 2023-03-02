@@ -17,33 +17,33 @@ package tracer
 
 import (
 	"fmt"
-	"github.com/fuyibing/log/v5/base"
+	"github.com/fuyibing/log/v5/traces"
 	"time"
 )
 
 type (
 	// Log 用户日志.
 	Log struct {
-		Attribute base.Attribute
-		L         base.Level
+		Attribute traces.Attribute
+		L         traces.Level
 		T         time.Time
 		Text      string
 	}
 )
 
-func NewLog(level base.Level, text string, args ...interface{}) *Log {
+func NewLog(level traces.Level, text string, args ...interface{}) *Log {
 	return &Log{
-		Attribute: base.Attribute{},
+		Attribute: traces.Attribute{},
 		L:         level, T: time.Now(),
 		Text: fmt.Sprintf(text, args...),
 	}
 }
 
 // GetAttribute 日志属性.
-func (o *Log) GetAttribute() base.Attribute { return o.Attribute }
+func (o *Log) GetAttribute() traces.Attribute { return o.Attribute }
 
 // GetLevel 日志级别.
-func (o *Log) GetLevel() base.Level { return o.L }
+func (o *Log) GetLevel() traces.Level { return o.L }
 
 // GetTime 记录时间.
 func (o *Log) GetTime() time.Time { return o.T }

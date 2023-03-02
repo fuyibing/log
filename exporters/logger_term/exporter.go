@@ -20,31 +20,31 @@ package logger_term
 import (
 	"context"
 	"fmt"
-	"github.com/fuyibing/log/v5/base"
 	"github.com/fuyibing/log/v5/formatters/logger_term"
+	"github.com/fuyibing/log/v5/traces"
 	"github.com/fuyibing/util/v8/process"
 	"os"
 )
 
 type Exporter struct {
-	formatter base.LoggerFormatter
+	formatter traces.LoggerFormatter
 	name      string
 	processor process.Processor
 }
 
-func New() base.LoggerExporter { return (&Exporter{}).init() }
+func New() traces.LoggerExporter { return (&Exporter{}).init() }
 
 // Processor 获取类进程.
 func (o *Exporter) Processor() process.Processor { return o.processor }
 
 // Send 发送日志.
-func (o *Exporter) Send(log base.Log) error {
+func (o *Exporter) Send(log traces.Log) error {
 	_, err := fmt.Fprintf(os.Stdout, fmt.Sprintf("%s\n", o.formatter.String(log)))
 	return err
 }
 
 // SetFormatter 设置格式化.
-func (o *Exporter) SetFormatter(formatter base.LoggerFormatter) {
+func (o *Exporter) SetFormatter(formatter traces.LoggerFormatter) {
 	o.formatter = formatter
 }
 
@@ -52,7 +52,7 @@ func (o *Exporter) SetFormatter(formatter base.LoggerFormatter) {
 // Access and constructor
 // /////////////////////////////////////////////////////////////////////////////
 
-func (o *Exporter) format(log base.Log) string {
+func (o *Exporter) format(log traces.Log) string {
 	if o.formatter != nil {
 		return o.formatter.String(log)
 	}
@@ -93,5 +93,5 @@ func (o *Exporter) onCall(ctx context.Context) (ignored bool) {
 }
 
 func (o *Exporter) onPanic(_ context.Context, v interface{}) {
-	base.InternalError("<%s> %v", o.name, v)
+	traces.InternalError("<%s> %v", o.name, v)
 }

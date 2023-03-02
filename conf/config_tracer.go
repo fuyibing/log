@@ -16,7 +16,7 @@
 package conf
 
 import (
-	"github.com/fuyibing/log/v5/base"
+	"github.com/fuyibing/log/v5/traces"
 )
 
 type (
@@ -48,6 +48,6 @@ func (o *config) GetTracerTopic() string { return o.TracerTopic }
 
 func (o *config) initTracerDefaults() {
 	if o.TracerTopic == "" {
-		o.TracerTopic = base.TracerTopic
+		o.TracerTopic = traces.TracerTopic
 	}
 }

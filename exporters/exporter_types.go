@@ -16,11 +16,11 @@
 package exporters
 
 import (
-	"github.com/fuyibing/log/v5/base"
 	"github.com/fuyibing/log/v5/exporters/logger_file"
 	"github.com/fuyibing/log/v5/exporters/logger_term"
 	"github.com/fuyibing/log/v5/exporters/tracer_jaeger"
 	"github.com/fuyibing/log/v5/exporters/tracer_term"
+	"github.com/fuyibing/log/v5/traces"
 )
 
 type (
@@ -38,7 +38,7 @@ const (
 
 // 内置日志构造.
 
-func (o BuiltinLog) Callable() (callable func() base.LoggerExporter) {
+func (o BuiltinLog) Callable() (callable func() traces.LoggerExporter) {
 	switch o {
 	case BuiltinLogTerm:
 		callable = logger_term.New
@@ -63,7 +63,7 @@ const (
 
 // 内置链路构造.
 
-func (o BuiltinSpan) Callable() (callable func() base.TracerExporter) {
+func (o BuiltinSpan) Callable() (callable func() traces.TracerExporter) {
 	switch o {
 	case BuiltinSpanTerm:
 		callable = tracer_term.New

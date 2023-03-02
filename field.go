@@ -16,10 +16,10 @@
 package log
 
 import (
-	"github.com/fuyibing/log/v5/base"
 	"github.com/fuyibing/log/v5/conf"
 	"github.com/fuyibing/log/v5/exporters"
 	"github.com/fuyibing/log/v5/tracer"
+	"github.com/fuyibing/log/v5/traces"
 	"sync"
 )
 
@@ -53,7 +53,7 @@ type (
 		Warn(text string, args ...interface{})
 	}
 
-	field struct{ Attribute base.Attribute }
+	field struct{ Attribute traces.Attribute }
 )
 
 // Field 创建 Key/Value 空属性.
@@ -76,35 +76,35 @@ func (o *field) Add(key string, value interface{}) FieldManager {
 // Debug 记录DEBUG级日志.
 func (o *field) Debug(text string, args ...interface{}) {
 	if conf.Config.DebugOn() {
-		o.sendLogger(base.Debug, text, args...)
+		o.sendLogger(traces.Debug, text, args...)
 	}
 }
 
 // Error 记录ERROR级日志.
 func (o *field) Error(text string, args ...interface{}) {
 	if conf.Config.ErrorOn() {
-		o.sendLogger(base.Error, text, args...)
+		o.sendLogger(traces.Error, text, args...)
 	}
 }
 
 // Fatal 记录FATAL级日志.
 func (o *field) Fatal(text string, args ...interface{}) {
 	if conf.Config.FatalOn() {
-		o.sendLogger(base.Fatal, text, args...)
+		o.sendLogger(traces.Fatal, text, args...)
 	}
 }
 
 // Info 记录INFO级日志.
 func (o *field) Info(text string, args ...interface{}) {
 	if conf.Config.InfoOn() {
-		o.sendLogger(base.Info, text, args...)
+		o.sendLogger(traces.Info, text, args...)
 	}
 }
 
 // Warn 记录WARN级日志.
 func (o *field) Warn(text string, args ...interface{}) {
 	if conf.Config.WarnOn() {
-		o.sendLogger(base.Warn, text, args...)
+		o.sendLogger(traces.Warn, text, args...)
 	}
 }
 
@@ -113,11 +113,11 @@ func (o *field) Warn(text string, args ...interface{}) {
 // /////////////////////////////////////////////////////////////////////////////
 
 func (o *field) before() *field {
-	o.Attribute = base.Attribute{}
+	o.Attribute = traces.Attribute{}
 	return o
 }
 
-func (o *field) sendLogger(level base.Level, text string, args ...interface{}) {
+func (o *field) sendLogger(level traces.Level, text string, args ...interface{}) {
 	// 释放实例.
 	defer func() {
 		o.Attribute = nil

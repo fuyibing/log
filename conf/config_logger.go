@@ -16,7 +16,7 @@
 package conf
 
 import (
-	"github.com/fuyibing/log/v5/base"
+	"github.com/fuyibing/log/v5/traces"
 )
 
 type (
@@ -40,7 +40,7 @@ type (
 		// - WARN
 		// - ERROR
 		// - FATAL
-		GetLoggerLevel() base.Level
+		GetLoggerLevel() traces.Level
 
 		DebugOn() bool
 		ErrorOn() bool
@@ -56,7 +56,7 @@ func (o *config) GetLoggerExporter() string { return o.LoggerExporter }
 
 // GetLoggerLevel
 // 日志记录级别.
-func (o *config) GetLoggerLevel() base.Level { return o.LoggerLevel }
+func (o *config) GetLoggerLevel() traces.Level { return o.LoggerLevel }
 
 func (o *config) DebugOn() bool { return true }
 func (o *config) ErrorOn() bool { return true }

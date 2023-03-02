@@ -13,7 +13,7 @@
 // author: wsfuyibing <websearch@163.com>
 // date: 2023-02-25
 
-package base
+package traces
 
 import (
 	cr "crypto/rand"

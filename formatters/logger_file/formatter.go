@@ -17,7 +17,7 @@ package logger_file
 
 import (
 	"fmt"
-	"github.com/fuyibing/log/v5/base"
+	"github.com/fuyibing/log/v5/traces"
 )
 
 type (
@@ -26,15 +26,15 @@ type (
 	Formatter struct{}
 )
 
-func NewFormatter() base.LoggerFormatter { return &Formatter{} }
+func NewFormatter() traces.LoggerFormatter { return &Formatter{} }
 
 // Byte
 // 转成Byte切片.
-func (o *Formatter) Byte(_ base.Log) []byte { return nil }
+func (o *Formatter) Byte(_ traces.Log) []byte { return nil }
 
 // String
 // 转成字符串.
-func (o *Formatter) String(v base.Log) (text string) {
+func (o *Formatter) String(v traces.Log) (text string) {
 	// 基础信息.
 	// - 时间
 	// - 级别

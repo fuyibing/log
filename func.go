@@ -16,44 +16,44 @@
 package log
 
 import (
-	"github.com/fuyibing/log/v5/base"
 	"github.com/fuyibing/log/v5/conf"
 	"github.com/fuyibing/log/v5/exporters"
 	"github.com/fuyibing/log/v5/tracer"
+	"github.com/fuyibing/log/v5/traces"
 )
 
 // Debug 记录DEBUG级日志.
 func Debug(text string, args ...interface{}) {
 	if conf.Config.DebugOn() {
-		sendLogger(nil, base.Debug, text, args...)
+		sendLogger(nil, traces.Debug, text, args...)
 	}
 }
 
 // Error 记录ERROR级日志.
 func Error(text string, args ...interface{}) {
 	if conf.Config.ErrorOn() {
-		sendLogger(nil, base.Error, text, args...)
+		sendLogger(nil, traces.Error, text, args...)
 	}
 }
 
 // Fatal 记录FATAL级日志.
 func Fatal(text string, args ...interface{}) {
 	if conf.Config.FatalOn() {
-		sendLogger(nil, base.Fatal, text, args...)
+		sendLogger(nil, traces.Fatal, text, args...)
 	}
 }
 
 // Info 记录INFO级日志.
 func Info(text string, args ...interface{}) {
 	if conf.Config.InfoOn() {
-		sendLogger(nil, base.Info, text, args...)
+		sendLogger(nil, traces.Info, text, args...)
 	}
 }
 
 // Warn 记录WARN级日志.
 func Warn(text string, args ...interface{}) {
 	if conf.Config.WarnOn() {
-		sendLogger(nil, base.Warn, text, args...)
+		sendLogger(nil, traces.Warn, text, args...)
 	}
 }
 
@@ -61,7 +61,7 @@ func Warn(text string, args ...interface{}) {
 // Access and constructor
 // /////////////////////////////////////////////////////////////////////////////
 
-func sendLogger(attr base.Attribute, level base.Level, text string, args ...interface{}) {
+func sendLogger(attr traces.Attribute, level traces.Level, text string, args ...interface{}) {
 	x := tracer.NewLog(level, text, args...)
 	x.Attribute.Copy(attr)
 	exporters.Exporter.PutLogger(x)

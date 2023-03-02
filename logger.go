@@ -17,9 +17,9 @@ package log
 
 import (
 	"context"
-	"github.com/fuyibing/log/v5/base"
 	"github.com/fuyibing/log/v5/conf"
 	"github.com/fuyibing/log/v5/exporters"
+	"github.com/fuyibing/log/v5/traces"
 	"github.com/fuyibing/util/v8/process"
 	"sync"
 	"time"
@@ -53,13 +53,13 @@ func (o *logger) Start(ctx context.Context) {
 	// 并行启动.
 	go func() {
 		if err := o.processor.Start(ctx); err != nil {
-			base.InternalError("<%s> start: %v", o.name, err)
+			traces.InternalError("<%s> start: %v", o.name, err)
 		}
 	}()
 
 	// 等待完备.
 	time.Sleep(time.Millisecond * 3)
-	base.InternalInfo("<%s> started", o.name)
+	traces.InternalInfo("<%s> started", o.name)
 }
 
 // Stop 退出日志.
@@ -80,7 +80,7 @@ func (o *logger) Stop() {
 			}
 			return true
 		}() {
-			base.InternalInfo("<%s> stopped", o.name)
+			traces.InternalInfo("<%s> stopped", o.name)
 			return
 		}
 
@@ -102,11 +102,11 @@ func (o *logger) init() *logger {
 }
 
 func (o *logger) onBeforeLogExporter(_ context.Context) (ignored bool) {
-	var exporter base.LoggerExporter
+	var exporter traces.LoggerExporter
 
 	defer func() {
 		if exporter != nil {
-			base.InternalInfo("<%s> register logger: level=%s, exporter=%s, configured=%s",
+			traces.InternalInfo("<%s> register logger: level=%s, exporter=%s, configured=%s",
 				o.name,
 				conf.Config.GetLoggerLevel(),
 				exporter.Processor().Name(),
@@ -137,11 +137,11 @@ func (o *logger) onBeforeLogExporter(_ context.Context) (ignored bool) {
 }
 
 func (o *logger) onBeforeSpanExporter(_ context.Context) (ignored bool) {
-	var exporter base.TracerExporter
+	var exporter traces.TracerExporter
 
 	defer func() {
 		if exporter != nil {
-			base.InternalInfo("<%s> register tracer: topic=%s, exporter=%s, configured=%s",
+			traces.InternalInfo("<%s> register tracer: topic=%s, exporter=%s, configured=%s",
 				o.name,
 				conf.Config.GetTracerTopic(),
 				exporter.Processor().Name(),
@@ -172,10 +172,10 @@ func (o *logger) onBeforeSpanExporter(_ context.Context) (ignored bool) {
 }
 
 func (o *logger) onBeforeUpdate(_ context.Context) (ignored bool) {
-	base.Resource.
-		Add(base.ResourceServiceName, conf.Config.GetServiceName()).
-		Add(base.ResourceServicePort, conf.Config.GetServicePort()).
-		Add(base.ResourceServiceVersion, conf.Config.GetServiceVersion())
+	traces.Resource.
+		Add(traces.ResourceServiceName, conf.Config.GetServiceName()).
+		Add(traces.ResourceServicePort, conf.Config.GetServicePort()).
+		Add(traces.ResourceServiceVersion, conf.Config.GetServiceVersion())
 	return
 }
 
@@ -187,7 +187,7 @@ func (o *logger) onCall(ctx context.Context) (ignored bool) {
 }
 
 func (o *logger) onPanic(_ context.Context, v interface{}) {
-	base.InternalError("<%s> %v", o.name, v)
+	traces.InternalError("<%s> %v", o.name, v)
 }
 
 func init() { new(sync.Once).Do(func() { Logger = (&logger{}).init() }) }

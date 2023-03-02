@@ -16,21 +16,21 @@
 package tracer
 
 import (
-	"github.com/fuyibing/log/v5/base"
 	"github.com/fuyibing/log/v5/conf"
 	"github.com/fuyibing/log/v5/exporters"
+	"github.com/fuyibing/log/v5/traces"
 )
 
 type (
 	// SpanLogger 跨度日志.
 	SpanLogger struct {
-		Attribute base.Attribute
+		Attribute traces.Attribute
 		Span      *Span
 	}
 )
 
 // Add 添加 Key/Value 属性.
-func (o *SpanLogger) Add(key string, value interface{}) base.SpanLogger {
+func (o *SpanLogger) Add(key string, value interface{}) traces.SpanLogger {
 	o.Attribute.Add(key, value)
 	return o
 }
@@ -38,35 +38,35 @@ func (o *SpanLogger) Add(key string, value interface{}) base.SpanLogger {
 // Debug 设置DEBUG级日志.
 func (o *SpanLogger) Debug(text string, args ...interface{}) {
 	if conf.Config.DebugOn() {
-		o.Send(base.Debug, text, args...)
+		o.Send(traces.Debug, text, args...)
 	}
 }
 
 // Error 设置ERROR级日志.
 func (o *SpanLogger) Error(text string, args ...interface{}) {
 	if conf.Config.ErrorOn() {
-		o.Send(base.Error, text, args...)
+		o.Send(traces.Error, text, args...)
 	}
 }
 
 // Fatal 设置FATAL级日志.
 func (o *SpanLogger) Fatal(text string, args ...interface{}) {
 	if conf.Config.FatalOn() {
-		o.Send(base.Fatal, text, args...)
+		o.Send(traces.Fatal, text, args...)
 	}
 }
 
 // Info 设置INFO级日志.
 func (o *SpanLogger) Info(text string, args ...interface{}) {
 	if conf.Config.InfoOn() {
-		o.Send(base.Info, text, args...)
+		o.Send(traces.Info, text, args...)
 	}
 }
 
 // Warn 设置WARN级日志.
 func (o *SpanLogger) Warn(text string, args ...interface{}) {
 	if conf.Config.WarnOn() {
-		o.Send(base.Warn, text, args...)
+		o.Send(traces.Warn, text, args...)
 	}
 }
 
@@ -74,18 +74,18 @@ func (o *SpanLogger) Warn(text string, args ...interface{}) {
 // Internal methods
 // /////////////////////////////////////////////////////////////////////////////
 
-func (o *SpanLogger) Send(level base.Level, text string, args ...interface{}) {
+func (o *SpanLogger) Send(level traces.Level, text string, args ...interface{}) {
 	o.SendLog(level, text, args...)
 	o.SendSpan(level, text, args...)
 }
 
-func (o *SpanLogger) SendLog(level base.Level, text string, args ...interface{}) {
+func (o *SpanLogger) SendLog(level traces.Level, text string, args ...interface{}) {
 	x := NewLog(level, text, args...)
 	x.Attribute.Copy(o.Attribute)
 	exporters.Exporter.PutLogger(x)
 }
 
-func (o *SpanLogger) SendSpan(level base.Level, text string, args ...interface{}) {
+func (o *SpanLogger) SendSpan(level traces.Level, text string, args ...interface{}) {
 	x := NewLog(level, text, args...)
 	x.Attribute.Copy(o.Attribute)
 	o.Span.addLog(x)
@@ -96,6 +96,6 @@ func (o *SpanLogger) SendSpan(level base.Level, text string, args ...interface{}
 // /////////////////////////////////////////////////////////////////////////////
 
 func (o *SpanLogger) init() *SpanLogger {
-	o.Attribute = base.Attribute{}
+	o.Attribute = traces.Attribute{}
 	return o
 }

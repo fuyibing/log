@@ -13,21 +13,36 @@
 // author: wsfuyibing <websearch@163.com>
 // date: 2023-03-01
 
-package base
+package traces
 
 import (
-	"sync"
+	"fmt"
+	"os"
+	"runtime"
+	"strings"
 )
 
-var (
-	// Resource 全局资源.
-	//
-	// 上报链路数据时携带此参数, 如进程ID, 主机名, IP地址等.
-	Resource = Attribute{}
-)
+// InternalError
+// 打印内部错误.
+func InternalError(text string, args ...interface{}) {
+	var (
+		file string
+		line int
+		list = []string{fmt.Sprintf(text, args...)}
+		ln   = "\n"
+		ok   bool
+	)
 
-func init() {
-	new(sync.Once).Do(func() {
-		Id = (&id{}).init()
-	})
+	for i := 0; ; i++ {
+		if _, file, line, ok = runtime.Caller(i); !ok {
+			break
+		}
+		list = append(list, fmt.Sprintf("    #%d. %s:%d", i, strings.TrimSpace(file), line))
+	}
+
+	_, _ = fmt.Fprintf(os.Stdout, strings.Join(list, ln)+ln)
+}
+
+func InternalInfo(text string, args ...interface{}) {
+	_, _ = fmt.Fprintf(os.Stdout, fmt.Sprintf(text, args...)+"\n")
 }

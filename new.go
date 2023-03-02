@@ -17,22 +17,22 @@ package log
 
 import (
 	"context"
-	"github.com/fuyibing/log/v5/base"
 	"github.com/fuyibing/log/v5/tracer"
+	"github.com/fuyibing/log/v5/traces"
 	"net/http"
 )
 
 // NewTrace 生成跟踪组件.
-func NewTrace(name string) base.Trace {
+func NewTrace(name string) traces.Trace {
 	return tracer.NewTrace(name)
 }
 
 // NewTraceFromContext 生成跟踪组件.
-func NewTraceFromContext(ctx context.Context, name string) base.Trace {
+func NewTraceFromContext(ctx context.Context, name string) traces.Trace {
 	return tracer.NewTraceFromContext(ctx, name)
 }
 
 // NewTraceFromRequest 生成跟踪组件.
-func NewTraceFromRequest(req *http.Request, name string) base.Trace {
+func NewTraceFromRequest(req *http.Request, name string) traces.Trace {
 	return tracer.NewTraceFromRequest(req, name)
 }

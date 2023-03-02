@@ -13,7 +13,7 @@
 // author: wsfuyibing <websearch@163.com>
 // date: 2023-02-28
 
-package base
+package traces
 
 import (
 	"fmt"

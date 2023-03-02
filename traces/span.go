@@ -13,10 +13,11 @@
 // author: wsfuyibing <websearch@163.com>
 // date: 2023-03-01
 
-package base
+package traces
 
 import (
 	"bytes"
+	"context"
 	"encoding/hex"
 	"time"
 )
@@ -30,6 +31,9 @@ type (
 	Span interface {
 		// Child 生成子跨度组件.
 		Child(name string) Span
+
+		// Context 获取上下文.
+		Context() context.Context
 
 		// End 结束跨度.
 		End()

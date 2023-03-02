@@ -13,36 +13,20 @@
 // author: wsfuyibing <websearch@163.com>
 // date: 2023-03-01
 
-package base
+package traces
 
-import (
-	"fmt"
-	"os"
-	"runtime"
-	"strings"
+type (
+	// Level 日志级别.
+	Level string
 )
 
-// InternalError
-// 打印内部错误.
-func InternalError(text string, args ...interface{}) {
-	var (
-		file string
-		line int
-		list = []string{fmt.Sprintf(text, args...)}
-		ln   = "\n"
-		ok   bool
-	)
+// 日志级别枚举.
 
-	for i := 0; ; i++ {
-		if _, file, line, ok = runtime.Caller(i); !ok {
-			break
-		}
-		list = append(list, fmt.Sprintf("    #%d. %s:%d", i, strings.TrimSpace(file), line))
-	}
-
-	_, _ = fmt.Fprintf(os.Stdout, strings.Join(list, ln)+ln)
-}
-
-func InternalInfo(text string, args ...interface{}) {
-	_, _ = fmt.Fprintf(os.Stdout, fmt.Sprintf(text, args...)+"\n")
-}
+const (
+	Off   Level = "OFF"
+	Debug Level = "DEBUG"
+	Info  Level = "INFO"
+	Warn  Level = "WARN"
+	Error Level = "ERROR"
+	Fatal Level = "FATAL"
+)

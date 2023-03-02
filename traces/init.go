@@ -13,20 +13,21 @@
 // author: wsfuyibing <websearch@163.com>
 // date: 2023-03-01
 
-package base
+package traces
 
-type (
-	// Level 日志级别.
-	Level string
+import (
+	"sync"
 )
 
-// 日志级别枚举.
-
-const (
-	Off   Level = "OFF"
-	Debug Level = "DEBUG"
-	Info  Level = "INFO"
-	Warn  Level = "WARN"
-	Error Level = "ERROR"
-	Fatal Level = "FATAL"
+var (
+	// Resource 全局资源.
+	//
+	// 上报链路数据时携带此参数, 如进程ID, 主机名, IP地址等.
+	Resource = Attribute{}
 )
+
+func init() {
+	new(sync.Once).Do(func() {
+		Id = (&id{}).init()
+	})
+}

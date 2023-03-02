@@ -17,8 +17,8 @@ package tracer
 
 import (
 	"context"
-	"github.com/fuyibing/log/v5/base"
 	"github.com/fuyibing/log/v5/conf"
+	"github.com/fuyibing/log/v5/traces"
 	"net/http"
 )
 
@@ -32,7 +32,7 @@ type (
 		//   {
 		//       "key": "value"
 		//   }
-		Attribute base.Attribute
+		Attribute traces.Attribute
 
 		// Ctx 跟踪上下文.
 		Ctx context.Context
@@ -43,17 +43,17 @@ type (
 		// SpanId 跨度ID.
 		//
 		// 长度为16个字符的跨度ID
-		SpanId base.SpanId
+		SpanId traces.SpanId
 
 		// TraceId 跟踪ID.
 		//
 		// 长度为32个字符的跟踪ID.
-		TraceId base.TraceId
+		TraceId traces.TraceId
 	}
 )
 
 // NewTrace 生成跟踪组件.
-func NewTrace(name string) base.Trace {
+func NewTrace(name string) traces.Trace {
 	return NewTraceFromContext(
 		context.Background(),
 		name,
@@ -63,9 +63,9 @@ func NewTrace(name string) base.Trace {
 // NewTraceFromContext 生成跟踪组件.
 //
 // 基于指定上下文(context.Context)生成跟踪组件.
-func NewTraceFromContext(ctx context.Context, name string) base.Trace {
+func NewTraceFromContext(ctx context.Context, name string) traces.Trace {
 	// 组件复用.
-	if v := ctx.Value(base.ContextKeyForTrace); v != nil {
+	if v := ctx.Value(traces.ContextKeyForTrace); v != nil {
 		// 基于跨度Span.
 		if vc, ok := v.(*Span); ok {
 			return vc.GetTrace()
@@ -87,7 +87,7 @@ func NewTraceFromContext(ctx context.Context, name string) base.Trace {
 // NewTraceFromRequest 生成跟踪组件.
 //
 // 基于HTTP请求生成跟踪组件.
-func NewTraceFromRequest(req *http.Request, name string) base.Trace {
+func NewTraceFromRequest(req *http.Request, name string) traces.Trace {
 	x := (&Trace{Name: name}).init()
 	x.initRequestArguments(req)
 	x.initRequestId(req)
@@ -99,19 +99,19 @@ func NewTraceFromRequest(req *http.Request, name string) base.Trace {
 func (o *Trace) Context() context.Context { return o.Ctx }
 
 // GetAttribute 获取组件属性.
-func (o *Trace) GetAttribute() base.Attribute { return o.Attribute }
+func (o *Trace) GetAttribute() traces.Attribute { return o.Attribute }
 
 // GetName 获取跟踪名称.
 func (o *Trace) GetName() string { return o.Name }
 
 // GetSpanId 获取跨度ID.
-func (o *Trace) GetSpanId() base.SpanId { return o.SpanId }
+func (o *Trace) GetSpanId() traces.SpanId { return o.SpanId }
 
 // GetTraceId 获取跟踪ID.
-func (o *Trace) GetTraceId() base.TraceId { return o.TraceId }
+func (o *Trace) GetTraceId() traces.TraceId { return o.TraceId }
 
 // Span 生成跨度.
-func (o *Trace) Span(name string) base.Span {
+func (o *Trace) Span(name string) traces.Span {
 	x := (&Span{Name: name}).init()
 	x.Trace = o
 	x.ParentSpanId = o.SpanId
@@ -128,24 +128,24 @@ func (o *Trace) Span(name string) base.Span {
 // init
 // 初始化跟踪.
 func (o *Trace) init() *Trace {
-	o.Attribute = base.Attribute{}
+	o.Attribute = traces.Attribute{}
 	return o
 }
 
 // initContext
 // 初始化Context上下文.
 func (o *Trace) initContext(ctx context.Context) {
-	o.Ctx = context.WithValue(ctx, base.ContextKeyForTrace, o)
+	o.Ctx = context.WithValue(ctx, traces.ContextKeyForTrace, o)
 }
 
 // initRequestArguments
 // 初始化HTTP请求.
 func (o *Trace) initRequestArguments(req *http.Request) {
-	o.Attribute.Add(base.ResourceHttpHeader, req.Header)
-	o.Attribute.Add(base.ResourceHttpProtocol, req.Proto)
-	o.Attribute.Add(base.ResourceHttpRequestMethod, req.Method)
-	o.Attribute.Add(base.ResourceHttpRequestUrl, req.RequestURI)
-	o.Attribute.Add(base.ResourceHttpUserAgent, req.UserAgent())
+	o.Attribute.Add(traces.ResourceHttpHeader, req.Header)
+	o.Attribute.Add(traces.ResourceHttpProtocol, req.Proto)
+	o.Attribute.Add(traces.ResourceHttpRequestMethod, req.Method)
+	o.Attribute.Add(traces.ResourceHttpRequestUrl, req.RequestURI)
+	o.Attribute.Add(traces.ResourceHttpUserAgent, req.UserAgent())
 }
 
 // initRequestId
@@ -154,10 +154,10 @@ func (o *Trace) initRequestId(req *http.Request) {
 	// 解析HTTP头参数.
 	if s1 := req.Header.Get(conf.Config.GetOpenTracingTraceId()); s1 != "" {
 		// 跟踪ID.
-		if o.TraceId = base.Id.TraceIdFromHex(s1); o.TraceId.IsValid() {
+		if o.TraceId = traces.Id.TraceIdFromHex(s1); o.TraceId.IsValid() {
 			// 跨度ID.
 			if s2 := req.Header.Get(conf.Config.GetOpenTracingSpanId()); s2 != "" {
-				if o.SpanId = base.Id.SpanIdFromHex(s2); o.SpanId.IsValid() {
+				if o.SpanId = traces.Id.SpanIdFromHex(s2); o.SpanId.IsValid() {
 					return
 				}
 			}
@@ -172,11 +172,11 @@ func (o *Trace) initRequestId(req *http.Request) {
 // initSpanId
 // 初始化跨度ID.
 func (o *Trace) initSpanId() {
-	o.SpanId = base.SpanId{}
+	o.SpanId = traces.SpanId{}
 }
 
 // initTraceId
 // 初始化跟踪ID.
 func (o *Trace) initTraceId() {
-	o.TraceId = base.Id.TraceIdNew()
+	o.TraceId = traces.Id.TraceIdNew()
 }

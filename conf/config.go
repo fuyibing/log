@@ -16,7 +16,7 @@
 package conf
 
 import (
-	"github.com/fuyibing/log/v5/base"
+	"github.com/fuyibing/log/v5/traces"
 	"gopkg.in/yaml.v3"
 	"os"
 )
@@ -61,8 +61,8 @@ type (
 		// 每隔多少时间(毫秒)检查数据桶是否有积压.
 		BucketFrequency int `yaml:"bucket-frequency"`
 
-		LoggerExporter string     `yaml:"logger-exporter"`
-		LoggerLevel    base.Level `yaml:"logger-level"`
+		LoggerExporter string       `yaml:"logger-exporter"`
+		LoggerLevel    traces.Level `yaml:"logger-level"`
 
 		OpenTracingSampled string `yaml:"open-tracing-sampled"`
 		OpenTracingSpanId  string `yaml:"open-tracing-span-id"`

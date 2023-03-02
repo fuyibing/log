@@ -16,7 +16,7 @@
 package conf
 
 import (
-	"github.com/fuyibing/log/v5/base"
+	"github.com/fuyibing/log/v5/traces"
 )
 
 type (
@@ -37,16 +37,16 @@ func (o *config) GetBucketFrequency() int     { return o.BucketFrequency }
 
 func (o *config) initBucketDefaults() bool {
 	if o.BucketBatch == 0 {
-		o.BucketBatch = base.BucketBatch
+		o.BucketBatch = traces.BucketBatch
 	}
 	if o.BucketConcurrency == 0 {
-		o.BucketConcurrency = base.BucketConcurrency
+		o.BucketConcurrency = traces.BucketConcurrency
 	}
 	if o.BucketCapacity == 0 {
-		o.BucketCapacity = base.BucketCapacity
+		o.BucketCapacity = traces.BucketCapacity
 	}
 	if o.BucketFrequency == 0 {
-		o.BucketFrequency = base.BucketFrequency
+		o.BucketFrequency = traces.BucketFrequency
 	}
 	return true
 }
