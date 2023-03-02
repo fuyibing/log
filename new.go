@@ -36,3 +36,13 @@ func NewTraceFromContext(ctx context.Context, name string) traces.Trace {
 func NewTraceFromRequest(req *http.Request, name string) traces.Trace {
 	return tracer.NewTraceFromRequest(req, name)
 }
+
+// Span 获取链路.
+func Span(ctx context.Context) (span traces.Span, exists bool) {
+	if v := ctx.Value(traces.ContextKeyForTrace); v != nil {
+		if s, ok := v.(traces.Span); ok {
+			return s, true
+		}
+	}
+	return nil, false
+}
