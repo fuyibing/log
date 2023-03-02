@@ -31,6 +31,9 @@ type (
 		// Add 向桶中添加多个元素.
 		Add(item interface{}) (total int, err error)
 
+		// Count 积压数量.
+		Count() int
+
 		// IsEmpty 数据桶是否已空.
 		IsEmpty() bool
 
@@ -50,8 +53,8 @@ type (
 	bucket struct {
 		sync.Mutex
 
+		caches   []interface{}
 		capacity int
-		memories []interface{}
 	}
 )
 
@@ -72,7 +75,7 @@ func (o *bucket) Add(item interface{}) (total int, err error) {
 	}
 
 	// 元素总量.
-	total = len(o.memories)
+	total = len(o.caches)
 
 	// 容量已满.
 	if o.capacity > 0 && total >= o.capacity {
@@ -82,15 +85,20 @@ func (o *bucket) Add(item interface{}) (total int, err error) {
 
 	// 加入桶中.
 	total++
-	o.memories = append(o.memories, item)
+	o.caches = append(o.caches, item)
 	return
+}
+
+func (o *bucket) Count() int {
+	o.Lock()
+	defer o.Unlock()
+
+	return len(o.caches)
 }
 
 // IsEmpty 是否为空.
 func (o *bucket) IsEmpty() bool {
-	o.Lock()
-	defer o.Unlock()
-	return len(o.memories) == 0
+	return 0 == o.Count()
 }
 
 // Pop 取出1个元素.
@@ -108,22 +116,22 @@ func (o *bucket) Popn(limit int) (items []interface{}, total, count int) {
 	defer o.Unlock()
 
 	// 空数据桶.
-	if total = len(o.memories); total == 0 {
+	if total = len(o.caches); total == 0 {
 		return
 	}
 
 	// 全部取出.
 	if limit >= total {
 		count = total
-		items = o.memories[:]
+		items = o.caches[:]
 		o.initMemory()
 		return
 	}
 
 	// 分段取出.
 	count = limit
-	items = o.memories[0:count]
-	o.memories = o.memories[count:]
+	items = o.caches[0:count]
+	o.caches = o.caches[count:]
 	return
 }
 
@@ -142,6 +150,6 @@ func (o *bucket) init() *bucket {
 }
 
 func (o *bucket) initMemory() *bucket {
-	o.memories = make([]interface{}, 0)
+	o.caches = make([]interface{}, 0)
 	return o
 }

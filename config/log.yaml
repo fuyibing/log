@@ -1,7 +1,7 @@
 #
 # log-trace
 #
-logger-exporter: "file"
+logger-exporter: "term"
 logger-level: debug
 # service definitions.
 service-name: "gmd-v8"

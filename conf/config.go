@@ -19,6 +19,7 @@ import (
 	"github.com/fuyibing/log/v5/traces"
 	"gopkg.in/yaml.v3"
 	"os"
+	"sync"
 )
 
 var (
@@ -29,13 +30,12 @@ type (
 	// ConfigManager
 	// 配置管理器.
 	ConfigManager interface {
-		GetServiceName() string
-		GetServicePort() int
-		GetServiceVersion() string
+		FieldManager() *FieldManager
 
 		ConfigBucket
 		ConfigOpenTracing
 		ConfigLogger
+		ConfigService
 		FileLogger
 
 		ConfigTracer
@@ -61,8 +61,22 @@ type (
 		// 每隔多少时间(毫秒)检查数据桶是否有积压.
 		BucketFrequency int `yaml:"bucket-frequency"`
 
-		LoggerExporter string       `yaml:"logger-exporter"`
-		LoggerLevel    traces.Level `yaml:"logger-level"`
+		// 日志上报.
+		//
+		// - term
+		// - file
+		// - kafka
+		// - aliyunsls
+		LoggerExporter string `yaml:"logger-exporter"`
+
+		// 日志级别.
+		//
+		// - DEBUG
+		// - INFO
+		// - WARN
+		// - ERROR
+		// - FATAL
+		LoggerLevel traces.Level `yaml:"logger-level"`
 
 		OpenTracingSampled string `yaml:"open-tracing-sampled"`
 		OpenTracingSpanId  string `yaml:"open-tracing-span-id"`
@@ -72,17 +86,27 @@ type (
 		ServicePort    int    `yaml:"service-port"`
 		ServiceVersion string `yaml:"service-version"`
 
+		// 链路上报.
+		//
+		// - term
+		// - file
+		// - jaeger
+		// - zipkin
 		TracerExporter string `yaml:"tracer-exporter"`
-		TracerTopic    string `yaml:"tracer-topic"`
 
-		FileLogger   *fileLogger   `yaml:"file-logger"`
+		// 链路上报位置.
+		TracerTopic string `yaml:"tracer-topic"`
+
+		FileLogger *fileLogger `yaml:"file-logger"`
+
 		JaegerTracer *jaegerTracer `yaml:"jaeger-tracer"`
+
+		fm                                        *FieldManager
+		debugOn, infoOn, warnOn, errorOn, fatalOn bool
 	}
 )
 
-func (o *config) GetServiceName() string    { return o.ServiceName }
-func (o *config) GetServicePort() int       { return o.ServicePort }
-func (o *config) GetServiceVersion() string { return o.ServiceVersion }
+func (o *config) FieldManager() *FieldManager { return o.fm }
 
 // /////////////////////////////////////////////////////////////////////////////
 // Access and constructor
@@ -101,12 +125,18 @@ func (o *config) scan() {
 func (o *config) init() *config {
 	o.scan()
 	o.initLoggerDefaults()
-	o.initDefaultsOpenTracing()
+	o.initOpenTracingDefaults()
 	o.initTracerDefaults()
 	o.initBucketDefaults()
 
+	// logger
 	o.initFileLogger()
+
+	// tracer.
 	o.initJaegerTracer()
+
+	// fields manager.
+	o.fm = &FieldManager{config: o}
 	return o
 }
 
@@ -122,4 +152,10 @@ func (o *config) initJaegerTracer() {
 		o.JaegerTracer = &jaegerTracer{}
 	}
 	o.JaegerTracer.initDefaults()
+}
+
+func init() {
+	new(sync.Once).Do(func() {
+		Config = (&config{}).init()
+	})
 }

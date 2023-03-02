@@ -15,6 +15,10 @@
 
 package traces
 
+import (
+	"strings"
+)
+
 type (
 	// Level 日志级别.
 	Level string
@@ -29,4 +33,28 @@ const (
 	Warn  Level = "WARN"
 	Error Level = "ERROR"
 	Fatal Level = "FATAL"
+
+	DefaultLevel = Info
 )
+
+var (
+	LevelToIntegers = map[Level]int{
+		Off:   1,
+		Fatal: 2,
+		Error: 3,
+		Warn:  4,
+		Info:  5,
+		Debug: 6,
+	}
+)
+
+func (o Level) Int() int {
+	if n, ok := LevelToIntegers[o]; ok {
+		return n
+	}
+	return 0
+}
+
+func (o Level) Upper() Level {
+	return Level(strings.ToUpper(string(o)))
+}

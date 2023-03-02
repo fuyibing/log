@@ -114,8 +114,6 @@ func (o *Exporter) onBefore(_ context.Context) (ignored bool) {
 }
 
 func (o *Exporter) onCall(ctx context.Context) (ignored bool) {
-	traces.InternalInfo("<%s> tracer listening", o.name)
-
 	for {
 		select {
 		case <-ctx.Done():

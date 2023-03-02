@@ -19,23 +19,53 @@ import (
 	"github.com/fuyibing/log/v5/traces"
 )
 
-type (
-	// ConfigBucket
-	// 数据桶配置.
-	ConfigBucket interface {
-		GetBucketBatch() int
-		GetBucketConcurrency() int32
-		GetBucketCapacity() int
-		GetBucketFrequency() int
-	}
-)
+type ConfigBucket interface {
+	GetBucketBatch() int
+	GetBucketConcurrency() int32
+	GetBucketCapacity() int
+	GetBucketFrequency() int
+}
+
+// Getter
 
 func (o *config) GetBucketBatch() int         { return o.BucketBatch }
 func (o *config) GetBucketConcurrency() int32 { return o.BucketConcurrency }
 func (o *config) GetBucketCapacity() int      { return o.BucketCapacity }
 func (o *config) GetBucketFrequency() int     { return o.BucketFrequency }
 
-func (o *config) initBucketDefaults() bool {
+// Setter
+
+func (o *FieldManager) SetBucketBatch(n int) *FieldManager {
+	if n > 0 {
+		o.config.BucketBatch = n
+	}
+	return o
+}
+
+func (o *FieldManager) SetBucketConcurrency(n int32) *FieldManager {
+	if n > 0 {
+		o.config.BucketConcurrency = n
+	}
+	return o
+}
+
+func (o *FieldManager) SetBucketCapacity(n int) *FieldManager {
+	if n > 0 {
+		o.config.BucketCapacity = n
+	}
+	return o
+}
+
+func (o *FieldManager) SetBucketFrequency(n int) *FieldManager {
+	if n > 0 {
+		o.config.BucketFrequency = n
+	}
+	return o
+}
+
+// Initialize
+
+func (o *config) initBucketDefaults() {
 	if o.BucketBatch == 0 {
 		o.BucketBatch = traces.BucketBatch
 	}
@@ -48,5 +78,4 @@ func (o *config) initBucketDefaults() bool {
 	if o.BucketFrequency == 0 {
 		o.BucketFrequency = traces.BucketFrequency
 	}
-	return true
 }

@@ -11,16 +11,10 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-01
+// date: 2023-03-02
 
 package conf
 
-import (
-	"sync"
-)
-
-func init() {
-	new(sync.Once).Do(func() {
-		Config = (&config{}).init()
-	})
+type FieldManager struct {
+	config *config
 }

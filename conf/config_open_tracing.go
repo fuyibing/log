@@ -25,11 +25,38 @@ type ConfigOpenTracing interface {
 	GetOpenTracingTraceId() string
 }
 
+// Getter
+
 func (o *config) GetOpenTracingSampled() string { return o.OpenTracingSampled }
 func (o *config) GetOpenTracingSpanId() string  { return o.OpenTracingSpanId }
 func (o *config) GetOpenTracingTraceId() string { return o.OpenTracingTraceId }
 
-func (o *config) initDefaultsOpenTracing() {
+// Setter
+
+func (o *FieldManager) SetOpenTracingSampled(s string) *FieldManager {
+	if s != "" {
+		o.config.OpenTracingSampled = s
+	}
+	return o
+}
+
+func (o *FieldManager) SetOpenTracingSpanId(s string) *FieldManager {
+	if s != "" {
+		o.config.OpenTracingSpanId = s
+	}
+	return o
+}
+
+func (o *FieldManager) SetOpenTracingTraceId(s string) *FieldManager {
+	if s != "" {
+		o.config.OpenTracingTraceId = s
+	}
+	return o
+}
+
+// Initialize
+
+func (o *config) initOpenTracingDefaults() {
 	if o.OpenTracingTraceId == "" {
 		o.OpenTracingTraceId = traces.OpenTracingTraceId
 	}

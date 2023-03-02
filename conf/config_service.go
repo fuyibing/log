@@ -11,44 +11,41 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-01
+// date: 2023-03-02
 
 package conf
 
-import (
-	"github.com/fuyibing/log/v5/traces"
-)
-
-type ConfigTracer interface {
-	GetTracerExporter() string
-	GetTracerTopic() string
+type ConfigService interface {
+	GetServiceName() string
+	GetServicePort() int
+	GetServiceVersion() string
 }
 
 // Getter
 
-func (o *config) GetTracerExporter() string { return o.TracerExporter }
-func (o *config) GetTracerTopic() string    { return o.TracerTopic }
+func (o *config) GetServiceName() string    { return o.ServiceName }
+func (o *config) GetServicePort() int       { return o.ServicePort }
+func (o *config) GetServiceVersion() string { return o.ServiceVersion }
 
 // Setter
 
-func (o *FieldManager) SetTracerExporter(s string) *FieldManager {
+func (o *FieldManager) SetServiceName(s string) *FieldManager {
 	if s != "" {
-		o.config.TracerExporter = s
+		o.config.ServiceName = s
 	}
 	return o
 }
 
-func (o *FieldManager) SetTracerTopic(s string) *FieldManager {
-	if s != "" {
-		o.config.TracerTopic = s
+func (o *FieldManager) SetServicePort(n int) *FieldManager {
+	if n > 0 {
+		o.config.ServicePort = n
 	}
 	return o
 }
 
-// Initialize
-
-func (o *config) initTracerDefaults() {
-	if o.TracerTopic == "" {
-		o.TracerTopic = traces.TracerTopic
+func (o *FieldManager) SetServiceVersion(s string) *FieldManager {
+	if s != "" {
+		o.config.ServiceVersion = s
 	}
+	return o
 }

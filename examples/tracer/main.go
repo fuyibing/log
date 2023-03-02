@@ -17,10 +17,26 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/fuyibing/log/v5"
+	"github.com/fuyibing/log/v5/conf"
+	"github.com/fuyibing/log/v5/traces"
 )
 
 func main() {
+	log.Logger.Config().FieldManager().
+		SetLoggerExporter("file").
+		SetLoggerLevel(traces.Debug).
+		SetTracerExporter("term")
+
+	fmt.Printf("debug:%v, info:%v, warn:%v, error:%v, fatal:%v\n",
+		conf.Config.DebugOn(),
+		conf.Config.InfoOn(),
+		conf.Config.WarnOn(),
+		conf.Config.ErrorOn(),
+		conf.Config.FatalOn(),
+	)
+
 	log.Logger.Start(context.Background())
 	defer log.Logger.Stop()
 

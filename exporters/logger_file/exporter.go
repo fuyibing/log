@@ -103,13 +103,14 @@ func (o *Exporter) onAfter(ctx context.Context) (ignored bool) {
 	//
 	// - 上传完成
 	// - 数据桶为空.
-	if atomic.LoadInt32(&o.processing) == 0 && o.bucket.IsEmpty() {
-		return
+	if concurrency := atomic.LoadInt32(&o.processing); concurrency > 0 || o.bucket.Count() > 0 {
+		if concurrency < conf.Config.GetBucketConcurrency() {
+			go o.pop()
+		}
+		time.Sleep(time.Millisecond * 400)
+		return o.onAfter(ctx)
 	}
-
-	// 延后检查.
-	time.Sleep(time.Millisecond * 400)
-	return o.onAfter(ctx)
+	return
 }
 
 func (o *Exporter) onBefore(_ context.Context) (ignored bool) {

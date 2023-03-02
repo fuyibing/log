@@ -33,6 +33,8 @@ var (
 type (
 	// LoggerManager 日志管理器.
 	LoggerManager interface {
+		Config() conf.ConfigManager
+
 		// Start 启动日志.
 		Start(ctx context.Context)
 
@@ -41,12 +43,15 @@ type (
 	}
 
 	logger struct {
+		config        conf.ConfigManager
 		name          string
 		processor     process.Processor
 		processorLog  process.Processor
 		processorSpan process.Processor
 	}
 )
+
+func (o *logger) Config() conf.ConfigManager { return o.config }
 
 // Start 启动日志.
 func (o *logger) Start(ctx context.Context) {
@@ -68,7 +73,12 @@ func (o *logger) Stop() {
 	o.processor.Stop()
 
 	// 等待完成.
-	for {
+	var (
+		max = 300
+		ms  = time.Millisecond * 100
+	)
+
+	for i := 0; i < max; i++ {
 		if func() bool {
 			if o.processorLog != nil {
 				return o.processorLog.Stopped()
@@ -84,7 +94,7 @@ func (o *logger) Stop() {
 			return
 		}
 
-		time.Sleep(time.Millisecond * 10)
+		time.Sleep(ms)
 	}
 }
 
@@ -93,6 +103,7 @@ func (o *logger) Stop() {
 // /////////////////////////////////////////////////////////////////////////////
 
 func (o *logger) init() *logger {
+	o.config = conf.Config
 	o.name = "logger"
 	o.processor = process.New(o.name).
 		Before(o.onBeforeLogExporter, o.onBeforeSpanExporter, o.onBeforeUpdate).

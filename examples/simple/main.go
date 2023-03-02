@@ -23,9 +23,7 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
-
-	log.Logger.Start(ctx)
+	log.Logger.Start(context.Background())
 	defer log.Logger.Stop()
 
 	// main0()
