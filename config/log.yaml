@@ -1,0 +1,25 @@
+#
+# log-trace
+#
+bucket-batch: 100
+bucket-capacity: 10000
+bucket-concurrency: 5
+bucket-frequency: 500
+# logger
+logger-exporter: "file"
+logger-level: debug
+# service definitions.
+service-name: "gmd-v8"
+service-port: 8101
+service-version: "8.0"
+# tracer definitions.
+tracer-exporter: "term"
+tracer-topic: "gmdv8"
+# jaeger tracer.
+jaeger-tracer:
+  content-type: "application/x-thrift"
+  endpoint: "http://localhost:14268/api/traces"
+# zipkin tracer
+zipkin-tracer:
+  content-type: "application/json"
+  endpoint: "http://localhost:19411/api/v2/spans"

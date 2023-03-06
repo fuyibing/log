@@ -1,0 +1,59 @@
+[2023-03-05 21:42:17.698643][DEBUG] debug message
+[2023-03-05 21:42:17.698645][ INFO] info message
+[2023-03-05 21:42:17.698647][ WARN] warn message
+[2023-03-05 21:42:17.698648][ERROR] error message
+[2023-03-05 21:42:17.698648][FATAL] fatal message
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:69> IN <main.main1()>
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:57> IN <main.main()>
+[2023-03-05 21:42:17.698793][FATAL] {"key":"value"} fatal message
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:74> IN <main.main2(...)>
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:58> IN <main.main()>
+[2023-03-05 21:42:17.698855][DEBUG] {"span-key":"span value"} span debug message
+[2023-03-05 21:44:45.683732][DEBUG] debug message
+[2023-03-05 21:44:45.683734][ INFO] info message
+[2023-03-05 21:44:45.683736][ WARN] warn message
+[2023-03-05 21:44:45.683737][ERROR] error message
+[2023-03-05 21:44:45.683737][FATAL] fatal message
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:69> IN <main.main1()>
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:57> IN <main.main()>
+[2023-03-05 21:44:45.683874][FATAL] {"key":"value"} fatal message
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:74> IN <main.main2(...)>
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:58> IN <main.main()>
+[2023-03-05 21:44:45.683937][DEBUG] {"span-key":"span value"} span debug message
+[2023-03-05 21:44:58.401933][DEBUG] debug message
+[2023-03-05 21:44:58.401935][ INFO] info message
+[2023-03-05 21:44:58.401936][ WARN] warn message
+[2023-03-05 21:44:58.401936][ERROR] error message
+[2023-03-05 21:44:58.401937][FATAL] fatal message
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:69> IN <main.main1()>
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:57> IN <main.main()>
+[2023-03-05 21:44:58.40207 ][FATAL] {"key":"value"} fatal message
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:74> IN <main.main2(...)>
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:58> IN <main.main()>
+[2023-03-05 21:44:58.402131][DEBUG] {"span-key":"span value"} span debug message
+[2023-03-05 21:45:29.359021][DEBUG] debug message
+[2023-03-05 21:45:29.359023][ INFO] info message
+[2023-03-05 21:45:29.359027][ WARN] warn message
+[2023-03-05 21:45:29.359027][ERROR] error message
+[2023-03-05 21:45:29.359027][FATAL] fatal message
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:69> IN <main.main1()>
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:57> IN <main.main()>
+[2023-03-05 21:45:29.359164][FATAL] {"key":"value"} fatal message
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:74> IN <main.main2(...)>
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:58> IN <main.main()>
+[2023-03-05 21:45:29.359226][FATAL] {"span-key":"span value"} span fatal message
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:84> IN <main.main3()>
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:59> IN <main.main()>
+[2023-03-05 22:02:26.892789][DEBUG] debug message
+[2023-03-05 22:02:26.892792][ INFO] info message
+[2023-03-05 22:02:26.892795][ WARN] warn message
+[2023-03-05 22:02:26.892795][ERROR] error message
+[2023-03-05 22:02:26.892796][FATAL] fatal message
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:69> IN <main.main1()>
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:57> IN <main.main()>
+[2023-03-05 22:02:26.892931][FATAL] {"key":"value"} fatal message
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:74> IN <main.main2(...)>
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:58> IN <main.main()>
+[2023-03-05 22:02:26.892995][FATAL] {"span-key":"span value"} span fatal message
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:84> IN <main.main3()>
+</Users/fuyibing/codes/github.com/fuyibing/log-v5/examples/demo/main.go:59> IN <main.main()>
