@@ -82,6 +82,9 @@ func NewTrace(name string) Trace {
 func NewTraceFromContext(ctx context.Context, name string) Trace {
 	// 复用上下文.
 	if g := ctx.Value(ContextKey); g != nil {
+		if v, ok := g.(Span); ok {
+			return v.Trace()
+		}
 		if v, ok := g.(Trace); ok {
 			return v
 		}
