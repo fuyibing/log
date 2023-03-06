@@ -46,8 +46,8 @@ const (
 )
 
 const (
-	defaultFileTracerExt    = "trace.log"
-	defaultFileTracerFolder = "06-01"
-	defaultFileTracerName   = "06-01-02"
+	defaultFileTracerExt    = "trace"
+	defaultFileTracerFolder = "2006-01"
+	defaultFileTracerName   = "2006-01-02"
 	defaultFileTracerPath   = "./logs"
 )
