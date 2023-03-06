@@ -19,7 +19,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"github.com/fuyibing/log/v5"
 	"github.com/fuyibing/log/v5/configurer"
 	"github.com/fuyibing/log/v5/loggers"
 	"github.com/fuyibing/log/v5/tracers"
@@ -64,7 +63,7 @@ func (o *formatter) format(v tracers.Span) (sm *model.SpanModel) {
 	sm.Annotations = o.genLogs(v.Logs()...)
 
 	// 标签
-	sm.Tags = o.genTags(log.Manager.Tracer().GetResource(), v.Kv())
+	sm.Tags = o.genTags(tracers.Operator.GetResource(), v.Kv())
 	return
 }
 

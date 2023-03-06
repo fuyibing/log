@@ -41,7 +41,7 @@ func init() {
 	// initTracerFile()
 	// initTracerJaeger()
 	// initTracerTerm()
-	initTracerZipkin()
+	// initTracerZipkin()
 }
 
 func initLoggerFile()  { log.Manager.Logger().SetExecutor(logger_file.New()) }

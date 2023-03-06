@@ -105,6 +105,19 @@ func (o *manager) onBeforeLogger(_ context.Context) (ignored bool) {
 	}
 
 	// 基于配置
+	if call, ok := builtinLoggers[configurer.Config.GetLoggerExporter()]; ok {
+		if ex := call(); ex != nil {
+			common.InternalInfo(`<%s> logger executor [name="%s"][level="%s"]`,
+				o.name, ex.Processor().Name(),
+				configurer.Config.GetLoggerLevel(),
+			)
+
+			// 加为子进程
+			o.logger.SetExecutor(ex)
+			o.processor.Add(ex.Processor())
+		}
+	}
+
 	return
 }
 
@@ -124,6 +137,19 @@ func (o *manager) onBeforeTracer(_ context.Context) (ignored bool) {
 	}
 
 	// 基于配置
+	if call, ok := builtinTracers[configurer.Config.GetTracerExporter()]; ok {
+		if ex := call(); ex != nil {
+			common.InternalInfo(`<%s> tracer executor [name="%s"][topic="%s"]`,
+				o.name, ex.Processor().Name(),
+				configurer.Config.GetTracerTopic(),
+			)
+
+			// 加为子进程
+			o.tracer.SetExecutor(ex)
+			o.processor.Add(ex.Processor())
+		}
+	}
+
 	return
 }
 
