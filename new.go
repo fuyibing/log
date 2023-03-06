@@ -21,20 +21,20 @@ import (
 	"net/http"
 )
 
-// NewTrace
+// NewSpan
 // 链路跟踪.
-func NewTrace(name string) tracers.Trace {
-	return tracers.NewTrace(name)
+func NewSpan(name string) tracers.Span {
+	return tracers.NewSpan(name)
 }
 
-// NewTraceFromContext
+// NewSpanFromContext
 // 链路跟踪.
-func NewTraceFromContext(ctx context.Context, name string) tracers.Trace {
-	return tracers.NewTraceFromContext(ctx, name)
+func NewSpanFromContext(ctx context.Context, name string) tracers.Span {
+	return tracers.NewSpanWithContext(ctx, name)
 }
 
-// NewTraceFromRequest
+// NewSpanFromRequest
 // 链路跟踪.
-func NewTraceFromRequest(req *http.Request, name string) tracers.Trace {
-	return tracers.NewTraceFromRequest(req, name)
+func NewSpanFromRequest(req *http.Request, name string) tracers.Span {
+	return tracers.NewSpanWithRequest(req, name)
 }

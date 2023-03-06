@@ -68,51 +68,9 @@ type (
 	}
 )
 
-// NewTrace
-// 链路跟踪.
-func NewTrace(name string) Trace {
-	v := (&trace{name: name}).init()
-	v.traceId = Operator.Generator().TraceIdNew()
-	v.ctx = context.WithValue(context.Background(), ContextKey, v)
-	return v
-}
-
-// NewTraceFromContext
-// 链路跟踪.
-func NewTraceFromContext(ctx context.Context, name string) Trace {
-	// 复用上下文.
-	if g := ctx.Value(ContextKey); g != nil {
-		if v, ok := g.(Span); ok {
-			return v.Trace()
-		}
-		if v, ok := g.(Trace); ok {
-			return v
-		}
-	}
-
-	// 新建上下文.
-	v := (&trace{name: name}).init()
-	v.traceId = Operator.Generator().TraceIdNew()
-	v.ctx = context.WithValue(ctx, ContextKey, v)
-	return v
-}
-
-// NewTraceFromRequest
-// 链路跟踪.
-func NewTraceFromRequest(req *http.Request, name string) Trace {
-	v := (&trace{name: name}).init()
-	v.parseRequestField(req)
-
-	// 解析ID.
-	if !v.parseRequestId(req) {
-		v.traceId = Operator.Generator().TraceIdNew()
-		v.spanId = Operator.Generator().SpanIdNew()
-	}
-
-	// 配置上下文.
-	v.ctx = context.WithValue(req.Context(), ContextKey, v)
-	return v
-}
+// /////////////////////////////////////////////////////////////////////////////
+// Interface methods
+// /////////////////////////////////////////////////////////////////////////////
 
 func (o *trace) Context() context.Context { return o.ctx }
 func (o *trace) Kv() loggers.Kv           { return o.kv }
@@ -141,20 +99,14 @@ func (o *trace) init() *trace {
 }
 
 func (o *trace) parseRequestField(req *http.Request) {
-	o.kv.Add(
-		"http.protocol", req.Proto,
-	).Add(
-		"http.request.header", req.Header,
-	).Add(
-		"http.request.method", req.Method,
-	).Add(
-		"http.request.url", req.RequestURI,
-	).Add(
-		"http.user.agent", req.UserAgent(),
-	)
+	o.kv.Add("http.protocol", req.Proto).
+		Add("http.request.header", req.Header).
+		Add("http.request.method", req.Method).
+		Add("http.request.url", req.RequestURI).
+		Add("http.user.agent", req.UserAgent())
 }
 
-func (o *trace) parseRequestId(req *http.Request) bool {
+func (o *trace) parseRequestId(req *http.Request) {
 	// 获取 X-B3 Trace id.
 	//
 	//   {
@@ -176,6 +128,4 @@ func (o *trace) parseRequestId(req *http.Request) bool {
 			o.spanId = v
 		}
 	}
-
-	return o.traceId.IsValid() && o.spanId.IsValid()
 }

@@ -57,6 +57,52 @@ type (
 	}
 )
 
+func NewSpan(name string) Span {
+	t := (&trace{name: name}).init()
+	t.traceId = Operator.Generator().TraceIdNew()
+	t.ctx = context.WithValue(context.Background(), ContextKey, t)
+	return t.New(name)
+}
+
+func NewSpanWithContext(ctx context.Context, name string) Span {
+	// 复用
+	if g := ctx.Value(ContextKey); g != nil {
+		// 子跨度.
+		if v, ok := g.(Span); ok {
+			return v.Child(name)
+		}
+
+		// 根跨度.
+		if v, ok := g.(Trace); ok {
+			return v.New(name)
+		}
+	}
+
+	// 新建.
+	t := (&trace{name: name}).init()
+	t.traceId = Operator.Generator().TraceIdNew()
+	t.ctx = context.WithValue(ctx, ContextKey, t)
+	return t.New(name)
+}
+
+func NewSpanWithRequest(req *http.Request, name string) Span {
+	t := (&trace{name: name}).init()
+	t.parseRequestField(req)
+	t.parseRequestId(req)
+
+	if !t.spanId.IsValid() || !t.traceId.IsValid() {
+		t.traceId = Operator.Generator().TraceIdNew()
+		t.spanId = SpanId{}
+	}
+
+	t.ctx = context.WithValue(req.Context(), ContextKey, t)
+	return t.New(name)
+}
+
+// /////////////////////////////////////////////////////////////////////////////
+// Interface methods
+// /////////////////////////////////////////////////////////////////////////////
+
 func (o *span) ApplyRequest(req *http.Request) {
 	req.Header.Set(configurer.Config.GetOpenTracingTraceId(), o.trace.TraceId().String())
 	req.Header.Set(configurer.Config.GetOpenTracingSpanId(), o.trace.SpanId().String())
