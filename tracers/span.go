@@ -95,7 +95,7 @@ func NewSpanWithRequest(req *http.Request, name string) Span {
 		t.spanId = SpanId{}
 	}
 
-	t.ctx = context.WithValue(req.Context(), ContextKey, t)
+	t.ctx = context.WithValue(context.Background(), ContextKey, t)
 	return t.New(name)
 }
 
