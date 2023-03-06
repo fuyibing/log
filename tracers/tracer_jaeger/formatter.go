@@ -49,13 +49,12 @@ func (o *formatter) buildLogs(list []loggers.Log) []*jaeger.Log {
 	logs := make([]*jaeger.Log, 0)
 
 	for _, x := range list {
-		x.Kv().Add(x.Time().Format("15:04:05.999999"), x.Text()).
-			Add("log-level", x.Level()).
-			Add("log-time", x.Text())
-
 		logs = append(logs, &jaeger.Log{
 			Timestamp: x.Time().UnixMicro(),
-			Fields:    o.buildTagsMapper(x.Kv()),
+			Fields: o.buildTagsMapper(x.Kv(), loggers.Kv{
+				x.Time().Format("15:04:05.999999"): x.Text(),
+				"log-level":                        x.Level(),
+			}),
 		})
 	}
 	return logs
