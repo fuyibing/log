@@ -21,26 +21,43 @@ import (
 )
 
 type (
-	// Field
-	// 自定义字段.
+	// Field 字段组件, 允许在记录日志时附加自定义字段.
 	//
 	//   log.Field{"key":"value"}.
 	//       Debug("message")
 	Field map[string]interface{}
 )
 
-func (o Field) Debug(text string, args ...interface{}) { sendLog(o, common.Debug, text, args...) }
-func (o Field) Info(text string, args ...interface{})  { sendLog(o, common.Info, text, args...) }
-func (o Field) Warn(text string, args ...interface{})  { sendLog(o, common.Warn, text, args...) }
-func (o Field) Error(text string, args ...interface{}) { sendLog(o, common.Error, text, args...) }
-func (o Field) Fatal(text string, args ...interface{}) { sendLog(o, common.Fatal, text, args...) }
+// Debug 记录 DEBUG 级日志.
+func (o Field) Debug(format string, args ...interface{}) {
+	sendLog(o, common.Debug, format, args...)
+}
 
-// sendLog
-// 发送日志.
-func sendLog(field Field, level common.Level, text string, args ...interface{}) {
+// Error 记录 ERROR 级日志.
+func (o Field) Error(format string, args ...interface{}) {
+	sendLog(o, common.Error, format, args...)
+}
+
+// Fatal 记录 FATAL 级日志.
+func (o Field) Fatal(format string, args ...interface{}) {
+	sendLog(o, common.Fatal, format, args...)
+}
+
+// Info 记录 INFO 级日志.
+func (o Field) Info(format string, args ...interface{}) {
+	sendLog(o, common.Info, format, args...)
+}
+
+// Warn 记录 WARN 级日志.
+func (o Field) Warn(format string, args ...interface{}) {
+	sendLog(o, common.Warn, format, args...)
+}
+
+func sendLog(field Field, level common.Level, format string, args ...interface{}) {
 	var kv loggers.Kv
 
-	// 复制 Key/Value.
+	// 复制
+	// Key/Value.
 	if len(field) > 0 {
 		kv = loggers.Kv{}
 		for k, v := range field {
@@ -48,6 +65,7 @@ func sendLog(field Field, level common.Level, text string, args ...interface{}) 
 		}
 	}
 
-	// 发送 Log.
-	Manager.Logger().Push(kv, level, text, args...)
+	// 发送
+	// Log 到 操作台.
+	Manager.Logger().Push(kv, level, format, args...)
 }

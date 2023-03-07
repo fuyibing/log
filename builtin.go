@@ -28,14 +28,14 @@ import (
 
 var (
 	// builtinLoggers
-	// 内置日志/Logger.
+	// 内置日志执行器.
 	builtinLoggers = map[string]func() loggers.Executor{
 		"file": logger_file.New,
 		"term": logger_term.New,
 	}
 
 	// builtinTracers
-	// 内置链路/Tracer.
+	// 内置链路执行器.
 	builtinTracers = map[string]func() tracers.Executor{
 		"file":   tracer_file.New,
 		"jaeger": tracer_jaeger.New,

@@ -36,16 +36,13 @@ type (
 		// 例如: http://localhost:14268/api/traces
 		Endpoint string `yaml:"endpoint"`
 
+		// 鉴权密码.
 		Password string `yaml:"password"`
+
+		// 鉴权用户名.
 		Username string `yaml:"username"`
 	}
 )
-
-func (o *jaegerTracer) initDefaults() {
-	if o.ContentType == "" {
-		o.ContentType = "application/x-thrift"
-	}
-}
 
 // Getter
 
@@ -76,4 +73,12 @@ func (o *Setter) SetJaegerTracerPassword(s string) *Setter {
 func (o *Setter) SetJaegerTracerUsername(s string) *Setter {
 	o.config.JaegerTracer.Username = s
 	return o
+}
+
+// Access.
+
+func (o *jaegerTracer) initDefaults() {
+	if o.ContentType == "" {
+		o.ContentType = "application/x-thrift"
+	}
 }

@@ -19,8 +19,27 @@ import (
 	"github.com/fuyibing/log/v5/common"
 )
 
-func Debug(text string, args ...interface{}) { Manager.Logger().Push(nil, common.Debug, text, args...) }
-func Error(text string, args ...interface{}) { Manager.Logger().Push(nil, common.Error, text, args...) }
-func Fatal(text string, args ...interface{}) { Manager.Logger().Push(nil, common.Fatal, text, args...) }
-func Info(text string, args ...interface{})  { Manager.Logger().Push(nil, common.Info, text, args...) }
-func Warn(text string, args ...interface{})  { Manager.Logger().Push(nil, common.Warn, text, args...) }
+// Debug 记录 DEBUG 级日志.
+func Debug(format string, args ...interface{}) {
+	Manager.Logger().Push(nil, common.Debug, format, args...)
+}
+
+// Error 记录 ERROR 级日志.
+func Error(format string, args ...interface{}) {
+	Manager.Logger().Push(nil, common.Error, format, args...)
+}
+
+// Fatal 记录 FATAL 级日志.
+func Fatal(format string, args ...interface{}) {
+	Manager.Logger().Push(nil, common.Fatal, format, args...)
+}
+
+// Info 记录 INFO 级日志.
+func Info(format string, args ...interface{}) {
+	Manager.Logger().Push(nil, common.Info, format, args...)
+}
+
+// Warn 记录 WARN 级日志.
+func Warn(format string, args ...interface{}) {
+	Manager.Logger().Push(nil, common.Warn, format, args...)
+}

@@ -54,32 +54,76 @@ type (
 
 	// 配置结构.
 	config struct {
-		BucketBatch       int   `yaml:"bucket-batch"`
-		BucketConcurrency int32 `yaml:"bucket-concurrency"`
-		BucketCapacity    int   `yaml:"bucket-capacity"`
-		BucketFrequency   int   `yaml:"bucket-frequency"`
-
-		// OpenTracing
-
 		OpenTracingSampled string `yaml:"open-tracing-sampled"`
 		OpenTracingSpanId  string `yaml:"open-tracing-span-id"`
 		OpenTracingTraceId string `yaml:"open-tracing-trace-id"`
 
-		// Logger
+		// +-------------------------------------------------------------------+
+		// | Bucket for ASYNC                                                  |
+		// +-------------------------------------------------------------------+
 
-		LoggerLevel    common.Level `yaml:"logger-level"`
-		LoggerExporter string       `yaml:"logger-exporter"`
-		FileLogger     *fileLogger  `yaml:"file-logger"`
+		// 批处理量.
+		// 每个批次最大 Logger/Span 数量.
+		// 默认: 100
+		BucketBatch int `yaml:"bucket-batch"`
 
-		// Tracer
+		// 批处理并发.
+		// 最大允许多少个协程同时上报.
+		// 默认: 10
+		BucketConcurrency int32 `yaml:"bucket-concurrency"`
 
-		TracerTopic    string        `yaml:"tracer-topic"`
-		TracerExporter string        `yaml:"tracer-exporter"`
-		FileTracer     *fileTracer   `yaml:"file-tracer"`
-		JaegerTracer   *jaegerTracer `yaml:"jaeger-tracer"`
-		ZipkinTracer   *zipkinTracer `yaml:"zipkin-tracer"`
+		// 数据桶容量.
+		// 当瞬间数量太多且来不急处理时, 先暂存在内存中, 此配置定义最多在内存中存储数量.
+		// 默认: 30,000
+		BucketCapacity int `yaml:"bucket-capacity"`
 
-		// 内部列表.
+		// 批处理频率.
+		// 每 200 毫秒自动上报积压的数据.
+		// 默认: 200 (毫秒)
+		BucketFrequency int `yaml:"bucket-frequency"`
+
+		// +-------------------------------------------------------------------+
+		// | Logger                                                            |
+		// +-------------------------------------------------------------------+
+
+		// 日志级别.
+		// 默认: INFO.
+		LoggerLevel common.Level `yaml:"logger-level"`
+
+		// 日志上报适配.
+		// 接受: term, file.
+		// 默认: term
+		LoggerExporter string `yaml:"logger-exporter"`
+
+		// 文件日志.
+		FileLogger *fileLogger `yaml:"file-logger"`
+
+		// +-------------------------------------------------------------------+
+		// | Tracer                                                            |
+		// +-------------------------------------------------------------------+
+
+		// 链路上报主题.
+		// 说明: 应用于 Kafka主题, Jaeger服务名等, 与 TracerExporter 配合使用.
+		TracerTopic string `yaml:"tracer-topic"`
+
+		// 链路上报适配.
+		// 接受: term, file, jaeger, zipkin
+		// 默认: term
+		TracerExporter string `yaml:"tracer-exporter"`
+
+		// 输出到 File.
+		FileTracer *fileTracer `yaml:"file-tracer"`
+
+		// 上报到 Jaeger.
+		JaegerTracer *jaegerTracer `yaml:"jaeger-tracer"`
+
+		// 上报到 Zipkin.
+		ZipkinTracer *zipkinTracer `yaml:"zipkin-tracer"`
+
+		// +-------------------------------------------------------------------+
+		// | Internal                                                          |
+		// +-------------------------------------------------------------------+
+
 		setter                                    *Setter
 		debugOn, infoOn, warnOn, errorOn, fatalOn bool
 	}

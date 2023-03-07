@@ -36,4 +36,7 @@ func (o *config) defaultTracer() {
 	if o.TracerTopic == "" {
 		o.TracerTopic = defaultTracerTopic
 	}
+	if o.TracerExporter == "" {
+		o.TracerExporter = defaultTracerExporter
+	}
 }

@@ -23,13 +23,14 @@ const (
 	defaultBucketBatch       = 100
 	defaultBucketCapacity    = 30000
 	defaultBucketConcurrency = 10
-	defaultBucketFrequency   = 100
+	defaultBucketFrequency   = 200
 )
 
 const (
-	defaultLoggerExporter = "term"
 	defaultLoggerLevel    = common.Info
+	defaultLoggerExporter = "term"
 	defaultTracerTopic    = "log-trace"
+	defaultTracerExporter = "term"
 )
 
 const (

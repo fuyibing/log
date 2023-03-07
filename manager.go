@@ -34,7 +34,7 @@ var (
 
 type (
 	// Management
-	// 管理器入口.
+	// 管理器接口.
 	Management interface {
 		// Config
 		// 全局配置.
@@ -43,24 +43,25 @@ type (
 		Config() configurer.Configuration
 
 		// Logger
-		// 日志执行器.
+		// 日志操作接口.
 		Logger() loggers.OperatorManager
 
 		// Tracer
-		// 链路执行器.
+		// 链路操作接口.
 		Tracer() tracers.OperatorManager
 
 		// Start
 		// 启动管理器.
 		//
-		// 当触发启动时将阻塞协程(10ms), 直到设置的日志与链路执行器启动成功(异步批处理).
+		// 当触发启动时将阻塞协程(10ms), 直到设置的日志与链路执行器启动成功(异步批处
+		// 理).
 		Start(ctx context.Context)
 
 		// Stop
-		// 退出管理器.
+		// 安全退出.
 		//
-		// 当触发退出时将阻塞协程(30秒超时), 直到设置的日志与链路执行器全部处理完成, 此过程
-		// 可以避免数据丢失.
+		// 当触发退出时将阻塞协程(30秒超时), 直到设置的日志与链路执行器全部处理完成,
+		// 此过程可以避免数据丢失.
 		Stop()
 	}
 

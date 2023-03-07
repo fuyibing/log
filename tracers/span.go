@@ -57,6 +57,8 @@ type (
 	}
 )
 
+// NewSpan 返回 tracers.Span 组件. 此过程先创建 tracers.Trace 组件, 然后基于此组
+// 件创建 tracers.Span 组件并返回.
 func NewSpan(name string) Span {
 	t := (&trace{name: name}).init()
 	t.traceId = Operator.Generator().TraceIdNew()
@@ -64,7 +66,10 @@ func NewSpan(name string) Span {
 	return t.New(name)
 }
 
-func NewSpanWithContext(ctx context.Context, name string) Span {
+// NewSpanFromContext 返回 tracers.Span 组件. 若 context.Context 绑定过
+// tracers.Span 组件则基于此创建子 tracers.Span 并返回, 若绑定过 tracers.Trace
+// 则基于此创建新的 tracers.Span 并返回, 反之则使用和 NewSpan 相同逻辑.
+func NewSpanFromContext(ctx context.Context, name string) Span {
 	// 复用
 	if g := ctx.Value(ContextKey); g != nil {
 		// 子跨度.
@@ -85,7 +90,9 @@ func NewSpanWithContext(ctx context.Context, name string) Span {
 	return t.New(name)
 }
 
-func NewSpanWithRequest(req *http.Request, name string) Span {
+// NewSpanFromRequest 返回 tracers.Span 组件. 基于 HTTP 请求创建并返回, 创建
+// 过程同 NewSpan 逻辑, 不同点在于此过程打通服务间链路.
+func NewSpanFromRequest(req *http.Request, name string) Span {
 	t := (&trace{name: name}).init()
 	t.parseRequestField(req)
 	t.parseRequestId(req)

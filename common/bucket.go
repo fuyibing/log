@@ -26,14 +26,14 @@ var (
 
 type (
 	// Bucket
-	// 元素数据桶.
+	// 数据桶.
 	Bucket interface {
 		// Add
 		// 添加元素.
 		Add(item interface{}) (total int, err error)
 
 		// Count
-		// 积压数量.
+		// 桶元素量.
 		Count() int
 
 		// IsEmpty
@@ -52,7 +52,7 @@ type (
 		Popn(limit int) (items []interface{}, total, count int)
 
 		// SetCapacity
-		// 设置桶容量.
+		// 设置容量.
 		SetCapacity(n int) Bucket
 	}
 
@@ -64,7 +64,13 @@ type (
 	}
 )
 
+// NewBucket
+// 创建数据桶.
 func NewBucket(capacity int) Bucket { return (&bucket{capacity: capacity}).init() }
+
+// /////////////////////////////////////////////////////////////////////////////
+// Interface methods
+// /////////////////////////////////////////////////////////////////////////////
 
 func (o *bucket) Add(item interface{}) (total int, err error) {
 	o.Lock()
@@ -127,6 +133,10 @@ func (o *bucket) SetCapacity(n int) Bucket {
 	o.capacity = n
 	return o
 }
+
+// /////////////////////////////////////////////////////////////////////////////
+// Access and constructor
+// /////////////////////////////////////////////////////////////////////////////
 
 func (o *bucket) init() *bucket {
 	o.reset()

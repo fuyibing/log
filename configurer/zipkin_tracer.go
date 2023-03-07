@@ -36,17 +36,12 @@ type (
 	}
 )
 
-func (o *zipkinTracer) initDefaults() {
-	if o.ContentType == "" {
-		o.ContentType = "application/json"
-	}
-}
-
 // Getter
 
 func (o *config) GetZipkinTracer() ZipkinTracer { return o.ZipkinTracer }
-func (o *zipkinTracer) GetContentType() string  { return o.ContentType }
-func (o *zipkinTracer) GetEndpoint() string     { return o.Endpoint }
+
+func (o *zipkinTracer) GetContentType() string { return o.ContentType }
+func (o *zipkinTracer) GetEndpoint() string    { return o.Endpoint }
 
 // Setter.
 
@@ -58,4 +53,12 @@ func (o *Setter) SetZipkinTracerContentType(s string) *Setter {
 func (o *Setter) SetZipkinTracerEndpoint(s string) *Setter {
 	o.config.ZipkinTracer.Endpoint = s
 	return o
+}
+
+// Access.
+
+func (o *zipkinTracer) initDefaults() {
+	if o.ContentType == "" {
+		o.ContentType = "application/json"
+	}
 }

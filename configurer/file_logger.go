@@ -28,16 +28,27 @@ type (
 	}
 
 	fileLogger struct {
-		Ext    string `yaml:"ext"`
+		// 扩展名.
+		// 默认: log
+		Ext string `yaml:"ext"`
+
+		// 目录分隔.
+		// 默认: 2006-01 (即按月分隔)
 		Folder string `yaml:"folder"`
-		Name   string `yaml:"name"`
-		Path   string `yaml:"path"`
+
+		// 文件全名.
+		// 默认: 2006-01-02
+		Name string `yaml:"name"`
+
+		// 存储位置.
+		// 默认: ./logs (在项目目录)
+		Path string `yaml:"path"`
 	}
 )
 
-func (o *config) GetFileLogger() FileLogger { return o.FileLogger }
-
 // Getter
+
+func (o *config) GetFileLogger() FileLogger { return o.FileLogger }
 
 func (o *fileLogger) GetExt() string    { return o.Ext }
 func (o *fileLogger) GetFolder() string { return o.Folder }

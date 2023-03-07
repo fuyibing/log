@@ -28,10 +28,21 @@ type (
 	}
 
 	fileTracer struct {
-		Ext    string `yaml:"ext"`
+		// 扩展名.
+		// 默认: trace
+		Ext string `yaml:"ext"`
+
+		// 目录分隔.
+		// 默认: 2006-01 (即按月分隔)
 		Folder string `yaml:"folder"`
-		Name   string `yaml:"name"`
-		Path   string `yaml:"path"`
+
+		// 文件全名.
+		// 默认: 2006-01-02
+		Name string `yaml:"name"`
+
+		// 存储位置.
+		// 默认: ./logs (在项目目录)
+		Path string `yaml:"path"`
 	}
 )
 
