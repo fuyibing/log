@@ -59,14 +59,10 @@ func (o Level) Int() int {
 
 // String
 // 转字符串.
-func (o Level) String() string {
-	return string(o)
-}
+func (o Level) String() string { return string(o) }
 
 // Upper
 // 转大写.
 //
 // Level("debug").Upper() <-> Level("DEBUG")
-func (o Level) Upper() Level {
-	return Level(strings.ToUpper(string(o)))
-}
+func (o Level) Upper() Level { return Level(strings.ToUpper(string(o))) }

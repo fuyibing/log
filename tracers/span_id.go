@@ -28,12 +28,8 @@ type (
 
 // IsValid
 // 校验跨度ID.
-func (o SpanId) IsValid() bool {
-	return !bytes.Equal(o[:], nilSpanId[:])
-}
+func (o SpanId) IsValid() bool { return !bytes.Equal(o[:], nilSpanId[:]) }
 
 // String
 // 转成16进制字符串.
-func (o SpanId) String() string {
-	return hex.EncodeToString(o[:])
-}
+func (o SpanId) String() string { return hex.EncodeToString(o[:]) }

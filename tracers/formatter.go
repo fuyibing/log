@@ -25,6 +25,6 @@ type (
 
 		// String
 		// 转字符串.
-		String(vs ...Span) (string, error)
+		String(vs ...Span) (str string, err error)
 	}
 )

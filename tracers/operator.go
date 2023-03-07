@@ -41,15 +41,15 @@ type (
 	OperatorManager interface {
 		// Generator
 		// ID生成器.
-		Generator() *id
+		Generator() (generator *id)
 
 		// GetExecutor
 		// 执行器.
-		GetExecutor() Executor
+		GetExecutor() (executor Executor)
 
 		// GetResource
 		// 基础资源.
-		GetResource() loggers.Kv
+		GetResource() (kv loggers.Kv)
 
 		// Push
 		// 推送跨度.
@@ -57,7 +57,7 @@ type (
 
 		// SetExecutor
 		// 设置执行器.
-		SetExecutor(v Executor)
+		SetExecutor(executor Executor)
 	}
 
 	operator struct {
@@ -68,11 +68,15 @@ type (
 	}
 )
 
-func (o *operator) Generator() *id          { return o.generator }
-func (o *operator) GetExecutor() Executor   { return o.executor }
-func (o *operator) GetResource() loggers.Kv { return o.resource }
-func (o *operator) Push(span Span)          { o.push(span) }
-func (o *operator) SetExecutor(v Executor)  { o.executor = v }
+// /////////////////////////////////////////////////////////////////////////////
+// Interface methods
+// /////////////////////////////////////////////////////////////////////////////
+
+func (o *operator) Generator() (generator *id)       { return o.generator }
+func (o *operator) GetExecutor() (executor Executor) { return o.executor }
+func (o *operator) GetResource() (kv loggers.Kv)     { return o.resource }
+func (o *operator) Push(span Span)                   { o.push(span) }
+func (o *operator) SetExecutor(executor Executor)    { o.executor = executor }
 
 // /////////////////////////////////////////////////////////////////////////////
 // Access and constructor

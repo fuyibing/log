@@ -28,12 +28,8 @@ type (
 
 // IsValid
 // 校验链路ID.
-func (o TraceId) IsValid() bool {
-	return !bytes.Equal(o[:], nilTraceId[:])
-}
+func (o TraceId) IsValid() bool { return !bytes.Equal(o[:], nilTraceId[:]) }
 
 // String
 // 转成16进制字符串.
-func (o TraceId) String() string {
-	return hex.EncodeToString(o[:])
-}
+func (o TraceId) String() string { return hex.EncodeToString(o[:]) }

@@ -64,9 +64,9 @@ type (
 	}
 )
 
-func NewLog(level common.Level, text string, args ...interface{}) Log {
+func NewLog(level common.Level, format string, args ...interface{}) Log {
 	return (&log{
-		level: level, text: fmt.Sprintf(text, args...),
+		level: level, text: fmt.Sprintf(format, args...),
 		time: time.Now(),
 	}).init()
 }

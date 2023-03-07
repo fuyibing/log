@@ -33,7 +33,7 @@ type (
 	OperatorManager interface {
 		// GetExecutor
 		// 执行器.
-		GetExecutor() Executor
+		GetExecutor() (executor Executor)
 
 		// Push
 		// 推送日志.
@@ -41,7 +41,7 @@ type (
 
 		// SetExecutor
 		// 设置执行器.
-		SetExecutor(v Executor)
+		SetExecutor(executor Executor)
 	}
 
 	operator struct {
@@ -71,7 +71,7 @@ func (o *operator) init() *operator {
 //
 //   1. 日志级别
 //   2. 绑定执行器
-func (o *operator) send(kv Kv, level common.Level, text string, args ...interface{}) {
+func (o *operator) send(kv Kv, level common.Level, format string, args ...interface{}) {
 	// 日志禁用.
 	// 1. 级别不匹配
 	// 2. 执行器未定义
@@ -80,7 +80,7 @@ func (o *operator) send(kv Kv, level common.Level, text string, args ...interfac
 	}
 
 	// 建立日志.
-	v := NewLog(level, text, args...)
+	v := NewLog(level, format, args...)
 
 	// 绑定KV.
 	if kv != nil {

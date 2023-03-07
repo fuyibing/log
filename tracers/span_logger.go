@@ -59,11 +59,11 @@ func (o *spanLogger) Add(key string, value interface{}) SpanLogger {
 	return o
 }
 
-func (o *spanLogger) Debug(text string, args ...interface{}) { o.send(common.Debug, text, args...) }
-func (o *spanLogger) Info(text string, args ...interface{})  { o.send(common.Info, text, args...) }
-func (o *spanLogger) Warn(text string, args ...interface{})  { o.send(common.Warn, text, args...) }
-func (o *spanLogger) Error(text string, args ...interface{}) { o.send(common.Error, text, args...) }
-func (o *spanLogger) Fatal(text string, args ...interface{}) { o.send(common.Fatal, text, args...) }
+func (o *spanLogger) Debug(format string, args ...interface{}) { o.send(common.Debug, format, args...) }
+func (o *spanLogger) Info(format string, args ...interface{})  { o.send(common.Info, format, args...) }
+func (o *spanLogger) Warn(format string, args ...interface{})  { o.send(common.Warn, format, args...) }
+func (o *spanLogger) Error(format string, args ...interface{}) { o.send(common.Error, format, args...) }
+func (o *spanLogger) Fatal(format string, args ...interface{}) { o.send(common.Fatal, format, args...) }
 
 // /////////////////////////////////////////////////////////////////////////////
 // Access and constructor
@@ -79,13 +79,13 @@ func (o *spanLogger) before(span *span) {
 	o.span = span
 }
 
-func (o *spanLogger) send(level common.Level, text string, args ...interface{}) {
+func (o *spanLogger) send(level common.Level, format string, args ...interface{}) {
 	// 直推日志.
-	loggers.Operator.Push(o.kv, level, text, args...)
+	loggers.Operator.Push(o.kv, level, format, args...)
 
 	// 跨度日志.
 	if configurer.Config.LevelEnabled(level) {
-		log := loggers.NewLog(level, text, args...)
+		log := loggers.NewLog(level, format, args...)
 
 		// 日志属性.
 		if len(o.kv) > 0 {

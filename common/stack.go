@@ -40,10 +40,20 @@ type (
 	// StackItem
 	// 栈元素.
 	StackItem struct {
+		// 是否内部.
+		// true 表示元素是 fuyibing/log 包中的文件.
 		Internal bool
-		Call     string
-		File     string
-		Line     int
+
+		// 函数名称.
+		// 例如: main.main()
+		Call string
+
+		// 文件路径.
+		// 例如: /home/app/github.com/fuyibing/log/v5/field.go
+		File string
+
+		// 触发行号.
+		Line int
 	}
 )
 

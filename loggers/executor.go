@@ -27,11 +27,11 @@ type (
 		// 类进程.
 		//
 		// 获取具体执行器的类进程, 基于此类进程启动/退出服务.
-		Processor() process.Processor
+		Processor() (processor process.Processor)
 
 		// Publish
 		// 发布日志.
-		Publish(logs ...Log) error
+		Publish(logs ...Log) (err error)
 
 		// SetFormatter
 		// 设置格式.

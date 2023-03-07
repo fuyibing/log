@@ -25,6 +25,6 @@ type (
 
 		// String
 		// 转字符串.
-		String(vs ...Log) (string, error)
+		String(vs ...Log) (str string, err error)
 	}
 )

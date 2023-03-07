@@ -66,12 +66,11 @@ type (
 	}
 
 	manager struct {
-		config configurer.Configuration
-		logger loggers.OperatorManager
-		tracer tracers.OperatorManager
-
+		config    configurer.Configuration
+		logger    loggers.OperatorManager
 		name      string
 		processor process.Processor
+		tracer    tracers.OperatorManager
 	}
 )
 
@@ -174,14 +173,12 @@ func (o *manager) onPanic(_ context.Context, v interface{}) {
 func (o *manager) init() *manager {
 	o.config = configurer.Config
 	o.logger = loggers.Operator
-	o.tracer = tracers.Operator
-
 	o.name = "manager"
 	o.processor = process.New(o.name).
 		Before(o.onBeforeLogger, o.onBeforeTracer).
 		Callback(o.onCall).
 		Panic(o.onPanic)
-
+	o.tracer = tracers.Operator
 	return o
 }
 
@@ -189,7 +186,6 @@ func (o *manager) start(ctx context.Context) {
 	// 并行启动.
 	go func() {
 		common.InternalInfo("<%s> start", o.name)
-
 		if err := o.processor.Start(ctx); err != nil {
 			common.InternalInfo("<%s> stopped: %v", o.name, err)
 		} else {
@@ -202,7 +198,6 @@ func (o *manager) start(ctx context.Context) {
 	ms := time.Millisecond
 	for i := 0; i < mx; i++ {
 		time.Sleep(ms)
-
 		if func() bool {
 			if o.logger.GetExecutor() != nil {
 				return o.logger.GetExecutor().Processor().Healthy()
@@ -229,7 +224,6 @@ func (o *manager) stop() {
 	ms := time.Millisecond * 100
 	for i := 0; i < mx; i++ {
 		time.Sleep(ms)
-
 		if func() bool {
 			if o.logger.GetExecutor() != nil {
 				return o.logger.GetExecutor().Processor().Stopped()
