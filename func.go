@@ -19,27 +19,32 @@ import (
 	"github.com/fuyibing/log/v5/common"
 )
 
-// Debug 记录 DEBUG 级日志.
+// Debug
+// send DEBUG level log to executor.
 func Debug(format string, args ...interface{}) {
 	Manager.Logger().Push(nil, common.Debug, format, args...)
 }
 
-// Error 记录 ERROR 级日志.
+// Error
+// send ERROR level log to executor.
 func Error(format string, args ...interface{}) {
 	Manager.Logger().Push(nil, common.Error, format, args...)
 }
 
-// Fatal 记录 FATAL 级日志.
+// Fatal
+// send FATAL level log to executor.
 func Fatal(format string, args ...interface{}) {
 	Manager.Logger().Push(nil, common.Fatal, format, args...)
 }
 
-// Info 记录 INFO 级日志.
+// Info
+// send INFO level log to executor.
 func Info(format string, args ...interface{}) {
 	Manager.Logger().Push(nil, common.Info, format, args...)
 }
 
-// Warn 记录 WARN 级日志.
+// Warn
+// send WARN level log to executor.
 func Warn(format string, args ...interface{}) {
 	Manager.Logger().Push(nil, common.Warn, format, args...)
 }

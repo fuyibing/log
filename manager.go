@@ -27,41 +27,30 @@ import (
 )
 
 var (
-	// Manager
-	// 管理器.
 	Manager Management
 )
 
 type (
-	// Management
-	// 管理器接口.
 	Management interface {
 		// Config
-		// 全局配置.
-		//
-		// 此为读模式, 通过此方法读取全局配置.
+		// global configurations, readonly.
 		Config() configurer.Configuration
 
 		// Logger
-		// 日志操作接口.
+		// log operator.
 		Logger() loggers.OperatorManager
 
 		// Tracer
-		// 链路操作接口.
+		// trace operator.
 		Tracer() tracers.OperatorManager
 
 		// Start
-		// 启动管理器.
-		//
-		// 当触发启动时将阻塞协程(10ms), 直到设置的日志与链路执行器启动成功(异步批处
-		// 理).
+		// start boot manager as async mode.
 		Start(ctx context.Context)
 
 		// Stop
-		// 安全退出.
-		//
-		// 当触发退出时将阻塞协程(30秒超时), 直到设置的日志与链路执行器全部处理完成,
-		// 此过程可以避免数据丢失.
+		// send stop signal then wait all log and span push completed. Force
+		// stop after 30 seconds.
 		Stop()
 	}
 
@@ -81,30 +70,28 @@ type (
 func (o *manager) Config() configurer.Configuration { return o.config }
 func (o *manager) Logger() loggers.OperatorManager  { return o.logger }
 func (o *manager) Tracer() tracers.OperatorManager  { return o.tracer }
-
-func (o *manager) Start(ctx context.Context) { o.start(ctx) }
-func (o *manager) Stop()                     { o.stop() }
+func (o *manager) Start(ctx context.Context)        { o.start(ctx) }
+func (o *manager) Stop()                            { o.stop() }
 
 // /////////////////////////////////////////////////////////////////////////////
 // Event methods
 // /////////////////////////////////////////////////////////////////////////////
 
 func (o *manager) onBeforeLogger(_ context.Context) (ignored bool) {
-	// 基于编码
+	// Add logger exporter as child process which configured by user code.
 	if ex := o.logger.GetExecutor(); ex != nil {
 		common.InternalInfo(`<%s> logger executor [name="%s"][level="%s"]`,
 			o.name, ex.Processor().Name(),
 			configurer.Config.GetLoggerLevel(),
 		)
 
-		// 加为子进程
 		if _, exists := o.processor.Get(ex.Processor().Name()); !exists {
 			o.processor.Add(ex.Processor())
 		}
 		return
 	}
 
-	// 基于配置
+	// Add logger exporter as child process which configured by config file.
 	if call, ok := builtinLoggers[configurer.Config.GetLoggerExporter()]; ok {
 		if ex := call(); ex != nil {
 			common.InternalInfo(`<%s> logger executor [name="%s"][level="%s"]`,
@@ -112,7 +99,6 @@ func (o *manager) onBeforeLogger(_ context.Context) (ignored bool) {
 				configurer.Config.GetLoggerLevel(),
 			)
 
-			// 加为子进程
 			o.logger.SetExecutor(ex)
 			o.processor.Add(ex.Processor())
 		}
@@ -122,21 +108,20 @@ func (o *manager) onBeforeLogger(_ context.Context) (ignored bool) {
 }
 
 func (o *manager) onBeforeTracer(_ context.Context) (ignored bool) {
-	// 基于编码
+	// Add tracer exporter as child process which configured by user code.
 	if ex := o.tracer.GetExecutor(); ex != nil {
 		common.InternalInfo(`<%s> tracer executor [name="%s"][topic="%s"]`,
 			o.name, ex.Processor().Name(),
 			configurer.Config.GetTracerTopic(),
 		)
 
-		// 加为子进程
 		if _, exists := o.processor.Get(ex.Processor().Name()); !exists {
 			o.processor.Add(ex.Processor())
 		}
 		return
 	}
 
-	// 基于配置
+	// Add tracer exporter as child process which configured by config file.
 	if call, ok := builtinTracers[configurer.Config.GetTracerExporter()]; ok {
 		if ex := call(); ex != nil {
 			common.InternalInfo(`<%s> tracer executor [name="%s"][topic="%s"]`,
@@ -144,7 +129,6 @@ func (o *manager) onBeforeTracer(_ context.Context) (ignored bool) {
 				configurer.Config.GetTracerTopic(),
 			)
 
-			// 加为子进程
 			o.tracer.SetExecutor(ex)
 			o.processor.Add(ex.Processor())
 		}
@@ -173,17 +157,18 @@ func (o *manager) onPanic(_ context.Context, v interface{}) {
 func (o *manager) init() *manager {
 	o.config = configurer.Config
 	o.logger = loggers.Operator
+
 	o.name = "manager"
 	o.processor = process.New(o.name).
 		Before(o.onBeforeLogger, o.onBeforeTracer).
 		Callback(o.onCall).
 		Panic(o.onPanic)
 	o.tracer = tracers.Operator
+
 	return o
 }
 
 func (o *manager) start(ctx context.Context) {
-	// 并行启动.
 	go func() {
 		common.InternalInfo("<%s> start", o.name)
 		if err := o.processor.Start(ctx); err != nil {
@@ -193,7 +178,7 @@ func (o *manager) start(ctx context.Context) {
 		}
 	}()
 
-	// 等待完成.
+	// Wait all processors started.
 	mx := 10
 	ms := time.Millisecond
 	for i := 0; i < mx; i++ {
@@ -216,10 +201,10 @@ func (o *manager) start(ctx context.Context) {
 }
 
 func (o *manager) stop() {
-	// 并行退出.
+	// Send stop signal.
 	o.processor.Stop()
 
-	// 等待完成.
+	// Wait all log and span exported done or timed out.
 	mx := 300
 	ms := time.Millisecond * 100
 	for i := 0; i < mx; i++ {

@@ -20,8 +20,8 @@ import (
 	"github.com/fuyibing/log/v5/tracers"
 )
 
-// Span 返回 tracers.Span 组件, 如果指定的 context.Context 未通过 Value 绑定过则
-// 返回 nil.
+// Span returns a tracers.Span component if valued in context, otherwise nil
+// returned.
 func Span(ctx context.Context) (span tracers.Span, exists bool) {
 	if v, ok := ctx.Value(tracers.ContextKey).(tracers.Span); ok {
 		return v, true
@@ -29,8 +29,8 @@ func Span(ctx context.Context) (span tracers.Span, exists bool) {
 	return nil, false
 }
 
-// Trace 返回 tracers.Trace 组件, 如果指定的 context.Context 未通过 Value 绑定过
-// 则返回 nil.
+// Trace returns a tracers.Trace component if valued in context, otherwise nil
+// returned.
 func Trace(ctx context.Context) (trace tracers.Trace, exists bool) {
 	if g := ctx.Value(tracers.ContextKey); g != nil {
 		if v, ok := g.(tracers.Span); ok {

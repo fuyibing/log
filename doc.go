@@ -14,22 +14,21 @@
 // date: 2023-03-01
 
 // Package log
-// 集成了 Trace 的 Log 中间件, 遵循 OpenTelemetry 规范.
+// log and trace builtin, work like Open Telemetry.
 //
-// 启动
-//   // 在 main() 函数的主口调用此方法, 启动日志服务.
+// Start async mode.
+//   // Called at first line in main function.
 //   log.Logger.Start(ctx)
 //
-// 退出
-//   // 在 main() 函数退出前调用此方法, 以确保异步上报的数据能够正常完成, 避
-//   // 免丢失
+// Quit async mode.
+//   // Called before main function quit.
 //   log.Logger.Stop()
 //
-// 示例
+// Example.
 //   func main(){
 //       log.Logger.Start(ctx)
 //       defer log.Logger.Stop()
 //
-//       // ... 更多逻辑
+//       // ... ignored code
 //   }
 package log
