@@ -16,8 +16,15 @@
 package tracers
 
 type (
+	// Formatter
+	// for tracer.
 	Formatter interface {
+		// Byte
+		// return formatted tracer/span bytes.
 		Byte(vs ...Span) (body []byte, err error)
+
+		// String
+		// return formatted tracer/span string.
 		String(vs ...Span) (str string, err error)
 	}
 )

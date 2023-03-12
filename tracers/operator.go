@@ -36,11 +36,27 @@ var (
 )
 
 type (
+	// OperatorManager
+	// for tracer operations.
 	OperatorManager interface {
+		// Generator
+		// return id generator.
 		Generator() (generator *id)
+
+		// GetExecutor
+		// return tracer executor.
 		GetExecutor() (executor Executor)
+
+		// GetResource
+		// return operator key/value pairs.
 		GetResource() (kv loggers.Kv)
+
+		// Push
+		// span component on to executor.
 		Push(span Span)
+
+		// SetExecutor
+		// configure tracer executor.
 		SetExecutor(executor Executor)
 	}
 
@@ -101,7 +117,6 @@ func (o *operator) push(span Span) {
 	if o.executor == nil {
 		return
 	}
-
 	if err := o.executor.Publish(span); err != nil {
 		common.InternalFatal("<%s> send: %v", o.name, err)
 	}

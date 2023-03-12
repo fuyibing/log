@@ -20,9 +20,19 @@ import (
 )
 
 type (
+	// Executor
+	// for tracer.
 	Executor interface {
+		// Processor
+		// return executor processor like os process.
 		Processor() (processor process.Processor)
+
+		// Publish
+		// span component into executor.
 		Publish(spans ...Span) (err error)
+
+		// SetFormatter
+		// register tracer formatter handler.
 		SetFormatter(formatter Formatter)
 	}
 )

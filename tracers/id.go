@@ -23,13 +23,17 @@ import (
 	"sync"
 )
 
-type id struct {
-	sync.Mutex
-	data   int64
-	err    error
-	random *mr.Rand
-}
+type (
+	id struct {
+		sync.Mutex
+		data   int64
+		err    error
+		random *mr.Rand
+	}
+)
 
+// SpanIdFromHex
+// create and return SpanId component based on specified hex string.
 func (o *id) SpanIdFromHex(s string) SpanId {
 	r := SpanId{}
 	if d, de := hex.DecodeString(s); de == nil {
@@ -38,6 +42,8 @@ func (o *id) SpanIdFromHex(s string) SpanId {
 	return r
 }
 
+// SpanIdNew
+// create and return SpanId component.
 func (o *id) SpanIdNew() SpanId {
 	o.Lock()
 	defer o.Unlock()
@@ -47,6 +53,8 @@ func (o *id) SpanIdNew() SpanId {
 	return s
 }
 
+// TraceIdFromHex
+// create and return TraceId component based on specified hex string.
 func (o *id) TraceIdFromHex(s string) TraceId {
 	r := TraceId{}
 	if d, de := hex.DecodeString(s); de == nil {
@@ -55,6 +63,8 @@ func (o *id) TraceIdFromHex(s string) TraceId {
 	return r
 }
 
+// TraceIdNew
+// create and return TraceId component.
 func (o *id) TraceIdNew() TraceId {
 	o.Lock()
 	defer o.Unlock()

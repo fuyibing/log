@@ -21,15 +21,19 @@ import (
 
 type (
 	// Kv
-	// component for logger, stored as key/value.
+	// component for logger, stored as key/value pair.
 	Kv map[string]interface{}
 )
 
+// Add
+// key/value into memory storage.
 func (o Kv) Add(key string, value interface{}) Kv {
 	o[key] = value
 	return o
 }
 
+// Copy
+// key/value pairs into memory storage.
 func (o Kv) Copy(s Kv) Kv {
 	for k, v := range s {
 		o[k] = v
@@ -37,11 +41,14 @@ func (o Kv) Copy(s Kv) Kv {
 	return o
 }
 
+// Return
+// kv string, generated from key/value storage.
 func (o Kv) String() (str string) {
 	if o != nil {
 		if buf, err := json.Marshal(o); err == nil {
 			str = string(buf)
 		}
 	}
+
 	return
 }

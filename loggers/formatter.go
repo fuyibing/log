@@ -19,7 +19,12 @@ type (
 	// Formatter
 	// for logger.
 	Formatter interface {
+		// Byte
+		// return formatted logger/log bytes.
 		Byte(vs ...Log) (body []byte, err error)
+
+		// String
+		// return formatted logger/log string.
 		String(vs ...Log) (str string, err error)
 	}
 )

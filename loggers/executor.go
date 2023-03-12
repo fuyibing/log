@@ -23,8 +23,16 @@ type (
 	// Executor
 	// for logger.
 	Executor interface {
+		// Processor
+		// return executor processor like os process.
 		Processor() (processor process.Processor)
+
+		// Publish
+		// log component into executor.
 		Publish(logs ...Log) (err error)
+
+		// SetFormatter
+		// register logger formatter handler.
 		SetFormatter(formatter Formatter)
 	}
 )
