@@ -26,12 +26,12 @@ type (
 	}
 
 	zipkinTracer struct {
-		// 接口格式
-		// 默认: application/json
+		// API Content type.
+		// Default: application/json
 		ContentType string `yaml:"content-type"`
 
-		// 接口地址
-		// 例如: http://localhost:9411/api/v2/spans
+		// API Address.
+		// Example: http://localhost:9411/api/v2/spans
 		Endpoint string `yaml:"endpoint"`
 	}
 )

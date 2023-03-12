@@ -23,36 +23,29 @@ import (
 )
 
 var (
-	// Config
-	// 全部配置.
 	Config Configuration
 )
 
 type (
-	// Configuration
-	// 全部配置接口.
 	Configuration interface {
 		ConfigBucket
+		ConfigOpenTracing
+
 		ConfigLogger
 		ConfigLoggerFile
+
 		ConfigTracer
 		ConfigTracerJaeger
 		ConfigTracerZipkin
-		ConfigFileTracer
-		ConfigOpenTracing
+		ConfigTracerFile
 
-		// Setter
-		// 设置配置参数.
 		Setter() *Setter
 	}
 
-	// Setter
-	// 设置字段.
 	Setter struct {
 		config *config
 	}
 
-	// 配置结构.
 	config struct {
 		OpenTracingSampled string `yaml:"open-tracing-sampled"`
 		OpenTracingSpanId  string `yaml:"open-tracing-span-id"`
@@ -62,62 +55,58 @@ type (
 		// | Bucket for ASYNC                                                  |
 		// +-------------------------------------------------------------------+
 
-		// 批处理量.
-		// 每个批次最大 Logger/Span 数量.
-		// 默认: 100
+		// Batch count.
+		// Default: 100
 		BucketBatch int `yaml:"bucket-batch"`
 
-		// 批处理并发.
-		// 最大允许多少个协程同时上报.
-		// 默认: 10
+		// Batch concurrency.
+		// Default: 10 (goroutines)
 		BucketConcurrency int32 `yaml:"bucket-concurrency"`
 
-		// 数据桶容量.
-		// 当瞬间数量太多且来不急处理时, 先暂存在内存中, 此配置定义最多在内存中存储数量.
-		// 默认: 30,000
+		// Bucket capacity.
+		// Default: 30,000
 		BucketCapacity int `yaml:"bucket-capacity"`
 
-		// 批处理频率.
-		// 每 200 毫秒自动上报积压的数据.
-		// 默认: 200 (毫秒)
+		// Upload span per 200 ms if not triggered.
+		// Default: 200 (Millisecond)
 		BucketFrequency int `yaml:"bucket-frequency"`
 
 		// +-------------------------------------------------------------------+
 		// | Logger                                                            |
 		// +-------------------------------------------------------------------+
 
-		// 日志级别.
-		// 默认: INFO.
+		// Logger level.
+		// Default: INFO.
 		LoggerLevel common.Level `yaml:"logger-level"`
 
-		// 日志上报适配.
-		// 接受: term, file.
-		// 默认: term
+		// Logger name.
+		// Accept: term, file.
+		// Default: term
 		LoggerExporter string `yaml:"logger-exporter"`
 
-		// 文件日志.
+		// Save custom log to local files.
 		FileLogger *fileLogger `yaml:"file-logger"`
 
 		// +-------------------------------------------------------------------+
 		// | Tracer                                                            |
 		// +-------------------------------------------------------------------+
 
-		// 链路上报主题.
-		// 说明: 应用于 Kafka主题, Jaeger服务名等, 与 TracerExporter 配合使用.
+		// Tracer topic.
+		// Tracer span storages.
 		TracerTopic string `yaml:"tracer-topic"`
 
-		// 链路上报适配.
-		// 接受: term, file, jaeger, zipkin
-		// 默认: term
+		// Tracer name.
+		// Accept: term, file, jaeger, zipkin
+		// Default: term
 		TracerExporter string `yaml:"tracer-exporter"`
 
-		// 输出到 File.
+		// Save span to local files.
 		FileTracer *fileTracer `yaml:"file-tracer"`
 
-		// 上报到 Jaeger.
+		// Upload span to Jaeger.
 		JaegerTracer *jaegerTracer `yaml:"jaeger-tracer"`
 
-		// 上报到 Zipkin.
+		// Upload span to Zipkin.
 		ZipkinTracer *zipkinTracer `yaml:"zipkin-tracer"`
 
 		// +-------------------------------------------------------------------+
@@ -136,8 +125,7 @@ func (o *config) Setter() *Setter { return o.setter }
 // /////////////////////////////////////////////////////////////////////////////
 
 func (o *config) scan() {
-	// 解析文件.
-	// 包加载时扫描并读取YAML配置文件, 并基于配置赋值.
+	// Read config file then assign to configuration fields.
 	for _, path := range []string{"config/log.yaml", "../config/log.yaml"} {
 		if buf, err := os.ReadFile(path); err == nil {
 			if yaml.Unmarshal(buf, o) == nil {
@@ -148,21 +136,22 @@ func (o *config) scan() {
 }
 
 func (o *config) init() *config {
-	// 初始化.
-	o.setter = &Setter{config: o}
 	o.scan()
+	o.setter = &Setter{config: o}
 
-	// 默认值.
+	// Init default fields.
+
 	o.defaultBucket()
-	o.defaultLogger()
-	o.defaultTracer()
 	o.defaultOpenTracing()
 
-	// Logger{file}.
+	// Logger definitions.
+
+	o.defaultLogger()
 	o.initFileLogger()
 
 	// Tracer{file|jaeger|zipkin}
 
+	o.defaultTracer()
 	o.initFileTracer()
 	o.initJaegerTracer()
 	o.initZipkinTracer()

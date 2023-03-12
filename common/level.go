@@ -20,12 +20,8 @@ import (
 )
 
 type (
-	// Level
-	// 日志级别.
 	Level string
 )
-
-// 日志级别枚举.
 
 const (
 	Off   Level = "OFF"
@@ -37,7 +33,6 @@ const (
 )
 
 var (
-	// 日志级别转整型.
 	mapperLevel2Integer = map[Level]int{
 		Off:   1,
 		Fatal: 2,
@@ -48,8 +43,6 @@ var (
 	}
 )
 
-// Int
-// 转整型.
 func (o Level) Int() int {
 	if i, ok := mapperLevel2Integer[o]; ok {
 		return i
@@ -57,12 +50,6 @@ func (o Level) Int() int {
 	return 0
 }
 
-// String
-// 转字符串.
 func (o Level) String() string { return string(o) }
 
-// Upper
-// 转大写.
-//
-// Level("debug").Upper() <-> Level("DEBUG")
 func (o Level) Upper() Level { return Level(strings.ToUpper(string(o))) }

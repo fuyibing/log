@@ -25,16 +25,17 @@ var (
 )
 
 // InternalInfo
-// 内部/Info.
+// print INFO level to console/terminal.
 func InternalInfo(text string, args ...interface{}) {
 	_, _ = fmt.Fprintf(os.Stdout, fmt.Sprintf(text, args...)+ln)
 }
 
 // InternalFatal
-// 内部/Fatal.
+// print ERROR level to console/terminal.
 func InternalFatal(text string, args ...interface{}) {
 	text = fmt.Sprintf(text, args...)
 
+	// Range backstack then mixed on error message.
 	for i, item := range Backstack().Items {
 		text += fmt.Sprintf("\n%d. %s:%d call %s",
 			i,
@@ -44,6 +45,7 @@ func InternalFatal(text string, args ...interface{}) {
 		)
 	}
 
+	// Print ERROR level message.
 	_, _ = fmt.Fprintf(os.Stderr,
 		fmt.Sprintf("%s\n", text),
 	)

@@ -76,7 +76,6 @@ func (o *config) state() {
 	li := o.LoggerLevel.Int()
 	yes := li > common.Off.Int()
 
-	// 更新状态.
 	o.debugOn = yes && li >= common.Debug.Int()
 	o.errorOn = yes && li >= common.Error.Int()
 	o.fatalOn = yes && li >= common.Fatal.Int()

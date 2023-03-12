@@ -28,21 +28,10 @@ type (
 	}
 
 	fileLogger struct {
-		// 扩展名.
-		// 默认: log
-		Ext string `yaml:"ext"`
-
-		// 目录分隔.
-		// 默认: 2006-01 (即按月分隔)
+		Ext    string `yaml:"ext"`
 		Folder string `yaml:"folder"`
-
-		// 文件全名.
-		// 默认: 2006-01-02
-		Name string `yaml:"name"`
-
-		// 存储位置.
-		// 默认: ./logs (在项目目录)
-		Path string `yaml:"path"`
+		Name   string `yaml:"name"`
+		Path   string `yaml:"path"`
 	}
 )
 

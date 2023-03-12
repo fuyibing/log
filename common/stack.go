@@ -31,34 +31,27 @@ var (
 )
 
 type (
-	// Stack
-	// 栈结构.
 	Stack struct {
 		Items []StackItem
 	}
 
-	// StackItem
-	// 栈元素.
 	StackItem struct {
-		// 是否内部.
-		// true 表示元素是 fuyibing/log 包中的文件.
+		// Return true if code and line is current package.
 		Internal bool
 
-		// 函数名称.
-		// 例如: main.main()
+		// Return func name of stack position.
 		Call string
 
-		// 文件路径.
-		// 例如: /home/app/github.com/fuyibing/log/v5/field.go
+		// File path name.
 		File string
 
-		// 触发行号.
+		// File line number.
 		Line int
 	}
 )
 
 // Backstack
-// 解析堆栈.
+// extract debug stack into list.
 func Backstack() Stack {
 	var (
 		call       string
@@ -67,7 +60,7 @@ func Backstack() Stack {
 		startIndex int
 		startMax   = len(lines)
 	)
-	// 遍历堆栈.
+	// Range stack to find start line number.
 	for i, s := range lines {
 		if s = strings.TrimSpace(s); s == "" {
 			break
@@ -77,22 +70,20 @@ func Backstack() Stack {
 			break
 		}
 	}
-	// 遍历堆栈.
+	// Range stack.
 	for i := startIndex; i < startMax; i += 2 {
 		if call = lines[i]; call == "" {
 			break
 		}
-		// 元素结构.
+		// Init item struct.
 		item := StackItem{Call: call, Internal: stackRegexInternal.MatchString(call)}
-		// 去除参数.
+		// Remove func params.
 		item.Call = stackRegexFuncParams.ReplaceAllString(item.Call, `()`)
-		// 提取名称.
+		// Collect func name.
 		if m := stackRegexFunc.FindStringSubmatch(item.Call); len(m) > 0 {
 			item.Call = m[1]
 		}
-		// 文件解析.
-		// - 文件
-		// - 行号
+		// Parse file and line.
 		if (i + 1) < startMax {
 			if item.File = strings.TrimSpace(lines[i+1]); item.File != "" {
 				if m := stackRegexFile.FindStringSubmatch(item.File); len(m) > 0 {
@@ -103,7 +94,7 @@ func Backstack() Stack {
 				}
 			}
 		}
-		// 堆栈列表.
+		// Append to list.
 		stack.Items = append(stack.Items, item)
 	}
 	return stack

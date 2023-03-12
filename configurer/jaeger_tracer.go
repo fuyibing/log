@@ -28,19 +28,16 @@ type (
 	}
 
 	jaegerTracer struct {
-		// 接口格式
-		// 默认: application/x-thrift
+		// API Content type.
+		// Default: application/x-thrift
 		ContentType string `yaml:"content-type"`
 
-		// 接口地址
-		// 例如: http://localhost:14268/api/traces
+		// API Address
+		// Example: http://localhost:14268/api/traces
 		Endpoint string `yaml:"endpoint"`
 
-		// 鉴权密码.
-		Password string `yaml:"password"`
-
-		// 鉴权用户名.
 		Username string `yaml:"username"`
+		Password string `yaml:"password"`
 	}
 )
 

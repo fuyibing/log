@@ -25,34 +25,29 @@ var (
 )
 
 type (
-	// Bucket
-	// 数据桶.
 	Bucket interface {
 		// Add
-		// 添加元素.
+		// new item into bucket.
 		Add(item interface{}) (total int, err error)
 
 		// Count
-		// 桶元素量.
+		// return total items in bucket.
 		Count() int
 
 		// IsEmpty
-		// 是否为空.
+		// return true if no item in bucket.
 		IsEmpty() bool
 
 		// Pop
-		// 取出1个元素.
+		// pop one item from bucket.
 		Pop() (item interface{}, exists bool)
 
 		// Popn
-		// 取出N个元素.
-		//
-		// 参数 limit 为需取出元素量. 返回 items 为已取出的元素列表, total 为取出前桶
-		// 内元素总量, count 为实际取出元素量.
+		// pop specified count items from bucket.
 		Popn(limit int) (items []interface{}, total, count int)
 
 		// SetCapacity
-		// 设置容量.
+		// config bucket capacity.
 		SetCapacity(n int) Bucket
 	}
 
@@ -64,8 +59,6 @@ type (
 	}
 )
 
-// NewBucket
-// 创建数据桶.
 func NewBucket(capacity int) Bucket { return (&bucket{capacity: capacity}).init() }
 
 // /////////////////////////////////////////////////////////////////////////////
