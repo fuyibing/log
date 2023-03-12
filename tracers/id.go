@@ -30,10 +30,6 @@ type id struct {
 	random *mr.Rand
 }
 
-// SpanIdFromHex
-// 跨度ID.
-//
-// 基于指定的16进制字符串, 反向生成跨度ID.
 func (o *id) SpanIdFromHex(s string) SpanId {
 	r := SpanId{}
 	if d, de := hex.DecodeString(s); de == nil {
@@ -42,8 +38,6 @@ func (o *id) SpanIdFromHex(s string) SpanId {
 	return r
 }
 
-// SpanIdNew
-// 跨度ID.
 func (o *id) SpanIdNew() SpanId {
 	o.Lock()
 	defer o.Unlock()
@@ -53,10 +47,6 @@ func (o *id) SpanIdNew() SpanId {
 	return s
 }
 
-// TraceIdFromHex
-// 链路ID.
-//
-// 基于指定的16进制字符串, 反向生成链路ID.
 func (o *id) TraceIdFromHex(s string) TraceId {
 	r := TraceId{}
 	if d, de := hex.DecodeString(s); de == nil {
@@ -65,8 +55,6 @@ func (o *id) TraceIdFromHex(s string) TraceId {
 	return r
 }
 
-// TraceIdNew
-// 链路ID.
 func (o *id) TraceIdNew() TraceId {
 	o.Lock()
 	defer o.Unlock()

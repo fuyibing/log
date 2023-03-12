@@ -21,20 +21,10 @@ import (
 
 type (
 	// Executor
-	// 日志执行器.
+	// for logger.
 	Executor interface {
-		// Processor
-		// 类进程.
-		//
-		// 获取具体执行器的类进程, 基于此类进程启动/退出服务.
 		Processor() (processor process.Processor)
-
-		// Publish
-		// 发布日志.
 		Publish(logs ...Log) (err error)
-
-		// SetFormatter
-		// 设置格式.
 		SetFormatter(formatter Formatter)
 	}
 )

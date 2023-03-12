@@ -21,15 +21,11 @@ import (
 )
 
 type (
-	// SpanId
-	// 跨度ID.
+	// SpanId component stored as 8-byte array, encoded / decoded as 16 char
+	// string.
 	SpanId [8]byte
 )
 
-// IsValid
-// 校验跨度ID.
 func (o SpanId) IsValid() bool { return !bytes.Equal(o[:], nilSpanId[:]) }
 
-// String
-// 转成16进制字符串.
 func (o SpanId) String() string { return hex.EncodeToString(o[:]) }

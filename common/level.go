@@ -20,6 +20,8 @@ import (
 )
 
 type (
+	// Level
+	// log level type.
 	Level string
 )
 
@@ -50,6 +52,10 @@ func (o Level) Int() int {
 	return 0
 }
 
-func (o Level) String() string { return string(o) }
+func (o Level) String() string {
+	return string(o)
+}
 
-func (o Level) Upper() Level { return Level(strings.ToUpper(string(o))) }
+func (o Level) Upper() Level {
+	return Level(strings.ToUpper(string(o)))
+}

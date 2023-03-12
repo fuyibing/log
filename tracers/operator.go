@@ -36,27 +36,11 @@ var (
 )
 
 type (
-	// OperatorManager
-	// 链路操作接口.
 	OperatorManager interface {
-		// Generator
-		// ID生成器.
 		Generator() (generator *id)
-
-		// GetExecutor
-		// 执行器.
 		GetExecutor() (executor Executor)
-
-		// GetResource
-		// 基础资源.
 		GetResource() (kv loggers.Kv)
-
-		// Push
-		// 推送跨度.
 		Push(span Span)
-
-		// SetExecutor
-		// 设置执行器.
 		SetExecutor(executor Executor)
 	}
 
@@ -92,17 +76,14 @@ func (o *operator) init() *operator {
 }
 
 func (o *operator) initResource() {
-	// 基础项.
 	o.resource.Add("process.id", os.Getpid()).
 		Add("system.arch", fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH)).
 		Add("system.env", runtime.Version())
 
-	// 主机名.
 	if s, se := os.Hostname(); se == nil {
 		o.resource.Add("system.host", s)
 	}
 
-	// IP地址.
 	if l, le := net.InterfaceAddrs(); le == nil {
 		ls := make([]string, 0)
 		for _, la := range l {
@@ -117,12 +98,10 @@ func (o *operator) initResource() {
 }
 
 func (o *operator) push(span Span) {
-	// 链路禁用.
 	if o.executor == nil {
 		return
 	}
 
-	// 推送链路.
 	if err := o.executor.Publish(span); err != nil {
 		common.InternalFatal("<%s> send: %v", o.name, err)
 	}

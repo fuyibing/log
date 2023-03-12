@@ -35,11 +35,15 @@ type (
 		Items []StackItem
 	}
 
+	// StackItem
+	// record each node profile.
 	StackItem struct {
-		// Return true if code and line is current package.
+		// Return true
+		// if file and line of code is current package.
 		Internal bool
 
-		// Return func name of stack position.
+		// Return function name
+		// of each stack position.
 		Call string
 
 		// File path name.
@@ -60,7 +64,9 @@ func Backstack() Stack {
 		startIndex int
 		startMax   = len(lines)
 	)
-	// Range stack to find start line number.
+
+	// Range stack
+	// to find start line number.
 	for i, s := range lines {
 		if s = strings.TrimSpace(s); s == "" {
 			break
@@ -70,19 +76,28 @@ func Backstack() Stack {
 			break
 		}
 	}
-	// Range stack.
+
+	// Range stack
+	// from start number.
 	for i := startIndex; i < startMax; i += 2 {
 		if call = lines[i]; call == "" {
 			break
 		}
+
 		// Init item struct.
-		item := StackItem{Call: call, Internal: stackRegexInternal.MatchString(call)}
+		item := StackItem{
+			Call:     call,
+			Internal: stackRegexInternal.MatchString(call),
+		}
+
 		// Remove func params.
 		item.Call = stackRegexFuncParams.ReplaceAllString(item.Call, `()`)
+
 		// Collect func name.
 		if m := stackRegexFunc.FindStringSubmatch(item.Call); len(m) > 0 {
 			item.Call = m[1]
 		}
+
 		// Parse file and line.
 		if (i + 1) < startMax {
 			if item.File = strings.TrimSpace(lines[i+1]); item.File != "" {
@@ -94,8 +109,10 @@ func Backstack() Stack {
 				}
 			}
 		}
+
 		// Append to list.
 		stack.Items = append(stack.Items, item)
 	}
+
 	return stack
 }

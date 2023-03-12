@@ -21,26 +21,22 @@ import (
 	"sync"
 )
 
-var (
-	// Operator
-	// 日志操作.
-	Operator OperatorManager
-)
+var Operator OperatorManager
 
 type (
 	// OperatorManager
-	// 日志操作接口.
+	// for logger operations.
 	OperatorManager interface {
 		// GetExecutor
-		// 执行器.
+		// return logger executor.
 		GetExecutor() (executor Executor)
 
 		// Push
-		// 推送日志.
+		// log component on to executor.
 		Push(kv Kv, level common.Level, format string, args ...interface{})
 
 		// SetExecutor
-		// 设置执行器.
+		// configure logger executor.
 		SetExecutor(executor Executor)
 	}
 
@@ -67,28 +63,25 @@ func (o *operator) init() *operator {
 	return o
 }
 
-// 发送日志.
-//
-//   1. 日志级别
-//   2. 绑定执行器
 func (o *operator) send(kv Kv, level common.Level, format string, args ...interface{}) {
-	// 日志禁用.
-	// 1. 级别不匹配
-	// 2. 执行器未定义
+	// Ignore
+	// if executor not specified or log level is greater than configured.
 	if o.executor == nil || !configurer.Config.LevelEnabled(level) {
 		return
 	}
 
-	// 建立日志.
+	// Component
+	// created for sender.
 	v := NewLog(level, format, args...)
 
-	// 绑定KV.
+	// Copy
+	// key/value pair.
 	if kv != nil {
 		v.SetKv(kv)
 	}
 
-	// 执行日志.
-	// 发布到具体的执行器(如: Term/File/Kafka 等)存储.
+	// Call specified executor
+	// then push into it.
 	if err := o.executor.Publish(v); err != nil {
 		common.InternalInfo("<%s> publish: %v", o.name, err)
 	}

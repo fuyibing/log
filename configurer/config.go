@@ -27,21 +27,31 @@ var (
 )
 
 type (
+	// Configuration
+	// expose basic configuration methods.
 	Configuration interface {
 		ConfigBucket
 		ConfigOpenTracing
 
+		// For Logger.
+
 		ConfigLogger
 		ConfigLoggerFile
+
+		// For Tracer.
 
 		ConfigTracer
 		ConfigTracerJaeger
 		ConfigTracerZipkin
 		ConfigTracerFile
 
+		// Set able.
+
 		Setter() *Setter
 	}
 
+	// Setter
+	// used to reset configuration fields.
 	Setter struct {
 		config *config
 	}

@@ -15,12 +15,16 @@
 
 package configurer
 
-type ConfigBucket interface {
-	GetBucketBatch() int
-	GetBucketCapacity() int
-	GetBucketConcurrency() int32
-	GetBucketFrequency() int
-}
+type (
+	// ConfigBucket
+	// expose bucket (memory queue) configuration methods.
+	ConfigBucket interface {
+		GetBucketBatch() int
+		GetBucketCapacity() int
+		GetBucketConcurrency() int32
+		GetBucketFrequency() int
+	}
+)
 
 // Getter
 

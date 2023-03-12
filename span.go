@@ -26,6 +26,7 @@ func Span(ctx context.Context) (span tracers.Span, exists bool) {
 	if v, ok := ctx.Value(tracers.ContextKey).(tracers.Span); ok {
 		return v, true
 	}
+
 	return nil, false
 }
 
@@ -33,12 +34,16 @@ func Span(ctx context.Context) (span tracers.Span, exists bool) {
 // returned.
 func Trace(ctx context.Context) (trace tracers.Trace, exists bool) {
 	if g := ctx.Value(tracers.ContextKey); g != nil {
+		// Use span component.
 		if v, ok := g.(tracers.Span); ok {
 			return v.Trace(), true
 		}
+
+		// Use trace component.
 		if v, ok := g.(tracers.Trace); ok {
 			return v, true
 		}
 	}
+
 	return nil, false
 }

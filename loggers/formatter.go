@@ -17,14 +17,9 @@ package loggers
 
 type (
 	// Formatter
-	// 格式化.
+	// for logger.
 	Formatter interface {
-		// Byte
-		// 转字符码.
 		Byte(vs ...Log) (body []byte, err error)
-
-		// String
-		// 转字符串.
 		String(vs ...Log) (str string, err error)
 	}
 )

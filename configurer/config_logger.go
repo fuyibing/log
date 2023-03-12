@@ -19,11 +19,15 @@ import (
 	"github.com/fuyibing/log/v5/common"
 )
 
-type ConfigLogger interface {
-	GetLoggerExporter() string
-	GetLoggerLevel() common.Level
-	LevelEnabled(level common.Level) bool
-}
+type (
+	// ConfigLogger
+	// expose logger configuration methods.
+	ConfigLogger interface {
+		GetLoggerExporter() string
+		GetLoggerLevel() common.Level
+		LevelEnabled(level common.Level) bool
+	}
+)
 
 // Getter
 

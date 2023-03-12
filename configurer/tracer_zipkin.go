@@ -16,10 +16,14 @@
 package configurer
 
 type (
+	// ConfigTracerZipkin
+	// expose zipkin adapter for tracer.
 	ConfigTracerZipkin interface {
 		GetZipkinTracer() ZipkinTracer
 	}
 
+	// ZipkinTracer
+	// expose zipkin tracer configuration methods.
 	ZipkinTracer interface {
 		GetContentType() string
 		GetEndpoint() string

@@ -23,35 +23,15 @@ import (
 
 type (
 	// Log
-	// 单条日志元素.
+	// component for logger, stored with mixed.
 	Log interface {
-		// Kv
-		// Key/Value键值对.
 		Kv() Kv
-
-		// Level
-		// 日志级别.
 		Level() common.Level
-
-		// Stack
-		// 堆栈状态.
-		Stack() bool
-
-		// Stacks
-		// 堆栈列表, 仅当级别为Fatal时有效.
-		Stacks() []common.StackItem
-
-		// Text
-		// 日志正文.
-		Text() string
-
-		// Time
-		// 记录时间.
-		Time() time.Time
-
-		// SetKv
-		// 设置Key/Value键值对.
 		SetKv(s Kv) Log
+		Stack() bool
+		Stacks() []common.StackItem
+		Text() string
+		Time() time.Time
 	}
 
 	log struct {

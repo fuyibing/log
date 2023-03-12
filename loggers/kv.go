@@ -21,22 +21,15 @@ import (
 
 type (
 	// Kv
-	// 日志 Key/Value 键值对.
+	// component for logger, stored as key/value.
 	Kv map[string]interface{}
 )
 
-// Add
-// 添加 Key/Value 键值对.
-//
-//   .Add("k", 1)
-//   .Add("key", "value")
 func (o Kv) Add(key string, value interface{}) Kv {
 	o[key] = value
 	return o
 }
 
-// Copy
-// 复制KV.
 func (o Kv) Copy(s Kv) Kv {
 	for k, v := range s {
 		o[k] = v
@@ -44,13 +37,6 @@ func (o Kv) Copy(s Kv) Kv {
 	return o
 }
 
-// String
-// 转成JSON符串.
-//
-//   {
-//     "k": 1,
-//     "key": "value"
-//   }
 func (o Kv) String() (str string) {
 	if o != nil {
 		if buf, err := json.Marshal(o); err == nil {

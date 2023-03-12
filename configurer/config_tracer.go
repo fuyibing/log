@@ -15,10 +15,14 @@
 
 package configurer
 
-type ConfigTracer interface {
-	GetTracerExporter() string
-	GetTracerTopic() string
-}
+type (
+	// ConfigTracer
+	// expose tracer configuration methods.
+	ConfigTracer interface {
+		GetTracerExporter() string
+		GetTracerTopic() string
+	}
+)
 
 // Getter
 

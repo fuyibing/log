@@ -16,10 +16,14 @@
 package configurer
 
 type (
+	// ConfigTracerJaeger
+	// expose jaeger adapter for tracer.
 	ConfigTracerJaeger interface {
 		GetJaegerTracer() JaegerTracer
 	}
 
+	// JaegerTracer
+	// expose jaeger tracer configuration methods.
 	JaegerTracer interface {
 		GetContentType() string
 		GetEndpoint() string

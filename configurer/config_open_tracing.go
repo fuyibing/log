@@ -15,11 +15,15 @@
 
 package configurer
 
-type ConfigOpenTracing interface {
-	GetOpenTracingSampled() string
-	GetOpenTracingSpanId() string
-	GetOpenTracingTraceId() string
-}
+type (
+	// ConfigOpenTracing
+	// expose opentracing configuration methods.
+	ConfigOpenTracing interface {
+		GetOpenTracingSampled() string
+		GetOpenTracingSpanId() string
+		GetOpenTracingTraceId() string
+	}
+)
 
 // Getter
 

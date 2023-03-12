@@ -16,15 +16,8 @@
 package tracers
 
 type (
-	// Formatter
-	// 格式化.
 	Formatter interface {
-		// Byte
-		// 转字符码.
 		Byte(vs ...Span) (body []byte, err error)
-
-		// String
-		// 转字符串.
 		String(vs ...Span) (str string, err error)
 	}
 )

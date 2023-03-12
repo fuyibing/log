@@ -16,18 +16,22 @@
 package configurer
 
 type (
-	ConfigTracerFile interface {
-		GetFileTracer() FileTracer
+	// ConfigLoggerFile
+	// expose file adapter for logger.
+	ConfigLoggerFile interface {
+		GetFileLogger() FileLogger
 	}
 
-	FileTracer interface {
+	// FileLogger
+	// expose file logger configuration methods.
+	FileLogger interface {
 		GetExt() string
 		GetFolder() string
 		GetName() string
 		GetPath() string
 	}
 
-	fileTracer struct {
+	fileLogger struct {
 		Ext    string `yaml:"ext"`
 		Folder string `yaml:"folder"`
 		Name   string `yaml:"name"`
@@ -37,48 +41,48 @@ type (
 
 // Getter
 
-func (o *config) GetFileTracer() FileTracer { return o.FileTracer }
+func (o *config) GetFileLogger() FileLogger { return o.FileLogger }
 
-func (o *fileTracer) GetExt() string    { return o.Ext }
-func (o *fileTracer) GetFolder() string { return o.Folder }
-func (o *fileTracer) GetName() string   { return o.Name }
-func (o *fileTracer) GetPath() string   { return o.Path }
+func (o *fileLogger) GetExt() string    { return o.Ext }
+func (o *fileLogger) GetFolder() string { return o.Folder }
+func (o *fileLogger) GetName() string   { return o.Name }
+func (o *fileLogger) GetPath() string   { return o.Path }
 
 // Setter.
 
-func (o *Setter) SetFileTracerExt(s string) *Setter {
-	o.config.FileTracer.Ext = s
+func (o *Setter) SetFileLoggerExt(s string) *Setter {
+	o.config.FileLogger.Ext = s
 	return o
 }
 
-func (o *Setter) SetFileTracerFolder(s string) *Setter {
-	o.config.FileTracer.Folder = s
+func (o *Setter) SetFileLoggerFolder(s string) *Setter {
+	o.config.FileLogger.Folder = s
 	return o
 }
 
-func (o *Setter) SetFileTracerName(s string) *Setter {
-	o.config.FileTracer.Name = s
+func (o *Setter) SetFileLoggerName(s string) *Setter {
+	o.config.FileLogger.Name = s
 	return o
 }
 
-func (o *Setter) SetFileTracerPath(s string) *Setter {
-	o.config.FileTracer.Path = s
+func (o *Setter) SetFileLoggerPath(s string) *Setter {
+	o.config.FileLogger.Path = s
 	return o
 }
 
 // Defaults
 
-func (o *fileTracer) initDefaults() {
+func (o *fileLogger) initDefaults() {
 	if o.Ext == "" {
-		o.Ext = defaultFileTracerExt
+		o.Ext = defaultFileLoggerExt
 	}
 	if o.Folder == "" {
-		o.Folder = defaultFileTracerFolder
+		o.Folder = defaultFileLoggerFolder
 	}
 	if o.Name == "" {
-		o.Name = defaultFileTracerName
+		o.Name = defaultFileLoggerName
 	}
 	if o.Path == "" {
-		o.Path = defaultFileTracerPath
+		o.Path = defaultFileLoggerPath
 	}
 }

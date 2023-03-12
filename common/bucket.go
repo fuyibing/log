@@ -25,9 +25,12 @@ var (
 )
 
 type (
+	// Bucket component used for memory queues. In this package, his role used
+	// to store loggers.Log and tracers.Span components. Async goroutines pop
+	// them then publish to specified adapters (eg. Kafka, Jaeger and so on).
 	Bucket interface {
 		// Add
-		// new item into bucket.
+		// items (loggers.Log / tracers.Span) into memory queue.
 		Add(item interface{}) (total int, err error)
 
 		// Count
@@ -72,10 +75,11 @@ func (o *bucket) Add(item interface{}) (total int, err error) {
 	if item != nil {
 		if total = len(o.caches) + 1; o.capacity > 0 && total > o.capacity {
 			err = ErrBucketIsFull
-		} else {
-			o.caches = append(o.caches, item)
+			return
 		}
 	}
+
+	o.caches = append(o.caches, item)
 	return
 }
 
