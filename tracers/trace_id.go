@@ -22,14 +22,15 @@ import (
 
 type (
 	// TraceId
-	// 链路ID.
+	// component stored as 16-byte array, encoded / decoded as 32 char
+	// string.
 	TraceId [16]byte
 )
 
 // IsValid
-// 校验链路ID.
+// return true if value is not zero string.
 func (o TraceId) IsValid() bool { return !bytes.Equal(o[:], nilTraceId[:]) }
 
 // String
-// 转成16进制字符串.
+// return hex string, 32 chars.
 func (o TraceId) String() string { return hex.EncodeToString(o[:]) }

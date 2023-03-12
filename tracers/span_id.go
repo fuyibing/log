@@ -21,11 +21,16 @@ import (
 )
 
 type (
-	// SpanId component stored as 8-byte array, encoded / decoded as 16 char
+	// SpanId
+	// component stored as 8-byte array, encoded / decoded as 16 char
 	// string.
 	SpanId [8]byte
 )
 
+// IsValid
+// return true if value is not zero string.
 func (o SpanId) IsValid() bool { return !bytes.Equal(o[:], nilSpanId[:]) }
 
+// String
+// return hex string, 16 chars.
 func (o SpanId) String() string { return hex.EncodeToString(o[:]) }

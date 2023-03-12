@@ -22,20 +22,13 @@ import (
 	"sync"
 )
 
-var (
-	// spanLoggerPool
-	// 跨度日志池.
-	spanLoggerPool = sync.Pool{}
-)
+var spanLoggerPool = sync.Pool{}
 
 type (
 	// SpanLogger
-	// 跨度日志.
+	// log component for span.
 	SpanLogger interface {
-		// Add
-		// 添加 Key/Value 键值对.
 		Add(key string, value interface{}) SpanLogger
-
 		Debug(text string, args ...interface{})
 		Error(text string, args ...interface{})
 		Fatal(text string, args ...interface{})
@@ -51,23 +44,24 @@ type (
 	}
 )
 
-func (o *spanLogger) Add(key string, value interface{}) SpanLogger {
+func (o *spanLogger) Add(key string, value interface{}) SpanLogger { return o.add(key, value) }
+func (o *spanLogger) Debug(format string, args ...interface{})     { o.send(common.Debug, format, args...) }
+func (o *spanLogger) Info(format string, args ...interface{})      { o.send(common.Info, format, args...) }
+func (o *spanLogger) Warn(format string, args ...interface{})      { o.send(common.Warn, format, args...) }
+func (o *spanLogger) Error(format string, args ...interface{})     { o.send(common.Error, format, args...) }
+func (o *spanLogger) Fatal(format string, args ...interface{})     { o.send(common.Fatal, format, args...) }
+
+// /////////////////////////////////////////////////////////////////////////////
+// Access and constructor
+// /////////////////////////////////////////////////////////////////////////////
+
+func (o *spanLogger) add(key string, value interface{}) SpanLogger {
 	o.Lock()
 	defer o.Unlock()
 
 	o.kv.Add(key, value)
 	return o
 }
-
-func (o *spanLogger) Debug(format string, args ...interface{}) { o.send(common.Debug, format, args...) }
-func (o *spanLogger) Info(format string, args ...interface{})  { o.send(common.Info, format, args...) }
-func (o *spanLogger) Warn(format string, args ...interface{})  { o.send(common.Warn, format, args...) }
-func (o *spanLogger) Error(format string, args ...interface{}) { o.send(common.Error, format, args...) }
-func (o *spanLogger) Fatal(format string, args ...interface{}) { o.send(common.Fatal, format, args...) }
-
-// /////////////////////////////////////////////////////////////////////////////
-// Access and constructor
-// /////////////////////////////////////////////////////////////////////////////
 
 func (o *spanLogger) after() {
 	o.kv = nil
@@ -80,23 +74,19 @@ func (o *spanLogger) before(span *span) {
 }
 
 func (o *spanLogger) send(level common.Level, format string, args ...interface{}) {
-	// 直推日志.
+	// Push to logger executor.
 	loggers.Operator.Push(o.kv, level, format, args...)
 
-	// 跨度日志.
+	// Push to tracer executor.
 	if configurer.Config.LevelEnabled(level) {
 		log := loggers.NewLog(level, format, args...)
-
-		// 日志属性.
 		if len(o.kv) > 0 {
 			log.SetKv(o.kv)
 		}
-
-		// 加入跨度.
 		o.span.addLog(log)
 	}
 
-	// 释放实例.
+	// Release when ended.
 	o.after()
 }
 

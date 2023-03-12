@@ -26,7 +26,7 @@ import (
 
 type (
 	// Span
-	// 链路跨度.
+	// component for tracer.
 	Span interface {
 		ApplyRequest(req *http.Request)
 		Child(name string) Span
@@ -57,8 +57,7 @@ type (
 	}
 )
 
-// NewSpan 返回 tracers.Span 组件. 此过程先创建 tracers.Trace 组件, 然后基于此组
-// 件创建 tracers.Span 组件并返回.
+// NewSpan returns a Span component.
 func NewSpan(name string) Span {
 	t := (&trace{name: name}).init()
 	t.traceId = Operator.Generator().TraceIdNew()
@@ -66,32 +65,31 @@ func NewSpan(name string) Span {
 	return t.New(name)
 }
 
-// NewSpanFromContext 返回 tracers.Span 组件. 若 context.Context 绑定过
-// tracers.Span 组件则基于此创建子 tracers.Span 并返回, 若绑定过 tracers.Trace
-// 则基于此创建新的 tracers.Span 并返回, 反之则使用和 NewSpan 相同逻辑.
+// NewSpanFromContext returns a Span component, based on specified
+// context.Context.
 func NewSpanFromContext(ctx context.Context, name string) Span {
-	// 复用
+	// Tracer reuse.
 	if g := ctx.Value(ContextKey); g != nil {
-		// 子跨度.
+		// Return child span.
 		if v, ok := g.(Span); ok {
 			return v.Child(name)
 		}
 
-		// 根跨度.
+		// Return root span of a trace.
 		if v, ok := g.(Trace); ok {
 			return v.New(name)
 		}
 	}
 
-	// 新建.
+	// Return new span.
 	t := (&trace{name: name}).init()
 	t.traceId = Operator.Generator().TraceIdNew()
 	t.ctx = context.WithValue(ctx, ContextKey, t)
 	return t.New(name)
 }
 
-// NewSpanFromRequest 返回 tracers.Span 组件. 基于 HTTP 请求创建并返回, 创建
-// 过程同 NewSpan 逻辑, 不同点在于此过程打通服务间链路.
+// NewSpanFromRequest returns a Span component, based on http request
+// and context.Context.
 func NewSpanFromRequest(req *http.Request, name string) Span {
 	t := (&trace{name: name}).init()
 	t.parseRequestField(req)

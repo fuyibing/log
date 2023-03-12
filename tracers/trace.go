@@ -28,36 +28,16 @@ const (
 
 type (
 	// Trace
-	// 跨度组件.
+	// component for tracer.
 	Trace interface {
-		// Context
-		// 上下文.
 		Context() context.Context
-
-		// Kv
-		// 链路Key/Value属性.
 		Kv() loggers.Kv
-
-		// Name
-		// 链路名.
 		Name() string
-
-		// New
-		// 创建跨度.
-		//
-		// 基于 Trace 生成新的链路跨度 Span.
 		New(name string) Span
-
-		// SpanId
-		// 跨度ID.
 		SpanId() SpanId
-
-		// TraceId
-		// 链路ID.
 		TraceId() TraceId
 	}
 
-	// 链路组件.
 	trace struct {
 		ctx  context.Context
 		kv   loggers.Kv
@@ -75,19 +55,9 @@ type (
 func (o *trace) Context() context.Context { return o.ctx }
 func (o *trace) Kv() loggers.Kv           { return o.kv }
 func (o *trace) Name() string             { return o.name }
-
-func (o *trace) New(name string) Span {
-	v := (&span{name: name}).init()
-	v.kv.Copy(o.kv)
-	v.parentSpanId = o.spanId
-	v.trace = o
-
-	v.ctx = context.WithValue(o.ctx, ContextKey, v)
-	return v
-}
-
-func (o *trace) SpanId() SpanId   { return o.spanId }
-func (o *trace) TraceId() TraceId { return o.traceId }
+func (o *trace) New(name string) Span     { return o.new(name) }
+func (o *trace) SpanId() SpanId           { return o.spanId }
+func (o *trace) TraceId() TraceId         { return o.traceId }
 
 // /////////////////////////////////////////////////////////////////////////////
 // Access and constructor
@@ -96,6 +66,16 @@ func (o *trace) TraceId() TraceId { return o.traceId }
 func (o *trace) init() *trace {
 	o.kv = loggers.Kv{}
 	return o
+}
+
+func (o *trace) new(name string) Span {
+	v := (&span{name: name}).init()
+	v.kv.Copy(o.kv)
+	v.parentSpanId = o.spanId
+	v.trace = o
+
+	v.ctx = context.WithValue(o.ctx, ContextKey, v)
+	return v
 }
 
 func (o *trace) parseRequestField(req *http.Request) {
@@ -107,7 +87,7 @@ func (o *trace) parseRequestField(req *http.Request) {
 }
 
 func (o *trace) parseRequestId(req *http.Request) {
-	// 获取 X-B3 Trace id.
+	// Read trace id.
 	//
 	//   {
 	//     "X-B3-Traceid": "trace id"
@@ -118,7 +98,7 @@ func (o *trace) parseRequestId(req *http.Request) {
 		}
 	}
 
-	// 获取 X-B3 Span id.
+	// Read Span id.
 	//
 	//   {
 	//     "X-B3-Spanid": "span id"
